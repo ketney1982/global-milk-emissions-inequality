@@ -1,0 +1,1638 @@
+country,country_m49,year,milk_species,milk_tonnes,species_share
+Bangladesh,50,2023,Raw milk of buffalo,351700.0,0.025
+Bangladesh,50,2020,Raw milk of buffalo,267000.0,0.025
+Bangladesh,50,2021,Raw milk of buffalo,299625.0,0.025
+Bangladesh,50,2022,Raw milk of buffalo,326850.0,0.025
+Brunei Darussalam,96,2021,Raw milk of buffalo,142.74,0.76630697374778545
+Brunei Darussalam,96,2023,Raw milk of buffalo,127.69,0.75364457297999166
+Brunei Darussalam,96,2022,Raw milk of buffalo,137.82,0.75712794594297639
+Brunei Darussalam,96,2020,Raw milk of buffalo,183.04,0.77727292029385531
+Bulgaria,100,2021,Raw milk of buffalo,16580.0,0.01739641369469189
+Bulgaria,100,2022,Raw milk of buffalo,15280.0,0.017591526594519916
+Bulgaria,100,2023,Raw milk of buffalo,16880.0,0.020691853195714531
+Bulgaria,100,2020,Raw milk of buffalo,15930.0,0.015843652096076383
+China,159,2020,Raw milk of buffalo,3039265.29,0.077264431135509529
+China,159,2022,Raw milk of buffalo,3202196.39,0.071899625392649991
+China,159,2023,Raw milk of buffalo,3274849.21,0.069288635300685811
+China,159,2021,Raw milk of buffalo,3103707.73,0.074073492138271121
+"China, mainland",156,2021,Raw milk of buffalo,3103707.73,0.074898566479299489
+"China, mainland",156,2020,Raw milk of buffalo,3039265.29,0.078159391056025262
+"China, mainland",156,2022,Raw milk of buffalo,3202196.39,0.072674052030546693
+"China, mainland",156,2023,Raw milk of buffalo,3274849.21,0.070005079924333885
+Egypt,818,2021,Raw milk of buffalo,1337000.0,0.21686942416869423
+Egypt,818,2023,Raw milk of buffalo,1157000.0,0.20537246341088983
+Egypt,818,2020,Raw milk of buffalo,1265000.0,0.22678379347436356
+Egypt,818,2022,Raw milk of buffalo,1471000.0,0.21932309527359475
+Germany,276,2020,Raw milk of buffalo,1000.0,3.0130564776345338e-05
+Greece,300,2020,Raw milk of buffalo,90.0,4.521863208613647e-05
+India,356,2023,Raw milk of buffalo,104388290.0,0.43621091779671162
+India,356,2022,Raw milk of buffalo,103299834.0,0.44799020127195593
+India,356,2021,Raw milk of buffalo,99626360.0,0.44861267663728221
+India,356,2020,Raw milk of buffalo,95391341.85,0.45431603826163941
+Indonesia,360,2022,Raw milk of buffalo,87795.06,0.056430105360613388
+Indonesia,360,2020,Raw milk of buffalo,91233.29,0.058536384212630868
+Indonesia,360,2023,Raw milk of buffalo,84000.0,0.061176944341121357
+Indonesia,360,2021,Raw milk of buffalo,90716.53,0.058538620993507443
+Iran (Islamic Republic of),364,2022,Raw milk of buffalo,117678.19,0.01411803266426254
+Iran (Islamic Republic of),364,2021,Raw milk of buffalo,122512.22,0.01393568732117526
+Iran (Islamic Republic of),364,2020,Raw milk of buffalo,108003.25,0.01294377653338164
+Iran (Islamic Republic of),364,2023,Raw milk of buffalo,102601.86,0.012103281273133391
+Iraq,368,2022,Raw milk of buffalo,40369.0,0.11383445798284968
+Iraq,368,2020,Raw milk of buffalo,37737.0,0.11058461538461538
+Iraq,368,2023,Raw milk of buffalo,43002.0,0.11847684436448394
+Iraq,368,2021,Raw milk of buffalo,39393.09,0.11300518520868691
+Italy,380,2023,Raw milk of buffalo,254280.0,0.018369912297178194
+Italy,380,2022,Raw milk of buffalo,254450.0,0.018211826915713131
+Italy,380,2021,Raw milk of buffalo,257460.0,0.018392666936705823
+Italy,380,2020,Raw milk of buffalo,253830.0,0.018788972517158272
+Malaysia,458,2021,Raw milk of buffalo,5859.93,0.13142147932565174
+Malaysia,458,2020,Raw milk of buffalo,5728.8,0.12058981402544915
+Malaysia,458,2023,Raw milk of buffalo,6188.68,0.13366317815594456
+Malaysia,458,2022,Raw milk of buffalo,6068.08,0.13478832314918945
+Myanmar,104,2023,Raw milk of buffalo,330000.0,0.14716441334017044
+Myanmar,104,2022,Raw milk of buffalo,328000.0,0.14920042966630565
+Myanmar,104,2021,Raw milk of buffalo,316000.0,0.14919752224086519
+Myanmar,104,2020,Raw milk of buffalo,313000.0,0.14927730136857048
+Nepal,524,2023,Raw milk of buffalo,1399797.09,0.50521828629803145
+Nepal,524,2021,Raw milk of buffalo,1419412.0,0.53888505533538489
+Nepal,524,2020,Raw milk of buffalo,1380600.0,0.56324935525879294
+Nepal,524,2022,Raw milk of buffalo,1464802.0,0.53775383415702471
+Netherlands (Kingdom of the),528,2023,Raw milk of buffalo,4490.0,0.0002970156214340761
+Netherlands (Kingdom of the),528,2022,Raw milk of buffalo,4950.0,0.00033035436011027828
+Pakistan,586,2023,Raw milk of buffalo,38644100.0,0.59837678098466207
+Pakistan,586,2022,Raw milk of buffalo,37527850.0,0.59988938256448621
+Pakistan,586,2021,Raw milk of buffalo,36444850.0,0.60142001386184363
+Pakistan,586,2020,Raw milk of buffalo,35393200.0,0.602932107703682
+Romania,642,2022,Raw milk of buffalo,14100.0,0.0033083835847861282
+Romania,642,2020,Raw milk of buffalo,16100.0,0.00369054441260745
+Romania,642,2023,Raw milk of buffalo,19300.0,0.0044692478695813262
+Romania,642,2021,Raw milk of buffalo,15200.0,0.0035351303579319489
+Sri Lanka,144,2021,Raw milk of buffalo,90570.0,0.16617181152538843
+Sri Lanka,144,2020,Raw milk of buffalo,80240.0,0.15376947253985562
+Sri Lanka,144,2023,Raw milk of buffalo,95850.0,0.17904985889432742
+Sri Lanka,144,2022,Raw milk of buffalo,89870.0,0.16701156745122769
+Türkiye,792,2022,Raw milk of buffalo,43588.65,0.0020214096027609558
+Türkiye,792,2023,Raw milk of buffalo,43024.89,0.0020028748331015612
+Türkiye,792,2021,Raw milk of buffalo,63642.85,0.0027431900995478673
+Türkiye,792,2020,Raw milk of buffalo,63766.74,0.0027130406924900396
+Viet Nam,704,2022,Raw milk of buffalo,26477.18,0.022345173525123503
+Viet Nam,704,2021,Raw milk of buffalo,26666.49,0.023607302527139822
+Viet Nam,704,2020,Raw milk of buffalo,27107.5,0.024467737022035179
+Viet Nam,704,2023,Raw milk of buffalo,25852.36,0.020742516550535758
+Afghanistan,4,2022,Raw milk of camel,6850.27,0.0031190902115432952
+Afghanistan,4,2021,Raw milk of camel,6854.96,0.0031711378089422128
+Afghanistan,4,2020,Raw milk of camel,6873.29,0.0031371321257881858
+Afghanistan,4,2023,Raw milk of camel,6833.49,0.0030787967769755637
+Algeria,12,2023,Raw milk of camel,15290.15,0.0046149965991370305
+Algeria,12,2022,Raw milk of camel,15243.26,0.0045901834811361963
+Algeria,12,2021,Raw milk of camel,15003.09,0.0045974940195014765
+Algeria,12,2020,Raw milk of camel,14717.59,0.0043875887831396612
+Burkina Faso,854,2021,Raw milk of camel,270.0,0.000631010668754455
+Burkina Faso,854,2023,Raw milk of camel,265.64,0.00060247900469307194
+Burkina Faso,854,2022,Raw milk of camel,266.91,0.0006134241360093069
+Burkina Faso,854,2020,Raw milk of camel,260.0,0.00061740854635907057
+Chad,148,2020,Raw milk of camel,31771.82,0.075014399366109152
+Chad,148,2023,Raw milk of camel,35332.39,0.075288358560578847
+Chad,148,2022,Raw milk of camel,34103.27,0.075197320568448689
+Chad,148,2021,Raw milk of camel,32916.91,0.075617172847725678
+China,159,2022,Raw milk of camel,20567.77,0.00046181269917744947
+China,159,2021,Raw milk of camel,18611.08,0.00044417445455301782
+China,159,2020,Raw milk of camel,17301.75,0.00043984639175700317
+China,159,2023,Raw milk of camel,21479.93,0.0004544682642210144
+"China, mainland",156,2022,Raw milk of camel,20567.77,0.0004667868566088532
+"China, mainland",156,2023,Raw milk of camel,21479.93,0.00045916746695616478
+"China, mainland",156,2021,Raw milk of camel,18611.08,0.00044912193218385325
+"China, mainland",156,2020,Raw milk of camel,17301.75,0.00044494116675270064
+Djibouti,262,2020,Raw milk of camel,6077.38,0.40173375251522353
+Djibouti,262,2022,Raw milk of camel,6117.98,0.40133533979792785
+Djibouti,262,2021,Raw milk of camel,6108.71,0.40165574975573382
+Djibouti,262,2023,Raw milk of camel,6129.53,0.40087728878915962
+Eritrea,232,2022,Raw milk of camel,12443.18,0.084201586902555817
+Eritrea,232,2021,Raw milk of camel,12345.42,0.083615524717486331
+Eritrea,232,2023,Raw milk of camel,12388.7,0.083831429312099415
+Eritrea,232,2020,Raw milk of camel,12316.53,0.083499996203476312
+Ethiopia,231,2020,Raw milk of camel,243429.0,0.064061820365880845
+Ethiopia,231,2022,Raw milk of camel,220446.0,0.052525018397790363
+Ethiopia,231,2021,Raw milk of camel,235877.0,0.062233734055730495
+Ethiopia,231,2023,Raw milk of camel,233250.67,0.061644126454164581
+India,356,2023,Raw milk of camel,7929.23,3.3134144603012654e-05
+India,356,2022,Raw milk of camel,8000.0,3.4694359820323117e-05
+India,356,2020,Raw milk of camel,7045.92,3.3557285160555173e-05
+India,356,2021,Raw milk of camel,8000.0,3.602361275769041e-05
+Iraq,368,2023,Raw milk of camel,431.0,0.0011874684880027111
+Iraq,368,2022,Raw milk of camel,411.0,0.00115895767125644
+Iraq,368,2020,Raw milk of camel,353.0,0.0010344322344322345
+Iraq,368,2021,Raw milk of camel,372.1,0.0010674265313066937
+Kazakhstan,398,2020,Raw milk of camel,16952.21,0.0053623523936049489
+Kazakhstan,398,2023,Raw milk of camel,18168.2,0.0052816401882113048
+Kazakhstan,398,2022,Raw milk of camel,17169.2,0.0051608515807895919
+Kazakhstan,398,2021,Raw milk of camel,17727.22,0.0054313363716187533
+Kenya,404,2020,Raw milk of camel,1074325.28,0.19156843576747642
+Kenya,404,2022,Raw milk of camel,850228.57,0.14356600058929986
+Kenya,404,2023,Raw milk of camel,1006991.58,0.16594828202771603
+Kenya,404,2021,Raw milk of camel,1031414.43,0.16747741526637777
+Libya,434,2021,Raw milk of camel,2213.23,0.010111391928539578
+Libya,434,2023,Raw milk of camel,2227.01,0.009823834341341554
+Libya,434,2022,Raw milk of camel,2347.32,0.010281551716601098
+Libya,434,2020,Raw milk of camel,2010.93,0.0087901027428741625
+Mali,466,2023,Raw milk of camel,293333.0,0.26328246590637783
+Mali,466,2021,Raw milk of camel,281943.0,0.27174993180782048
+Mali,466,2020,Raw milk of camel,270995.0,0.2720808747712119
+Mali,466,2022,Raw milk of camel,287580.0,0.26750333937335125
+Mauritania,478,2020,Raw milk of camel,26366.15,0.074048763442395818
+Mauritania,478,2023,Raw milk of camel,26751.86,0.073806187226684347
+Mauritania,478,2022,Raw milk of camel,26628.74,0.07385080505207782
+Mauritania,478,2021,Raw milk of camel,26528.53,0.073299740684690667
+Mongolia,496,2022,Raw milk of camel,1426.96,0.0069247881414022184
+Mongolia,496,2023,Raw milk of camel,945.55,0.00377411478936903
+Mongolia,496,2020,Raw milk of camel,1452.66,0.0077073317116382167
+Mongolia,496,2021,Raw milk of camel,1032.95,0.0058943540254195338
+Morocco,504,2023,Raw milk of camel,8770.46,0.004285343506723163
+Morocco,504,2022,Raw milk of camel,8708.65,0.0040481505042453229
+Morocco,504,2021,Raw milk of camel,8687.49,0.0032563570497454383
+Morocco,504,2020,Raw milk of camel,8605.56,0.0031666549711058317
+Niger,562,2021,Raw milk of camel,105495.16,0.071113967484663115
+Niger,562,2022,Raw milk of camel,108334.95,0.069200728881038925
+Niger,562,2020,Raw milk of camel,112001.81,0.074126103433601959
+Niger,562,2023,Raw milk of camel,109743.55,0.066843814709262719
+Pakistan,586,2023,Raw milk of camel,956000.0,0.014802989398675009
+Pakistan,586,2022,Raw milk of camel,944000.0,0.015090008544077931
+Pakistan,586,2021,Raw milk of camel,932000.0,0.015380045546057626
+Pakistan,586,2020,Raw milk of camel,920000.0,0.015672432531881476
+Qatar,634,2023,Raw milk of camel,16261.68,0.36929952752257639
+Qatar,634,2021,Raw milk of camel,18255.28,0.38840004825405633
+Qatar,634,2020,Raw milk of camel,18892.04,0.38278554714085616
+Qatar,634,2022,Raw milk of camel,16930.79,0.38041931801840673
+Russian Federation,643,2022,Raw milk of camel,28.67,8.6936859936143521e-07
+Russian Federation,643,2021,Raw milk of camel,28.83,8.916509875654946e-07
+Russian Federation,643,2023,Raw milk of camel,28.45,8.41599734725397e-07
+Russian Federation,643,2020,Raw milk of camel,28.79,8.9356751778271288e-07
+Senegal,686,2020,Raw milk of camel,540.08,0.0021852037896340792
+Senegal,686,2022,Raw milk of camel,546.31,0.0021766654183840509
+Senegal,686,2023,Raw milk of camel,245.5,0.00095363211475593234
+Senegal,686,2021,Raw milk of camel,540.83,0.0021751985854593066
+Somalia,706,2020,Raw milk of camel,986195.2,0.44610598043260719
+Somalia,706,2021,Raw milk of camel,989565.3,0.45039972306181925
+Somalia,706,2023,Raw milk of camel,996469.74,0.460587561916704
+Somalia,706,2022,Raw milk of camel,992637.39,0.45500078781019326
+Sudan,729,2020,Raw milk of camel,63016.39,0.0135366582265787
+Sudan,729,2022,Raw milk of camel,60306.34,0.013547289930203592
+Sudan,729,2023,Raw milk of camel,60907.57,0.013500473992823848
+Sudan,729,2021,Raw milk of camel,61241.72,0.013496828403826837
+Tunisia,788,2021,Raw milk of camel,1105.02,0.00076605134838680412
+Tunisia,788,2022,Raw milk of camel,1106.25,0.00078329221317687187
+Tunisia,788,2023,Raw milk of camel,1107.54,0.00077857093071577043
+Tunisia,788,2020,Raw milk of camel,1103.66,0.00078122633124743941
+Turkmenistan,795,2021,Raw milk of camel,12428.08,0.0050010596198482764
+Turkmenistan,795,2023,Raw milk of camel,10401.0,0.003986215382832373
+Turkmenistan,795,2022,Raw milk of camel,10400.49,0.0041627770216600768
+Turkmenistan,795,2020,Raw milk of camel,12140.41,0.004927414552395243
+Yemen,887,2023,Raw milk of camel,3480.0,0.0080153858556078917
+Yemen,887,2021,Raw milk of camel,3208.64,0.0078726892634845783
+Yemen,887,2022,Raw milk of camel,3369.0,0.0078725253771521515
+Yemen,887,2020,Raw milk of camel,3055.85,0.007872695156006684
+Afghanistan,4,2023,Raw milk of cattle,1902352.02,0.85709575456303488
+Afghanistan,4,2021,Raw milk of cattle,1841535.8,0.85190341036280959
+Afghanistan,4,2022,Raw milk of cattle,1876786.33,0.85454527647249878
+Afghanistan,4,2020,Raw milk of cattle,1868866.61,0.85299492398019883
+Albania,8,2023,Raw milk of cattle,788307.0,0.84984880091851422
+Albania,8,2022,Raw milk of cattle,849690.26,0.85030840019460541
+Albania,8,2020,Raw milk of cattle,924270.0,0.85283642134789994
+Albania,8,2021,Raw milk of cattle,885160.0,0.8483338285046147
+Algeria,12,2020,Raw milk of cattle,2414552.0,0.71982310089542068
+Algeria,12,2023,Raw milk of cattle,2419276.56,0.73020559620225667
+Algeria,12,2022,Raw milk of cattle,2433986.67,0.73294330779240779
+Algeria,12,2021,Raw milk of cattle,2409291.0,0.73829464221961827
+Angola,24,2023,Raw milk of cattle,220646.99,1.0
+Angola,24,2021,Raw milk of cattle,219526.96,1.0
+Angola,24,2020,Raw milk of cattle,213047.39,1.0
+Angola,24,2022,Raw milk of cattle,219434.93,1.0
+Antigua and Barbuda,28,2020,Raw milk of cattle,2936.13,1.0
+Antigua and Barbuda,28,2021,Raw milk of cattle,2933.46,1.0
+Antigua and Barbuda,28,2022,Raw milk of cattle,2904.27,1.0
+Antigua and Barbuda,28,2023,Raw milk of cattle,2877.18,1.0
+Argentina,32,2023,Raw milk of cattle,11665405.0,1.0
+Argentina,32,2020,Raw milk of cattle,11446583.21,1.0
+Argentina,32,2021,Raw milk of cattle,11899905.14,1.0
+Argentina,32,2022,Raw milk of cattle,11904142.0,1.0
+Armenia,51,2020,Raw milk of cattle,605400.0,0.92526364053186616
+Armenia,51,2023,Raw milk of cattle,557000.0,0.94151453684922248
+Armenia,51,2021,Raw milk of cattle,647000.0,0.96466378410615772
+Armenia,51,2022,Raw milk of cattle,607000.0,0.97416145081046379
+Australia,36,2020,Raw milk of cattle,9099000.0,1.0
+Australia,36,2023,Raw milk of cattle,8467000.0,1.0
+Australia,36,2022,Raw milk of cattle,8450000.0,1.0
+Australia,36,2021,Raw milk of cattle,9067000.0,1.0
+Austria,40,2022,Raw milk of cattle,3942500.0,0.99050322839986937
+Austria,40,2020,Raw milk of cattle,3815470.0,0.99044976195791556
+Austria,40,2021,Raw milk of cattle,3830140.0,0.99034257360717159
+Austria,40,2023,Raw milk of cattle,3678790.0,0.98972819258697275
+Azerbaijan,31,2020,Raw milk of cattle,2156882.0,0.98375551539841766
+Azerbaijan,31,2022,Raw milk of cattle,2229118.0,0.98429755386966544
+Azerbaijan,31,2023,Raw milk of cattle,2249686.0,0.98498066979277488
+Azerbaijan,31,2021,Raw milk of cattle,2187782.0,0.98396888405550709
+Bahamas,44,2021,Raw milk of cattle,682.19,0.33153518299824558
+Bahamas,44,2023,Raw milk of cattle,683.83,0.3315555469359851
+Bahamas,44,2020,Raw milk of cattle,685.28,0.33340144593319126
+Bahamas,44,2022,Raw milk of cattle,683.56,0.33190902557927243
+Bahrain,48,2021,Raw milk of cattle,10000.0,0.95429772753082143
+Bahrain,48,2020,Raw milk of cattle,10000.0,0.95640788500916707
+Bahrain,48,2023,Raw milk of cattle,10528.33,0.95620469114139728
+Bahrain,48,2022,Raw milk of cattle,10765.88,0.957494797132642
+Bangladesh,50,2023,Raw milk of cattle,12661200.0,0.9
+Bangladesh,50,2022,Raw milk of cattle,11766600.0,0.9
+Bangladesh,50,2021,Raw milk of cattle,10786500.0,0.9
+Bangladesh,50,2020,Raw milk of cattle,9612000.0,0.9
+Barbados,52,2021,Raw milk of cattle,4341.0,1.0
+Barbados,52,2020,Raw milk of cattle,3978.0,1.0
+Barbados,52,2023,Raw milk of cattle,4119.33,1.0
+Barbados,52,2022,Raw milk of cattle,4039.0,1.0
+Belarus,112,2022,Raw milk of cattle,7869000.0,0.99788553520697287
+Belarus,112,2020,Raw milk of cattle,7751800.0,0.99826149665821029
+Belarus,112,2023,Raw milk of cattle,8331000.0,0.998048505490409
+Belarus,112,2021,Raw milk of cattle,7811000.0,0.99783322769344107
+Belgium,56,2020,Raw milk of cattle,4457000.0,1.0
+Belgium,56,2021,Raw milk of cattle,4438000.0,1.0
+Belgium,56,2022,Raw milk of cattle,4572000.0,0.99003897791251627
+Belgium,56,2023,Raw milk of cattle,4627000.0,1.0
+Belize,84,2023,Raw milk of cattle,6525.0,1.0
+Belize,84,2020,Raw milk of cattle,4522.0,1.0
+Belize,84,2022,Raw milk of cattle,5465.0,1.0
+Belize,84,2021,Raw milk of cattle,5739.0,1.0
+Benin,204,2020,Raw milk of cattle,95994.71,0.74571636140587094
+Benin,204,2021,Raw milk of cattle,104897.49,0.74024509685269746
+Benin,204,2022,Raw milk of cattle,114625.95,0.75357388286104177
+Benin,204,2023,Raw milk of cattle,136873.0,0.78193451511953527
+Bhutan,64,2021,Raw milk of cattle,54403.0,1.0
+Bhutan,64,2023,Raw milk of cattle,43829.0,1.0
+Bhutan,64,2020,Raw milk of cattle,57912.0,1.0
+Bhutan,64,2022,Raw milk of cattle,42255.0,1.0
+Bolivia (Plurinational State of),68,2021,Raw milk of cattle,560096.49,0.90113002026565781
+Bolivia (Plurinational State of),68,2020,Raw milk of cattle,558780.15,0.90159973645503588
+Bolivia (Plurinational State of),68,2022,Raw milk of cattle,569107.0,0.90307459715410432
+Bolivia (Plurinational State of),68,2023,Raw milk of cattle,576574.0,0.90469684204669487
+Bosnia and Herzegovina,70,2023,Raw milk of cattle,580214.0,0.99458152989072213
+Bosnia and Herzegovina,70,2022,Raw milk of cattle,560269.0,0.97689190650053526
+Bosnia and Herzegovina,70,2021,Raw milk of cattle,539510.0,0.98824387098665023
+Bosnia and Herzegovina,70,2020,Raw milk of cattle,629133.0,0.975375804631203
+Botswana,72,2023,Raw milk of cattle,27000.0,0.79058327477160928
+Botswana,72,2021,Raw milk of cattle,23111.54,0.66638755798064864
+Botswana,72,2020,Raw milk of cattle,23363.38,0.66638239225191542
+Botswana,72,2022,Raw milk of cattle,27000.0,0.70418053728453378
+Brazil,76,2020,Raw milk of cattle,36376167.01,0.99914851930139237
+Brazil,76,2021,Raw milk of cattle,36238557.98,0.99914528872899155
+Brazil,76,2023,Raw milk of cattle,36305658.36,0.99909187621422135
+Brazil,76,2022,Raw milk of cattle,35590786.0,0.99910834174513541
+Brunei Darussalam,96,2022,Raw milk of cattle,44.21,0.24287205405702358
+Brunei Darussalam,96,2021,Raw milk of cattle,43.53,0.23369302625221453
+Brunei Darussalam,96,2023,Raw milk of cattle,41.74,0.24635542702000826
+Brunei Darussalam,96,2020,Raw milk of cattle,52.45,0.22272707970614464
+Bulgaria,100,2020,Raw milk of cattle,881760.0,0.87698045651200951
+Bulgaria,100,2021,Raw milk of cattle,835780.0,0.87693453786185693
+Bulgaria,100,2022,Raw milk of cattle,770730.0,0.88732443011743034
+Bulgaria,100,2023,Raw milk of cattle,726790.0,0.8909142170683273
+Burkina Faso,854,2022,Raw milk of cattle,225235.0,0.51764484385769072
+Burkina Faso,854,2020,Raw milk of cattle,216287.0,0.51360554717832418
+Burkina Faso,854,2023,Raw milk of cattle,229847.56,0.52130074228252954
+Burkina Faso,854,2021,Raw milk of cattle,220716.0,0.51583018801780856
+Burundi,108,2021,Raw milk of cattle,53815.0,0.48199739937257491
+Burundi,108,2023,Raw milk of cattle,36494.0,0.37340662174136363
+Burundi,108,2022,Raw milk of cattle,31376.0,0.34521445688961727
+Burundi,108,2020,Raw milk of cattle,62001.0,0.57650363437836571
+Cabo Verde,132,2023,Raw milk of cattle,4602.04,0.44084854464726192
+Cabo Verde,132,2020,Raw milk of cattle,4572.17,0.45976178146038327
+Cabo Verde,132,2021,Raw milk of cattle,4573.2,0.45269168026101142
+Cabo Verde,132,2022,Raw milk of cattle,4592.77,0.44715202567188123
+Cambodia,116,2021,Raw milk of cattle,24390.45,1.0
+Cambodia,116,2023,Raw milk of cattle,24329.01,1.0
+Cambodia,116,2022,Raw milk of cattle,24337.99,1.0
+Cambodia,116,2020,Raw milk of cattle,24275.57,1.0
+Cameroon,120,2020,Raw milk of cattle,188000.0,0.70860577592106322
+Cameroon,120,2023,Raw milk of cattle,204740.74,0.7231948892622867
+Cameroon,120,2022,Raw milk of cattle,205555.56,0.72467092439420666
+Cameroon,120,2021,Raw milk of cattle,220666.67,0.739721579975545
+Canada,124,2020,Raw milk of cattle,9640572.0,1.0
+Canada,124,2021,Raw milk of cattle,9807240.0,1.0
+Canada,124,2022,Raw milk of cattle,9742541.0,1.0
+Canada,124,2023,Raw milk of cattle,9886559.0,1.0
+Chad,148,2020,Raw milk of cattle,238749.12,0.56369518132694685
+Chad,148,2022,Raw milk of cattle,254860.38,0.561964224986538
+Chad,148,2021,Raw milk of cattle,243710.53,0.55985514046794882
+Chad,148,2023,Raw milk of cattle,263319.24,0.56109630163765067
+Chile,152,2021,Raw milk of cattle,2336542.01,0.99654564634607223
+Chile,152,2020,Raw milk of cattle,2343640.37,0.99654516126170978
+Chile,152,2022,Raw milk of cattle,2284942.0,0.9964857612416641
+Chile,152,2023,Raw milk of cattle,2224325.0,0.99636645458061945
+China,159,2021,Raw milk of cattle,37276274.0,0.88964040086436891
+China,159,2023,Raw milk of cattle,42439009.0,0.89791646227385324
+China,159,2022,Raw milk of cattle,39779455.0,0.89317692123929271
+China,159,2020,Raw milk of cattle,34837214.58,0.88563429317135334
+"China, Hong Kong SAR",344,2023,Raw milk of cattle,60.0,1.0
+"China, Hong Kong SAR",344,2020,Raw milk of cattle,60.0,1.0
+"China, Hong Kong SAR",344,2021,Raw milk of cattle,60.0,1.0
+"China, Hong Kong SAR",344,2022,Raw milk of cattle,60.0,1.0
+"China, Taiwan Province of",158,2022,Raw milk of cattle,463095.0,0.97589424572317263
+"China, Taiwan Province of",158,2021,Raw milk of cattle,449214.0,0.97335702368312715
+"China, Taiwan Province of",158,2023,Raw milk of cattle,472449.0,0.97684674979892361
+"China, Taiwan Province of",158,2020,Raw milk of cattle,437154.58,0.97069204655045216
+"China, mainland",156,2023,Raw milk of cattle,41966500.0,0.89710029325122975
+"China, mainland",156,2021,Raw milk of cattle,36827000.0,0.88870787705682652
+"China, mainland",156,2020,Raw milk of cattle,34400000.0,0.88464901737066493
+"China, mainland",156,2022,Raw milk of cattle,39316300.0,0.8922859449755931
+Colombia,170,2022,Raw milk of cattle,7421000.0,1.0
+Colombia,170,2021,Raw milk of cattle,6992670.0,1.0
+Colombia,170,2023,Raw milk of cattle,7309000.0,1.0
+Colombia,170,2020,Raw milk of cattle,7071404.0,1.0
+Comoros,174,2021,Raw milk of cattle,13074.2,1.0
+Comoros,174,2020,Raw milk of cattle,13049.92,1.0
+Comoros,174,2022,Raw milk of cattle,13064.29,1.0
+Comoros,174,2023,Raw milk of cattle,13091.28,1.0
+Congo,178,2022,Raw milk of cattle,4463.49,1.0
+Congo,178,2021,Raw milk of cattle,4470.23,1.0
+Congo,178,2023,Raw milk of cattle,4464.75,1.0
+Congo,178,2020,Raw milk of cattle,4456.09,1.0
+Costa Rica,188,2022,Raw milk of cattle,1219694.0,0.98598658560146935
+Costa Rica,188,2023,Raw milk of cattle,1374094.0,0.98805632358376838
+Costa Rica,188,2020,Raw milk of cattle,1201444.0,0.98725506469431057
+Costa Rica,188,2021,Raw milk of cattle,1202445.5,0.98720637489188467
+Croatia,191,2022,Raw milk of cattle,522000.0,0.97570093457943929
+Croatia,191,2023,Raw milk of cattle,468000.0,0.97703549060542794
+Croatia,191,2021,Raw milk of cattle,558000.0,0.97894736842105268
+Croatia,191,2020,Raw milk of cattle,596000.0,0.97385620915032678
+Cuba,192,2022,Raw milk of cattle,369600.0,0.99273178514447791
+Cuba,192,2020,Raw milk of cattle,455337.0,0.9919093956880608
+Cuba,192,2021,Raw milk of cattle,374200.0,0.9925176581675822
+Cuba,192,2023,Raw milk of cattle,230800.0,0.98822521943909225
+Cyprus,196,2020,Raw milk of cattle,275160.0,0.79205526770293611
+Cyprus,196,2023,Raw milk of cattle,303910.0,1.0
+Cyprus,196,2022,Raw milk of cattle,286750.0,0.78297791005652184
+Cyprus,196,2021,Raw milk of cattle,298140.0,0.77904363731382287
+Czechia,203,2020,Raw milk of cattle,3267730.0,1.0
+Czechia,203,2022,Raw milk of cattle,3339160.0,0.999805378150254
+Czechia,203,2021,Raw milk of cattle,3309910.0,1.0
+Czechia,203,2023,Raw milk of cattle,3475280.0,1.0
+Côte d'Ivoire,384,2020,Raw milk of cattle,34668.11,1.0
+Côte d'Ivoire,384,2021,Raw milk of cattle,35759.69,1.0
+Côte d'Ivoire,384,2023,Raw milk of cattle,37805.47,1.0
+Côte d'Ivoire,384,2022,Raw milk of cattle,36768.92,1.0
+Democratic People's Republic of Korea,408,2023,Raw milk of cattle,84177.87,1.0
+Democratic People's Republic of Korea,408,2022,Raw milk of cattle,83833.67,1.0
+Democratic People's Republic of Korea,408,2020,Raw milk of cattle,84911.33,1.0
+Democratic People's Republic of Korea,408,2021,Raw milk of cattle,84724.96,1.0
+Democratic Republic of the Congo,180,2020,Raw milk of cattle,8370.62,1.0
+Democratic Republic of the Congo,180,2022,Raw milk of cattle,9318.52,1.0
+Democratic Republic of the Congo,180,2023,Raw milk of cattle,9831.99,1.0
+Democratic Republic of the Congo,180,2021,Raw milk of cattle,8831.86,1.0
+Denmark,208,2022,Raw milk of cattle,5664000.0,1.0
+Denmark,208,2021,Raw milk of cattle,5644000.0,1.0
+Denmark,208,2020,Raw milk of cattle,5666000.0,1.0
+Denmark,208,2023,Raw milk of cattle,5687000.0,1.0
+Djibouti,262,2023,Raw milk of cattle,9160.76,0.59912271121084038
+Djibouti,262,2022,Raw milk of cattle,9126.08,0.59866466020207221
+Djibouti,262,2021,Raw milk of cattle,9100.11,0.59834425024426618
+Djibouti,262,2020,Raw milk of cattle,9050.5,0.59826624748477641
+Dominica,212,2021,Raw milk of cattle,6980.04,1.0
+Dominica,212,2020,Raw milk of cattle,6975.9,1.0
+Dominica,212,2023,Raw milk of cattle,6990.94,1.0
+Dominica,212,2022,Raw milk of cattle,6985.2,1.0
+Dominican Republic,214,2023,Raw milk of cattle,862164.34,1.0
+Dominican Republic,214,2020,Raw milk of cattle,891531.27,1.0
+Dominican Republic,214,2022,Raw milk of cattle,860770.65,1.0
+Dominican Republic,214,2021,Raw milk of cattle,861564.88,1.0
+Ecuador,218,2021,Raw milk of cattle,2145000.0,0.99751199117535327
+Ecuador,218,2023,Raw milk of cattle,2100200.0,0.997568880653998
+Ecuador,218,2022,Raw milk of cattle,2071000.0,0.99759257933703
+Ecuador,218,2020,Raw milk of cattle,2315400.0,0.99802378875951081
+Egypt,818,2020,Raw milk of cattle,4281000.0,0.76747938329150234
+Egypt,818,2023,Raw milk of cattle,4445000.0,0.7890065685923987
+Egypt,818,2021,Raw milk of cattle,4794000.0,0.7776155717761557
+Egypt,818,2022,Raw milk of cattle,5207000.0,0.77635306396302373
+El Salvador,222,2022,Raw milk of cattle,421000.0,1.0
+El Salvador,222,2023,Raw milk of cattle,416980.47,1.0
+El Salvador,222,2021,Raw milk of cattle,419550.0,1.0
+El Salvador,222,2020,Raw milk of cattle,410391.4,1.0
+Eritrea,232,2022,Raw milk of cattle,120000.0,0.81202638138375383
+Eritrea,232,2020,Raw milk of cattle,120000.0,0.813540789850482
+Eritrea,232,2023,Raw milk of cattle,120000.0,0.81201187513233253
+Eritrea,232,2021,Raw milk of cattle,120000.0,0.81275995195775919
+Estonia,233,2022,Raw milk of cattle,848100.0,0.99941079424935186
+Estonia,233,2021,Raw milk of cattle,838700.0,0.9991660710030974
+Estonia,233,2020,Raw milk of cattle,848300.0,0.99917550058892812
+Estonia,233,2023,Raw milk of cattle,894200.0,0.9994411534592601
+Eswatini,748,2022,Raw milk of cattle,38159.18,1.0
+Eswatini,748,2021,Raw milk of cattle,37870.75,1.0
+Eswatini,748,2023,Raw milk of cattle,40575.2,1.0
+Eswatini,748,2020,Raw milk of cattle,37591.02,1.0
+Ethiopia,231,2021,Raw milk of cattle,3439666.97,0.907520951391023
+Ethiopia,231,2020,Raw milk of cattle,3438252.69,0.90482533387265518
+Ethiopia,231,2022,Raw milk of cattle,3866052.0,0.921152810333661
+Ethiopia,231,2023,Raw milk of cattle,3442497.27,0.90979261508657761
+Faroe Islands,234,2020,Raw milk of cattle,7556.0,1.0
+Faroe Islands,234,2023,Raw milk of cattle,7030.0,1.0
+Faroe Islands,234,2021,Raw milk of cattle,7763.0,1.0
+Faroe Islands,234,2022,Raw milk of cattle,7200.0,1.0
+Fiji,242,2020,Raw milk of cattle,12393.0,1.0
+Fiji,242,2022,Raw milk of cattle,13904.0,1.0
+Fiji,242,2021,Raw milk of cattle,11399.0,1.0
+Fiji,242,2023,Raw milk of cattle,12737.0,1.0
+Finland,246,2022,Raw milk of cattle,2258630.0,1.0
+Finland,246,2020,Raw milk of cattle,2406520.0,1.0
+Finland,246,2021,Raw milk of cattle,2314850.0,1.0
+Finland,246,2023,Raw milk of cattle,2239000.0,1.0
+France,250,2022,Raw milk of cattle,24606350.0,0.95813374120087813
+France,250,2020,Raw milk of cattle,25234840.0,0.95991862607708611
+France,250,2021,Raw milk of cattle,24760620.0,0.95863344726176847
+France,250,2023,Raw milk of cattle,23993580.0,0.95780842697750546
+French Polynesia,258,2023,Raw milk of cattle,529.59,1.0
+French Polynesia,258,2021,Raw milk of cattle,784.1,1.0
+French Polynesia,258,2022,Raw milk of cattle,632.72,1.0
+French Polynesia,258,2020,Raw milk of cattle,800.0,1.0
+Gabon,266,2022,Raw milk of cattle,10664.25,1.0
+Gabon,266,2023,Raw milk of cattle,10699.44,1.0
+Gabon,266,2020,Raw milk of cattle,10533.63,1.0
+Gabon,266,2021,Raw milk of cattle,10626.07,1.0
+Gambia,270,2023,Raw milk of cattle,51890.51,1.0
+Gambia,270,2022,Raw milk of cattle,49313.8,1.0
+Gambia,270,2020,Raw milk of cattle,49686.97,1.0
+Gambia,270,2021,Raw milk of cattle,49500.06,1.0
+Georgia,268,2020,Raw milk of cattle,575461.0,0.98189806678383129
+Georgia,268,2022,Raw milk of cattle,571032.0,0.98155603150429216
+Georgia,268,2021,Raw milk of cattle,594619.0,0.98232336999169034
+Georgia,268,2023,Raw milk of cattle,591941.0,0.98355047263313733
+Germany,276,2021,Raw milk of cattle,32506910.0,1.0
+Germany,276,2023,Raw milk of cattle,34012620.0,1.0
+Germany,276,2020,Raw milk of cattle,33164910.0,0.99927746905666326
+Germany,276,2022,Raw milk of cattle,32399050.0,1.0
+Ghana,288,2021,Raw milk of cattle,48756.54,1.0
+Ghana,288,2023,Raw milk of cattle,50460.99,1.0
+Ghana,288,2022,Raw milk of cattle,49487.6,1.0
+Ghana,288,2020,Raw milk of cattle,47802.95,1.0
+Greece,300,2021,Raw milk of cattle,710930.0,0.35060387724203912
+Greece,300,2022,Raw milk of cattle,691250.0,0.34572526032549439
+Greece,300,2023,Raw milk of cattle,669620.0,0.34120590468328826
+Greece,300,2020,Raw milk of cattle,683460.0,0.34339029206212035
+Grenada,308,2022,Raw milk of cattle,590.09,1.0
+Grenada,308,2021,Raw milk of cattle,598.8,1.0
+Grenada,308,2023,Raw milk of cattle,581.13,1.0
+Grenada,308,2020,Raw milk of cattle,610.0,1.0
+Guatemala,320,2023,Raw milk of cattle,559650.0,0.99535706347096664
+Guatemala,320,2021,Raw milk of cattle,586945.0,0.99559049476494232
+Guatemala,320,2020,Raw milk of cattle,558720.0,0.995378665225572
+Guatemala,320,2022,Raw milk of cattle,548990.0,0.99527670057407125
+Guinea,324,2020,Raw milk of cattle,209196.0,0.80120915957373628
+Guinea,324,2023,Raw milk of cattle,235000.0,0.80190981476531642
+Guinea,324,2021,Raw milk of cattle,220670.0,0.80367343623839893
+Guinea,324,2022,Raw milk of cattle,232773.14,0.80611405558312954
+Guinea-Bissau,624,2022,Raw milk of cattle,18051.09,0.4647202115597901
+Guinea-Bissau,624,2021,Raw milk of cattle,17961.58,0.46494780539866676
+Guinea-Bissau,624,2020,Raw milk of cattle,17852.77,0.46252640654866856
+Guinea-Bissau,624,2023,Raw milk of cattle,17979.19,0.46231833002478839
+Guyana,328,2021,Raw milk of cattle,20989.92,1.0
+Guyana,328,2022,Raw milk of cattle,20436.0,1.0
+Guyana,328,2020,Raw milk of cattle,21000.0,1.0
+Guyana,328,2023,Raw milk of cattle,28591.0,1.0
+Haiti,332,2022,Raw milk of cattle,47027.34,0.46847539144762396
+Haiti,332,2023,Raw milk of cattle,47129.62,0.47042450339520869
+Haiti,332,2021,Raw milk of cattle,47109.36,0.47812417696010995
+Haiti,332,2020,Raw milk of cattle,47142.7,0.48344297514728574
+Honduras,340,2022,Raw milk of cattle,690537.04,1.0
+Honduras,340,2021,Raw milk of cattle,688395.88,1.0
+Honduras,340,2020,Raw milk of cattle,685749.29,1.0
+Honduras,340,2023,Raw milk of cattle,693072.71,1.0
+Hungary,348,2023,Raw milk of cattle,2027570.0,0.9977658689736284
+Hungary,348,2021,Raw milk of cattle,2080230.0,0.99771223021582733
+Hungary,348,2022,Raw milk of cattle,2040340.0,0.9977700621057265
+Hungary,348,2020,Raw milk of cattle,2014330.0,0.99768697374938087
+Iceland,352,2023,Raw milk of cattle,155975.0,1.0
+Iceland,352,2022,Raw milk of cattle,152405.0,1.0
+Iceland,352,2021,Raw milk of cattle,153294.0,1.0
+Iceland,352,2020,Raw milk of cattle,155495.0,1.0
+India,356,2022,Raw milk of cattle,119677594.0,0.5190171885833178
+India,356,2020,Raw milk of cattle,108306663.52,0.51582725783558969
+India,356,2023,Raw milk of cattle,127105138.0,0.53113858751453524
+India,356,2021,Raw milk of cattle,115839640.0,0.5216202916687831
+Indonesia,360,2023,Raw milk of cattle,787374.38,0.5734423645343445
+Indonesia,360,2021,Raw milk of cattle,946388.0,0.61069629145651316
+Indonesia,360,2022,Raw milk of cattle,968980.0,0.62281002475910552
+Indonesia,360,2020,Raw milk of cattle,946913.0,0.60755085324594715
+Iran (Islamic Republic of),364,2023,Raw milk of cattle,7654331.0,0.90293217930614889
+Iran (Islamic Republic of),364,2021,Raw milk of cattle,7957000.0,0.90510370324357481
+Iran (Islamic Republic of),364,2020,Raw milk of cattle,7508993.0,0.89992409842043641
+Iran (Islamic Republic of),364,2022,Raw milk of cattle,7497000.0,0.89942657075177879
+Iraq,368,2023,Raw milk of cattle,237507.0,0.65436677071939653
+Iraq,368,2022,Raw milk of cattle,232493.0,0.655595002100787
+Iraq,368,2021,Raw milk of cattle,228107.0,0.65436028964465454
+Iraq,368,2020,Raw milk of cattle,223097.0,0.65376410256410256
+Ireland,372,2021,Raw milk of cattle,9039990.0,1.0
+Ireland,372,2020,Raw milk of cattle,8561470.0,1.0
+Ireland,372,2023,Raw milk of cattle,8730710.0,1.0
+Ireland,372,2022,Raw milk of cattle,9108280.0,1.0
+Israel,376,2021,Raw milk of cattle,1630222.0,0.97292474467187362
+Israel,376,2023,Raw milk of cattle,1646401.0,0.97576126104501926
+Israel,376,2022,Raw milk of cattle,1647175.0,0.97186263912620718
+Israel,376,2020,Raw milk of cattle,1610003.0,0.97351617666443746
+Italy,380,2023,Raw milk of cattle,13058970.0,0.94341723136495648
+Italy,380,2020,Raw milk of cattle,12712480.0,0.94100160479424877
+Italy,380,2021,Raw milk of cattle,13202450.0,0.94316890234798334
+Italy,380,2022,Raw milk of cattle,13181870.0,0.94346997392584575
+Jamaica,388,2020,Raw milk of cattle,12205.0,0.06032347120776288
+Jamaica,388,2023,Raw milk of cattle,10394.0,0.049805400038132705
+Jamaica,388,2022,Raw milk of cattle,12399.0,0.059469519796697609
+Jamaica,388,2021,Raw milk of cattle,11800.0,0.057404261974565537
+Japan,392,2021,Raw milk of cattle,7592061.0,1.0
+Japan,392,2022,Raw milk of cattle,7617473.0,1.0
+Japan,392,2023,Raw milk of cattle,7298933.0,1.0
+Japan,392,2020,Raw milk of cattle,7438218.0,1.0
+Jordan,400,2022,Raw milk of cattle,408059.0,0.78641858747651439
+Jordan,400,2023,Raw milk of cattle,485599.96,0.755561280008046
+Jordan,400,2021,Raw milk of cattle,309072.0,0.7261040553683944
+Jordan,400,2020,Raw milk of cattle,299819.0,0.73095386115682326
+Kazakhstan,398,2020,Raw milk of cattle,3143228.71,0.99427154316259037
+Kazakhstan,398,2021,Raw milk of cattle,3245035.92,0.99422704854485489
+Kazakhstan,398,2022,Raw milk of cattle,3308439.8,0.99447654938944163
+Kazakhstan,398,2023,Raw milk of cattle,3420415.6,0.99434200929893346
+Kenya,404,2022,Raw milk of cattle,4742430.0,0.80078667337033083
+Kenya,404,2021,Raw milk of cattle,4780090.0,0.77617405250056437
+Kenya,404,2023,Raw milk of cattle,4705660.0,0.7754744014905689
+Kenya,404,2020,Raw milk of cattle,4169560.0,0.74349557057676141
+Kuwait,414,2023,Raw milk of cattle,52398.46,0.89127715094545346
+Kuwait,414,2020,Raw milk of cattle,51555.63,0.89071075448178993
+Kuwait,414,2022,Raw milk of cattle,53672.45,0.89242830679310292
+Kuwait,414,2021,Raw milk of cattle,52011.71,0.890692916098835
+Kyrgyzstan,417,2023,Raw milk of cattle,1777613.0,0.99963559904873356
+Kyrgyzstan,417,2022,Raw milk of cattle,1734143.0,0.9996840935936141
+Kyrgyzstan,417,2020,Raw milk of cattle,1667973.0,0.99962363680712163
+Kyrgyzstan,417,2021,Raw milk of cattle,1698962.0,0.99965520244206107
+Lao People's Democratic Republic,418,2022,Raw milk of cattle,8822.96,1.0
+Lao People's Democratic Republic,418,2020,Raw milk of cattle,8359.06,1.0
+Lao People's Democratic Republic,418,2021,Raw milk of cattle,8576.85,1.0
+Lao People's Democratic Republic,418,2023,Raw milk of cattle,9070.36,1.0
+Latvia,428,2021,Raw milk of cattle,990310.0,0.9980750236842636
+Latvia,428,2020,Raw milk of cattle,988200.0,0.99808100191899807
+Latvia,428,2022,Raw milk of cattle,973810.0,0.9984825026402403
+Latvia,428,2023,Raw milk of cattle,962180.0,0.99844346671094142
+Lebanon,422,2020,Raw milk of cattle,245959.0,0.81567349050377891
+Lebanon,422,2021,Raw milk of cattle,245457.0,0.87791766515254477
+Lebanon,422,2022,Raw milk of cattle,201820.0,0.86306876496749918
+Lebanon,422,2023,Raw milk of cattle,188761.0,0.848074365609949
+Lesotho,426,2021,Raw milk of cattle,120000.0,1.0
+Lesotho,426,2023,Raw milk of cattle,225000.0,1.0
+Lesotho,426,2020,Raw milk of cattle,133000.0,1.0
+Lesotho,426,2022,Raw milk of cattle,205000.0,1.0
+Liberia,430,2022,Raw milk of cattle,8321.27,1.0
+Liberia,430,2023,Raw milk of cattle,8344.4,1.0
+Liberia,430,2021,Raw milk of cattle,8299.25,1.0
+Liberia,430,2020,Raw milk of cattle,8207.31,1.0
+Libya,434,2021,Raw milk of cattle,135559.57,0.619319249212371
+Libya,434,2023,Raw milk of cattle,142232.14,0.62741747067794917
+Libya,434,2020,Raw milk of cattle,145647.06,0.63664703475384909
+Libya,434,2022,Raw milk of cattle,144644.04,0.63355877245459413
+Lithuania,440,2023,Raw milk of cattle,1470320.0,0.99820091380000953
+Lithuania,440,2020,Raw milk of cattle,1488000.0,0.99753967030241275
+Lithuania,440,2022,Raw milk of cattle,1517610.0,0.99715494697557061
+Lithuania,440,2021,Raw milk of cattle,1473280.0,0.99755567442395843
+Luxembourg,442,2022,Raw milk of cattle,449090.0,0.99261764250823337
+Luxembourg,442,2021,Raw milk of cattle,443280.0,0.99975191140981978
+Luxembourg,442,2020,Raw milk of cattle,447340.0,0.99973181960398694
+Luxembourg,442,2023,Raw milk of cattle,469290.0,1.0
+Madagascar,450,2021,Raw milk of cattle,417927.03,1.0
+Madagascar,450,2020,Raw milk of cattle,456008.55,1.0
+Madagascar,450,2023,Raw milk of cattle,439077.45,1.0
+Madagascar,450,2022,Raw milk of cattle,387947.31,1.0
+Malawi,454,2021,Raw milk of cattle,64047.11,0.31236225629462733
+Malawi,454,2020,Raw milk of cattle,63716.73,0.31596427456740872
+Malawi,454,2023,Raw milk of cattle,68853.78,0.30673069182839896
+Malawi,454,2022,Raw milk of cattle,66078.41,0.30605015221127713
+Malaysia,458,2021,Raw milk of cattle,38728.9,0.86857852067434826
+Malaysia,458,2023,Raw milk of cattle,40111.88,0.86633682184405547
+Malaysia,458,2022,Raw milk of cattle,38951.25,0.86521167685081046
+Malaysia,458,2020,Raw milk of cattle,41777.7,0.87941018597455078
+Mali,466,2023,Raw milk of cattle,311353.0,0.27945640486187528
+Mali,466,2022,Raw milk of cattle,302283.0,0.28117988711243735
+Mali,466,2021,Raw milk of cattle,293481.0,0.28287079919306723
+Mali,466,2020,Raw milk of cattle,284933.0,0.28607472422437952
+Malta,470,2020,Raw milk of cattle,42110.0,0.93702714730752112
+Malta,470,2022,Raw milk of cattle,38970.0,0.9263132873781792
+Malta,470,2021,Raw milk of cattle,39540.0,0.93431001890359167
+Malta,470,2023,Raw milk of cattle,37300.0,0.92349591483040361
+Mauritania,478,2021,Raw milk of cattle,149695.52,0.41361669107409743
+Mauritania,478,2022,Raw milk of cattle,148007.89,0.41047762044164987
+Mauritania,478,2020,Raw milk of cattle,148225.61,0.41628842781349645
+Mauritania,478,2023,Raw milk of cattle,149523.8,0.41252389843716675
+Mauritius,480,2020,Raw milk of cattle,2500.0,1.0
+Mauritius,480,2021,Raw milk of cattle,2602.0,1.0
+Mauritius,480,2023,Raw milk of cattle,2788.0,1.0
+Mauritius,480,2022,Raw milk of cattle,2231.0,1.0
+Mexico,484,2020,Raw milk of cattle,12940611.0,0.987146517444012
+Mexico,484,2021,Raw milk of cattle,13239778.09,0.9872089399131494
+Mexico,484,2022,Raw milk of cattle,13500619.64,0.987296848754238
+Mexico,484,2023,Raw milk of cattle,13735386.75,0.98746815759179662
+Mongolia,496,2022,Raw milk of cattle,139309.15,0.67604302146438777
+Mongolia,496,2020,Raw milk of cattle,125878.23,0.66786809981956485
+Mongolia,496,2023,Raw milk of cattle,235526.53,0.94009217932607336
+Mongolia,496,2021,Raw milk of cattle,122053.93,0.69648005577595617
+Montenegro,499,2022,Raw milk of cattle,143742.68,0.91748565872952748
+Montenegro,499,2021,Raw milk of cattle,159500.0,0.893827824664044
+Montenegro,499,2020,Raw milk of cattle,170543.0,0.91825054111971394
+Montenegro,499,2023,Raw milk of cattle,148889.59,0.92252017418200383
+Morocco,504,2022,Raw milk of cattle,2060000.0,0.95757551844951461
+Morocco,504,2021,Raw milk of cattle,2575000.0,0.965194711371697
+Morocco,504,2020,Raw milk of cattle,2626500.0,0.96649367172031431
+Morocco,504,2023,Raw milk of cattle,1957000.0,0.956211788510207
+Mozambique,508,2023,Raw milk of cattle,2560.0,0.11106941187444817
+Mozambique,508,2021,Raw milk of cattle,3300.0,0.15010964827489898
+Mozambique,508,2020,Raw milk of cattle,2850.0,0.13627626306578555
+Mozambique,508,2022,Raw milk of cattle,2510.11,0.10549588457995145
+Myanmar,104,2023,Raw milk of cattle,1900000.0,0.8473102586252238
+Myanmar,104,2022,Raw milk of cattle,1858000.0,0.84516584853657284
+Myanmar,104,2020,Raw milk of cattle,1772000.0,0.84510983394602845
+Myanmar,104,2021,Raw milk of cattle,1790000.0,0.84513786332641994
+Namibia,516,2023,Raw milk of cattle,113641.86,1.0
+Namibia,516,2021,Raw milk of cattle,102578.74,1.0
+Namibia,516,2020,Raw milk of cattle,100553.31,1.0
+Namibia,516,2022,Raw milk of cattle,115965.81,1.0
+Nepal,524,2020,Raw milk of cattle,920400.0,0.37549957017252866
+Nepal,524,2022,Raw milk of cattle,1101812.0,0.40449400500560467
+Nepal,524,2023,Raw milk of cattle,1214046.0,0.43817653571988768
+Nepal,524,2021,Raw milk of cattle,1060487.0,0.40261784152695362
+Netherlands (Kingdom of the),528,2021,Raw milk of cattle,14217250.0,0.97344487435544735
+Netherlands (Kingdom of the),528,2022,Raw milk of cattle,14533740.0,0.96995643994124359
+Netherlands (Kingdom of the),528,2020,Raw milk of cattle,14522000.0,0.972737624757184
+Netherlands (Kingdom of the),528,2023,Raw milk of cattle,14685300.0,0.97143953350686807
+New Caledonia,540,2020,Raw milk of cattle,501.0,1.0
+New Caledonia,540,2021,Raw milk of cattle,486.0,1.0
+New Caledonia,540,2022,Raw milk of cattle,446.0,1.0
+New Caledonia,540,2023,Raw milk of cattle,100.0,1.0
+New Zealand,554,2020,Raw milk of cattle,21871305.0,1.0
+New Zealand,554,2022,Raw milk of cattle,21051000.0,1.0
+New Zealand,554,2021,Raw milk of cattle,21886376.0,1.0
+New Zealand,554,2023,Raw milk of cattle,21245000.0,1.0
+Nicaragua,558,2021,Raw milk of cattle,1430039.22,1.0
+Nicaragua,558,2022,Raw milk of cattle,1436683.9,1.0
+Nicaragua,558,2023,Raw milk of cattle,1372910.59,1.0
+Nicaragua,558,2020,Raw milk of cattle,1399699.26,1.0
+Niger,562,2021,Raw milk of cattle,840000.0,0.56624145304028173
+Niger,562,2022,Raw milk of cattle,871473.79,0.556668198662772
+Niger,562,2023,Raw milk of cattle,923762.6,0.56265553711126326
+Niger,562,2020,Raw milk of cattle,822843.6,0.54458217954939658
+Nigeria,566,2023,Raw milk of cattle,526502.2,1.0
+Nigeria,566,2021,Raw milk of cattle,523324.41,1.0
+Nigeria,566,2020,Raw milk of cattle,519811.34,1.0
+Nigeria,566,2022,Raw milk of cattle,525458.0,1.0
+Niue,570,2023,Raw milk of cattle,58.88,1.0
+Niue,570,2021,Raw milk of cattle,58.77,1.0
+Niue,570,2022,Raw milk of cattle,58.83,1.0
+Niue,570,2020,Raw milk of cattle,58.72,1.0
+North Macedonia,807,2020,Raw milk of cattle,417374.0,0.90508976647055894
+North Macedonia,807,2022,Raw milk of cattle,334018.7,0.8609461407556277
+North Macedonia,807,2021,Raw milk of cattle,336319.0,0.86411122073544222
+North Macedonia,807,2023,Raw milk of cattle,245478.0,0.8414532565959737
+Norway,578,2023,Raw milk of cattle,1390600.0,0.98669389429050069
+Norway,578,2020,Raw milk of cattle,1547025.0,0.98632744011680173
+Norway,578,2022,Raw milk of cattle,1453400.0,0.98685193282834183
+Norway,578,2021,Raw milk of cattle,1572450.0,0.98766525468441446
+Oman,512,2023,Raw milk of cattle,236480.0,0.62870334932351113
+Oman,512,2022,Raw milk of cattle,223971.6,0.61925367208002635
+Oman,512,2021,Raw milk of cattle,219580.0,0.61790054907828051
+Oman,512,2020,Raw milk of cattle,215270.0,0.616540362815688
+Pakistan,586,2023,Raw milk of cattle,23893450.0,0.36997331281147633
+Pakistan,586,2021,Raw milk of cattle,22189150.0,0.36616967556685037
+Pakistan,586,2020,Raw milk of cattle,21382600.0,0.36425799549587917
+Pakistan,586,2022,Raw milk of cattle,23026100.0,0.36807631963643311
+Palestine,275,2020,Raw milk of cattle,71206.25,0.49062644673005162
+Palestine,275,2021,Raw milk of cattle,171913.0,0.5662352976051277
+Palestine,275,2022,Raw milk of cattle,172000.0,0.56578947368421051
+Panama,591,2021,Raw milk of cattle,192137.0,1.0
+Panama,591,2022,Raw milk of cattle,188490.0,1.0
+Panama,591,2020,Raw milk of cattle,213773.0,1.0
+Panama,591,2023,Raw milk of cattle,184344.0,1.0
+Papua New Guinea,598,2020,Raw milk of cattle,164.27,0.80536353385301751
+Papua New Guinea,598,2021,Raw milk of cattle,164.21,0.80455658990690837
+Papua New Guinea,598,2022,Raw milk of cattle,164.2,0.80450759431651153
+Papua New Guinea,598,2023,Raw milk of cattle,164.18,0.80425198393259523
+Paraguay,600,2023,Raw milk of cattle,559000.0,1.0
+Paraguay,600,2021,Raw milk of cattle,536808.0,1.0
+Paraguay,600,2022,Raw milk of cattle,558738.0,1.0
+Paraguay,600,2020,Raw milk of cattle,541033.43,1.0
+Peru,604,2022,Raw milk of cattle,2246935.86,0.99100608738124307
+Peru,604,2021,Raw milk of cattle,2184934.54,0.99079841749198239
+Peru,604,2020,Raw milk of cattle,2138028.44,0.99046582312961728
+Peru,604,2023,Raw milk of cattle,2201096.29,0.99082177255986625
+Philippines,608,2021,Raw milk of cattle,27089.0,1.0
+Philippines,608,2020,Raw milk of cattle,27511.0,1.0
+Philippines,608,2023,Raw milk of cattle,29980.0,1.0
+Philippines,608,2022,Raw milk of cattle,31188.0,1.0
+Poland,616,2021,Raw milk of cattle,14881110.0,0.99938483318301141
+Poland,616,2022,Raw milk of cattle,15208490.0,0.99936982851976075
+Poland,616,2023,Raw milk of cattle,15482240.0,0.99937773853141132
+Poland,616,2020,Raw milk of cattle,14821820.0,0.9993897863038379
+Portugal,620,2020,Raw milk of cattle,1993610.0,0.949736079881093
+Portugal,620,2023,Raw milk of cattle,1959930.0,0.95203237025666931
+Portugal,620,2022,Raw milk of cattle,1928870.0,0.94974716016800187
+Portugal,620,2021,Raw milk of cattle,1995550.0,0.95017593646289145
+Puerto Rico,630,2021,Raw milk of cattle,213296.9,0.99972079590555651
+Puerto Rico,630,2023,Raw milk of cattle,223838.06,0.99973487858859655
+Puerto Rico,630,2020,Raw milk of cattle,242000.0,0.99975394485555535
+Puerto Rico,630,2022,Raw milk of cattle,234700.0,0.99974995601866934
+Qatar,634,2021,Raw milk of cattle,7500.0,0.15957029209661111
+Qatar,634,2023,Raw milk of cattle,7500.0,0.17032351247960376
+Qatar,634,2022,Raw milk of cattle,7500.0,0.16851811906816222
+Qatar,634,2020,Raw milk of cattle,7500.0,0.15196302800313893
+Republic of Korea,410,2020,Raw milk of cattle,2088786.0,0.99569252841056877
+Republic of Korea,410,2021,Raw milk of cattle,2034384.0,0.99561639047058614
+Republic of Korea,410,2022,Raw milk of cattle,1975414.0,0.99550139765309265
+Republic of Korea,410,2023,Raw milk of cattle,1929913.0,0.99534071868180407
+Republic of Moldova,498,2023,Raw milk of cattle,231905.0,0.88756252798689539
+Republic of Moldova,498,2021,Raw milk of cattle,264948.0,0.89731362694230321
+Republic of Moldova,498,2020,Raw milk of cattle,290529.0,0.90296784139189246
+Republic of Moldova,498,2022,Raw milk of cattle,240931.0,0.88895899286415325
+Romania,642,2023,Raw milk of cattle,3618800.0,0.83799555390885516
+Romania,642,2022,Raw milk of cattle,3621800.0,0.84980877073605665
+Romania,642,2021,Raw milk of cattle,3637000.0,0.84587296788148014
+Romania,642,2020,Raw milk of cattle,3679600.0,0.843461318051576
+Russian Federation,643,2023,Raw milk of cattle,33559230.0,0.99273951021401
+Russian Federation,643,2022,Raw milk of cattle,32738522.0,0.99273955410894776
+Russian Federation,643,2021,Raw milk of cattle,32078587.0,0.992122919814625
+Russian Federation,643,2020,Raw milk of cattle,31959801.0,0.9919499843139794
+Rwanda,646,2021,Raw milk of cattle,186047.18,0.766551858626989
+Rwanda,646,2020,Raw milk of cattle,195682.98,0.77139305914501555
+Rwanda,646,2023,Raw milk of cattle,182287.47,0.77414803993519476
+Rwanda,646,2022,Raw milk of cattle,179472.42,0.77270390408904988
+Saint Lucia,662,2022,Raw milk of cattle,1031.6,1.0
+Saint Lucia,662,2020,Raw milk of cattle,1027.12,1.0
+Saint Lucia,662,2021,Raw milk of cattle,1030.11,1.0
+Saint Lucia,662,2023,Raw milk of cattle,1031.51,1.0
+Saint Vincent and the Grenadines,670,2021,Raw milk of cattle,897.99,1.0
+Saint Vincent and the Grenadines,670,2022,Raw milk of cattle,920.82,1.0
+Saint Vincent and the Grenadines,670,2020,Raw milk of cattle,967.37,1.0
+Saint Vincent and the Grenadines,670,2023,Raw milk of cattle,862.18,1.0
+Samoa,882,2020,Raw milk of cattle,1648.79,1.0
+Samoa,882,2023,Raw milk of cattle,1570.99,1.0
+Samoa,882,2021,Raw milk of cattle,1617.28,1.0
+Samoa,882,2022,Raw milk of cattle,1585.98,1.0
+Sao Tome and Principe,678,2023,Raw milk of cattle,583.07,1.0
+Sao Tome and Principe,678,2021,Raw milk of cattle,560.89,1.0
+Sao Tome and Principe,678,2022,Raw milk of cattle,571.78,1.0
+Sao Tome and Principe,678,2020,Raw milk of cattle,551.48,1.0
+Senegal,686,2022,Raw milk of cattle,222629.63,0.88702424764078369
+Senegal,686,2020,Raw milk of cattle,220666.67,0.892833734872487
+Senegal,686,2023,Raw milk of cattle,230000.0,0.89342316250046616
+Senegal,686,2021,Raw milk of cattle,222222.22,0.89376968474682772
+Serbia,688,2023,Raw milk of cattle,1383806.0,0.976718513881017
+Serbia,688,2020,Raw milk of cattle,1539445.0,0.97203078028541279
+Serbia,688,2021,Raw milk of cattle,1517686.0,0.97071331489150769
+Serbia,688,2022,Raw milk of cattle,1468036.0,0.9708545757674556
+Seychelles,690,2022,Raw milk of cattle,172.72,1.0
+Seychelles,690,2021,Raw milk of cattle,167.97,1.0
+Seychelles,690,2020,Raw milk of cattle,152.18,1.0
+Seychelles,690,2023,Raw milk of cattle,155.39,1.0
+Sierra Leone,694,2020,Raw milk of cattle,142546.12,1.0
+Sierra Leone,694,2023,Raw milk of cattle,150614.57,1.0
+Sierra Leone,694,2022,Raw milk of cattle,146936.97,1.0
+Sierra Leone,694,2021,Raw milk of cattle,161305.12,1.0
+Slovakia,703,2022,Raw milk of cattle,915120.0,0.98720576495717272
+Slovakia,703,2023,Raw milk of cattle,913600.0,0.98681154880591049
+Slovakia,703,2020,Raw milk of cattle,917690.0,0.98774056055452708
+Slovakia,703,2021,Raw milk of cattle,902640.0,0.9874846840539121
+Slovenia,705,2023,Raw milk of cattle,605290.0,0.99593589574832175
+Slovenia,705,2022,Raw milk of cattle,625350.0,0.99560586521469174
+Slovenia,705,2020,Raw milk of cattle,630650.0,0.99597283638660772
+Slovenia,705,2021,Raw milk of cattle,639930.0,0.99531838118642491
+Solomon Islands,90,2022,Raw milk of cattle,3055.01,1.0
+Solomon Islands,90,2023,Raw milk of cattle,3063.26,1.0
+Solomon Islands,90,2021,Raw milk of cattle,3047.68,1.0
+Solomon Islands,90,2020,Raw milk of cattle,3026.25,1.0
+Somalia,706,2021,Raw milk of cattle,456409.3,0.20773426707953357
+Somalia,706,2022,Raw milk of cattle,456819.22,0.20939479721475934
+Somalia,706,2020,Raw milk of cattle,455265.98,0.20593983459411661
+Somalia,706,2023,Raw milk of cattle,456982.28,0.2112260370137648
+South Sudan,728,2020,Raw milk of cattle,2452701.0,0.78343763118710019
+South Sudan,728,2023,Raw milk of cattle,2872794.77,0.816388953390497
+South Sudan,728,2021,Raw milk of cattle,3057310.0,0.83511551093236736
+South Sudan,728,2022,Raw milk of cattle,2791258.59,0.81057020543942815
+Spain,724,2022,Raw milk of cattle,7454970.0,0.87881291995756217
+Spain,724,2020,Raw milk of cattle,7606070.0,0.87564786523942517
+Spain,724,2023,Raw milk of cattle,7564500.0,0.88322554506149131
+Spain,724,2021,Raw milk of cattle,7623090.0,0.875956468131901
+Sri Lanka,144,2023,Raw milk of cattle,423430.0,0.79097633543688117
+Sri Lanka,144,2022,Raw milk of cattle,431770.0,0.80238772091261357
+Sri Lanka,144,2021,Raw milk of cattle,438130.0,0.80385178076204511
+Sri Lanka,144,2020,Raw milk of cattle,426040.0,0.81644997608275294
+Sudan,729,2022,Raw milk of cattle,2867678.36,0.64419877196146791
+Sudan,729,2020,Raw milk of cattle,3011178.41,0.646836370592201
+Sudan,729,2021,Raw milk of cattle,2931661.21,0.64609759963510749
+Sudan,729,2023,Raw milk of cattle,2913791.8,0.645856835470589
+Suriname,740,2022,Raw milk of cattle,2839.67,1.0
+Suriname,740,2021,Raw milk of cattle,2501.0,1.0
+Suriname,740,2023,Raw milk of cattle,2786.89,1.0
+Suriname,740,2020,Raw milk of cattle,3020.0,1.0
+Sweden,752,2022,Raw milk of cattle,2764840.0,1.0
+Sweden,752,2023,Raw milk of cattle,2818530.0,1.0
+Sweden,752,2020,Raw milk of cattle,2772740.0,1.0
+Sweden,752,2021,Raw milk of cattle,2782220.0,1.0
+Switzerland,756,2022,Raw milk of cattle,3711977.77,0.99229204734885657
+Switzerland,756,2023,Raw milk of cattle,3739080.75,0.99253056581050259
+Switzerland,756,2020,Raw milk of cattle,3780500.0,0.99238745242157766
+Switzerland,756,2021,Raw milk of cattle,3811500.0,0.99252643091505655
+Tajikistan,762,2021,Raw milk of cattle,1042600.0,0.95021733373409067
+Tajikistan,762,2020,Raw milk of cattle,1020900.0,0.950229847839245
+Tajikistan,762,2022,Raw milk of cattle,1064200.0,0.95034932883833523
+Tajikistan,762,2023,Raw milk of cattle,1118500.0,0.95149688281624711
+Thailand,764,2022,Raw milk of cattle,1222000.0,1.0
+Thailand,764,2021,Raw milk of cattle,1296000.0,1.0
+Thailand,764,2020,Raw milk of cattle,1317000.0,1.0
+Thailand,764,2023,Raw milk of cattle,1278333.33,1.0
+Togo,768,2020,Raw milk of cattle,11762.0,1.0
+Togo,768,2021,Raw milk of cattle,11880.0,1.0
+Togo,768,2023,Raw milk of cattle,12837.93,1.0
+Togo,768,2022,Raw milk of cattle,12058.0,1.0
+Tonga,776,2022,Raw milk of cattle,324.56,1.0
+Tonga,776,2023,Raw milk of cattle,325.13,1.0
+Tonga,776,2020,Raw milk of cattle,322.85,1.0
+Tonga,776,2021,Raw milk of cattle,324.36,1.0
+Trinidad and Tobago,780,2020,Raw milk of cattle,2184.0,1.0
+Trinidad and Tobago,780,2023,Raw milk of cattle,1441.0,1.0
+Trinidad and Tobago,780,2022,Raw milk of cattle,1394.0,1.0
+Trinidad and Tobago,780,2021,Raw milk of cattle,1708.0,1.0
+Tunisia,788,2022,Raw milk of cattle,1377333.33,0.97523568120946513
+Tunisia,788,2021,Raw milk of cattle,1405000.0,0.97401146086356793
+Tunisia,788,2023,Raw milk of cattle,1387111.11,0.97510192671947327
+Tunisia,788,2020,Raw milk of cattle,1379000.0,0.976125899996574
+Turkmenistan,795,2022,Raw milk of cattle,2478325.45,0.9919452098367838
+Turkmenistan,795,2023,Raw milk of cattle,2589106.85,0.992283199044964
+Turkmenistan,795,2021,Raw milk of cattle,2460145.97,0.98996278343070443
+Turkmenistan,795,2020,Raw milk of cattle,2440618.42,0.99057105316475191
+Türkiye,792,2020,Raw milk of cattle,21749341.68,0.925354644328841
+Türkiye,792,2021,Raw milk of cattle,21370116.34,0.92111355116991311
+Türkiye,792,2023,Raw milk of cattle,19961908.41,0.92925755243226427
+Türkiye,792,2022,Raw milk of cattle,19912135.38,0.92341886405310025
+Uganda,800,2021,Raw milk of cattle,2894300.0,1.0
+Uganda,800,2023,Raw milk of cattle,3850000.0,1.0
+Uganda,800,2022,Raw milk of cattle,3296000.0,1.0
+Uganda,800,2020,Raw milk of cattle,2781000.0,1.0
+Ukraine,804,2020,Raw milk of cattle,9057900.0,0.977794809793169
+Ukraine,804,2022,Raw milk of cattle,7595600.0,0.97785673824604769
+Ukraine,804,2021,Raw milk of cattle,8516500.0,0.97734653828939966
+Ukraine,804,2023,Raw milk of cattle,7267100.0,0.97802271748492675
+United Kingdom of Great Britain and Northern Ireland,826,2021,Raw milk of cattle,15890600.0,1.0
+United Kingdom of Great Britain and Northern Ireland,826,2023,Raw milk of cattle,15759500.0,1.0
+United Kingdom of Great Britain and Northern Ireland,826,2020,Raw milk of cattle,15685870.0,1.0
+United Kingdom of Great Britain and Northern Ireland,826,2022,Raw milk of cattle,15757400.0,1.0
+United Republic of Tanzania,834,2023,Raw milk of cattle,4055222.0,0.93922141769335188
+United Republic of Tanzania,834,2021,Raw milk of cattle,3551514.0,0.93429168158265419
+United Republic of Tanzania,834,2020,Raw milk of cattle,3194426.0,0.92965036391656553
+United Republic of Tanzania,834,2022,Raw milk of cattle,3708000.0,0.93538670290134773
+United States of America,840,2023,Raw milk of cattle,102653065.0,0.9997497234167354
+United States of America,840,2020,Raw milk of cattle,101291379.0,0.99973969951500319
+United States of America,840,2022,Raw milk of cattle,102700692.0,0.9997476103057118
+United States of America,840,2021,Raw milk of cattle,102619953.0,0.99974559473305169
+Uruguay,858,2021,Raw milk of cattle,2342220.0,1.0
+Uruguay,858,2020,Raw milk of cattle,2271150.0,1.0
+Uruguay,858,2022,Raw milk of cattle,2286703.0,1.0
+Uruguay,858,2023,Raw milk of cattle,2177420.0,1.0
+Uzbekistan,860,2021,Raw milk of cattle,11242745.0,1.0
+Uzbekistan,860,2020,Raw milk of cattle,10930078.0,1.0
+Uzbekistan,860,2023,Raw milk of cattle,11943952.0,1.0
+Uzbekistan,860,2022,Raw milk of cattle,11599137.0,1.0
+Vanuatu,548,2021,Raw milk of cattle,2320.41,1.0
+Vanuatu,548,2020,Raw milk of cattle,2318.87,1.0
+Vanuatu,548,2023,Raw milk of cattle,3100.0,1.0
+Vanuatu,548,2022,Raw milk of cattle,3091.56,1.0
+Venezuela (Bolivarian Republic of),862,2020,Raw milk of cattle,2762114.0,0.89556241459315067
+Venezuela (Bolivarian Republic of),862,2023,Raw milk of cattle,3422747.0,0.91586135996868234
+Venezuela (Bolivarian Republic of),862,2021,Raw milk of cattle,3195461.0,0.9075398066358541
+Venezuela (Bolivarian Republic of),862,2022,Raw milk of cattle,3305125.0,0.91589670516889832
+Viet Nam,704,2023,Raw milk of cattle,1220494.0,0.97925748344946417
+Viet Nam,704,2020,Raw milk of cattle,1080780.0,0.9755322629779648
+Viet Nam,704,2022,Raw milk of cattle,1158440.0,0.97765482647487656
+Viet Nam,704,2021,Raw milk of cattle,1102920.0,0.97639269747286017
+Yemen,887,2021,Raw milk of cattle,258541.39,0.63435475005590514
+Yemen,887,2022,Raw milk of cattle,271468.0,0.63435402762978332
+Yemen,887,2020,Raw milk of cattle,246229.9,0.63435474286827231
+Yemen,887,2023,Raw milk of cattle,276409.0,0.63664505429963258
+Zambia,894,2022,Raw milk of cattle,509514.86,1.0
+Zambia,894,2021,Raw milk of cattle,461904.62,1.0
+Zambia,894,2023,Raw milk of cattle,542688.95,1.0
+Zambia,894,2020,Raw milk of cattle,436591.64,1.0
+Zimbabwe,716,2023,Raw milk of cattle,443101.56,1.0
+Zimbabwe,716,2022,Raw milk of cattle,430408.12,1.0
+Zimbabwe,716,2020,Raw milk of cattle,410582.69,1.0
+Zimbabwe,716,2021,Raw milk of cattle,426942.02,1.0
+Afghanistan,4,2023,Raw milk of goats,119074.24,0.053648338745328483
+Afghanistan,4,2020,Raw milk of goats,117900.97,0.053812791348624767
+Afghanistan,4,2022,Raw milk of goats,118055.12,0.053753292821241944
+Afghanistan,4,2021,Raw milk of goats,116893.13,0.054075330001720982
+Albania,8,2022,Raw milk of goats,78478.79,0.078535882445102276
+Albania,8,2023,Raw milk of goats,72852.0,0.078539433043872
+Albania,8,2020,Raw milk of goats,82600.0,0.0762161364139662
+Albania,8,2021,Raw milk of goats,82580.0,0.079144344025838351
+Algeria,12,2023,Raw milk of goats,323791.22,0.097729281866458462
+Algeria,12,2022,Raw milk of goats,324463.67,0.097705331947550975
+Algeria,12,2021,Raw milk of goats,314117.0,0.096256906338877207
+Algeria,12,2020,Raw milk of goats,332793.0,0.099211816194594168
+Armenia,51,2022,Raw milk of goats,1100.0,0.0017653667148130317
+Armenia,51,2020,Raw milk of goats,3900.0,0.0059605685465382854
+Armenia,51,2023,Raw milk of goats,2400.0,0.0040567951318458417
+Armenia,51,2021,Raw milk of goats,1700.0,0.0025346652750857313
+Austria,40,2020,Raw milk of goats,25370.0,0.0065857444720761318
+Austria,40,2022,Raw milk of goats,26110.0,0.0065598070497198705
+Austria,40,2021,Raw milk of goats,26540.0,0.0068623319000178408
+Austria,40,2023,Raw milk of goats,26640.0,0.0071671280639876026
+Azerbaijan,31,2023,Raw milk of goats,4681.0,0.0020494835791750403
+Azerbaijan,31,2021,Raw milk of goats,5142.0,0.0023126472389906386
+Azerbaijan,31,2022,Raw milk of goats,5065.0,0.0022365200542770079
+Azerbaijan,31,2020,Raw milk of goats,5341.0,0.0024360341491759629
+Bahamas,44,2021,Raw milk of goats,1375.48,0.66846481700175442
+Bahamas,44,2022,Raw milk of goats,1375.92,0.66809097442072762
+Bahamas,44,2020,Raw milk of goats,1370.14,0.66659855406680879
+Bahamas,44,2023,Raw milk of goats,1378.66,0.66844445306401479
+Bahrain,48,2020,Raw milk of goats,299.74,0.028667369945264774
+Bahrain,48,2022,Raw milk of goats,319.72,0.02843522652484036
+Bahrain,48,2021,Raw milk of goats,322.75,0.030799959156057263
+Bahrain,48,2023,Raw milk of goats,323.24,0.029357324890514003
+Bangladesh,50,2023,Raw milk of goats,984760.0,0.07
+Bangladesh,50,2020,Raw milk of goats,747600.0,0.07
+Bangladesh,50,2021,Raw milk of goats,838950.0,0.07
+Bangladesh,50,2022,Raw milk of goats,915180.0,0.07
+Belarus,112,2021,Raw milk of goats,16961.41,0.0021667723065589306
+Belarus,112,2023,Raw milk of goats,16289.69,0.0019514945095909328
+Belarus,112,2022,Raw milk of goats,16673.98,0.002114464793027114
+Belarus,112,2020,Raw milk of goats,13500.0,0.0017385033417897571
+Belgium,56,2022,Raw milk of goats,46000.0,0.00996102208748376
+Benin,204,2023,Raw milk of goats,38171.07,0.21806548488046468
+Benin,204,2021,Raw milk of goats,36808.94,0.25975490314730248
+Benin,204,2020,Raw milk of goats,32733.47,0.25428363859412911
+Benin,204,2022,Raw milk of goats,37483.82,0.24642611713895829
+Bolivia (Plurinational State of),68,2020,Raw milk of goats,29673.27,0.047878244085369032
+Bolivia (Plurinational State of),68,2023,Raw milk of goats,29664.0,0.046545503478258046
+Bolivia (Plurinational State of),68,2022,Raw milk of goats,29766.0,0.047233505226414486
+Bolivia (Plurinational State of),68,2021,Raw milk of goats,30068.79,0.048377181121173979
+Botswana,72,2020,Raw milk of goats,11696.64,0.33361760774808452
+Botswana,72,2023,Raw milk of goats,7152.0,0.20941672522839072
+Botswana,72,2022,Raw milk of goats,11342.44,0.29581946271546622
+Botswana,72,2021,Raw milk of goats,11570.29,0.33361244201935136
+Brazil,76,2023,Raw milk of goats,33000.0,0.00090812378577864478
+Brazil,76,2021,Raw milk of goats,31000.0,0.00085471127100843712
+Brazil,76,2022,Raw milk of goats,31763.14,0.00089165825486457588
+Brazil,76,2020,Raw milk of goats,31000.0,0.00085148069860764488
+Bulgaria,100,2021,Raw milk of goats,30340.0,0.031833968124062244
+Bulgaria,100,2020,Raw milk of goats,31280.0,0.031110448058083447
+Bulgaria,100,2023,Raw milk of goats,20100.0,0.024638995807693249
+Bulgaria,100,2022,Raw milk of goats,25930.0,0.029852636426433342
+Burkina Faso,854,2022,Raw milk of goats,132132.0,0.30367149203544913
+Burkina Faso,854,2021,Raw milk of goats,131599.0,0.30755693702747233
+Burkina Faso,854,2023,Raw milk of goats,132668.33,0.30089551051307034
+Burkina Faso,854,2020,Raw milk of goats,131068.0,0.31124039751611793
+Burundi,108,2021,Raw milk of goats,56533.25,0.50634357480404391
+Burundi,108,2020,Raw milk of goats,44141.52,0.41044090751738382
+Burundi,108,2022,Raw milk of goats,58183.93,0.64016872114525458
+Burundi,108,2023,Raw milk of goats,59882.79,0.61272072982812287
+Cabo Verde,132,2023,Raw milk of goats,5837.01,0.559151455352738
+Cabo Verde,132,2022,Raw milk of goats,5678.39,0.55284797432811872
+Cabo Verde,132,2021,Raw milk of goats,5529.04,0.54730831973898864
+Cabo Verde,132,2020,Raw milk of goats,5372.48,0.54023821853961673
+Cameroon,120,2020,Raw milk of goats,58982.02,0.22231383003984928
+Cameroon,120,2022,Raw milk of goats,59188.47,0.20866457355071677
+Cameroon,120,2021,Raw milk of goats,59228.96,0.1985480628837529
+Cameroon,120,2023,Raw milk of goats,59397.5,0.20980664832488483
+Chad,148,2022,Raw milk of goats,118293.78,0.26083643286739205
+Chad,148,2021,Raw milk of goats,114247.01,0.26244978348532233
+Chad,148,2020,Raw milk of goats,110338.67,0.26051353233479624
+Chad,148,2023,Raw milk of goats,122483.9,0.26099598077282865
+Chile,152,2022,Raw milk of goats,8058.15,0.0035142387583358857
+Chile,152,2021,Raw milk of goats,8099.22,0.0034543536539276844
+Chile,152,2020,Raw milk of goats,8124.97,0.0034548387382901048
+Chile,152,2023,Raw milk of goats,8111.66,0.0036335454193804537
+China,159,2023,Raw milk of goats,228760.22,0.00484006512620001
+China,159,2022,Raw milk of goats,231549.57,0.0051990338240401257
+China,159,2020,Raw milk of goats,234060.4,0.0059503011194359454
+China,159,2021,Raw milk of goats,233221.7,0.0055660994089234772
+"China, Taiwan Province of",158,2021,Raw milk of goats,12296.0,0.026642976316872874
+"China, Taiwan Province of",158,2020,Raw milk of goats,13198.94,0.029307953449547813
+"China, Taiwan Province of",158,2022,Raw milk of goats,11439.0,0.02410575427682737
+"China, Taiwan Province of",158,2023,Raw milk of goats,11198.0,0.023153250201076406
+"China, mainland",156,2020,Raw milk of goats,220861.46,0.0056797928361642562
+"China, mainland",156,2023,Raw milk of goats,217562.22,0.0046507364531802407
+"China, mainland",156,2022,Raw milk of goats,220110.57,0.0049954234745275229
+"China, mainland",156,2021,Raw milk of goats,220925.7,0.0053313712720094858
+Costa Rica,188,2022,Raw milk of goats,17335.0,0.014013414398530674
+Costa Rica,188,2020,Raw milk of goats,15510.0,0.01274493530568945
+Costa Rica,188,2023,Raw milk of goats,16610.12,0.011943676416231511
+Costa Rica,188,2021,Raw milk of goats,15583.0,0.012793625108115287
+Croatia,191,2023,Raw milk of goats,6000.0,0.012526096033402923
+Croatia,191,2020,Raw milk of goats,9000.0,0.014705882352941176
+Croatia,191,2021,Raw milk of goats,7000.0,0.012280701754385965
+Croatia,191,2022,Raw milk of goats,7000.0,0.013084112149532711
+Cuba,192,2021,Raw milk of goats,2821.0,0.007482341832417823
+Cuba,192,2020,Raw milk of goats,3714.0,0.0080906043119391962
+Cuba,192,2022,Raw milk of goats,2706.0,0.00726821485552207
+Cuba,192,2023,Raw milk of goats,2750.0,0.011774780560907729
+Cyprus,196,2020,Raw milk of goats,34340.0,0.098848589522164645
+Cyprus,196,2021,Raw milk of goats,40110.0,0.10480794355892344
+Cyprus,196,2022,Raw milk of goats,35430.0,0.096742484231220824
+Czechia,203,2022,Raw milk of goats,550.0,0.00016468002670810616
+Ecuador,218,2022,Raw milk of goats,780.98,0.00037619500367485937
+Ecuador,218,2023,Raw milk of goats,859.19,0.00040810456459818522
+Ecuador,218,2020,Raw milk of goats,596.96,0.00025731203288325026
+Ecuador,218,2021,Raw milk of goats,1228.07,0.000571102354779821
+Egypt,818,2023,Raw milk of goats,8433.33,0.0014969522531175104
+Egypt,818,2022,Raw milk of goats,7800.0,0.0011629640673922767
+Egypt,818,2020,Raw milk of goats,8500.0,0.0015238436715668698
+Egypt,818,2021,Raw milk of goats,9000.0,0.00145985401459854
+Eritrea,232,2020,Raw milk of goats,9372.62,0.063541738981403542
+Eritrea,232,2021,Raw milk of goats,9427.68,0.06385367286560939
+Eritrea,232,2023,Raw milk of goats,9492.06,0.06423054532890507
+Eritrea,232,2022,Raw milk of goats,9458.2,0.064002566003365166
+Estonia,233,2021,Raw milk of goats,700.0,0.00083392899690254939
+Estonia,233,2022,Raw milk of goats,500.0,0.00058920575064812632
+Estonia,233,2023,Raw milk of goats,500.0,0.0005588465407399128
+Estonia,233,2020,Raw milk of goats,700.0,0.00082449941107184922
+Ethiopia,231,2021,Raw milk of goats,56267.62,0.0148456360689211
+Ethiopia,231,2023,Raw milk of goats,52306.07,0.013823591560960507
+Ethiopia,231,2022,Raw milk of goats,54124.41,0.012896063575748932
+Ethiopia,231,2020,Raw milk of goats,58155.38,0.015304419386636511
+France,250,2021,Raw milk of goats,718260.0,0.027808191387381973
+France,250,2023,Raw milk of goats,718100.0,0.028666094489131953
+France,250,2022,Raw milk of goats,733100.0,0.028545795929683343
+France,250,2020,Raw milk of goats,709510.0,0.026989347441392669
+Georgia,268,2022,Raw milk of goats,3430.0,0.0058958818210883487
+Georgia,268,2021,Raw milk of goats,3400.0,0.0056168730867526048
+Georgia,268,2023,Raw milk of goats,3170.0,0.0052671718942378471
+Georgia,268,2020,Raw milk of goats,3440.2,0.0058699472759226714
+Germany,276,2020,Raw milk of goats,16280.0,0.00049052559455890212
+Greece,300,2021,Raw milk of goats,365150.0,0.18007821554151687
+Greece,300,2020,Raw milk of goats,361350.0,0.18155280782583794
+Greece,300,2022,Raw milk of goats,351720.0,0.17591101419411628
+Greece,300,2023,Raw milk of goats,348920.0,0.17779272462305926
+Guatemala,320,2020,Raw milk of goats,2594.02,0.0046213347744280464
+Guatemala,320,2021,Raw milk of goats,2599.6,0.0044095052350577035
+Guatemala,320,2023,Raw milk of goats,2610.54,0.0046429365290333192
+Guatemala,320,2022,Raw milk of goats,2605.35,0.0047232994259288081
+Guinea,324,2023,Raw milk of goats,41539.29,0.14174793340162878
+Guinea,324,2022,Raw milk of goats,40005.81,0.13854367280515317
+Guinea,324,2021,Raw milk of goats,38481.33,0.14014783483085055
+Guinea,324,2020,Raw milk of goats,37014.94,0.14176518178680411
+Guinea-Bissau,624,2021,Raw milk of goats,14037.42,0.36336823500267529
+Guinea-Bissau,624,2020,Raw milk of goats,14104.77,0.3654238856656678
+Guinea-Bissau,624,2022,Raw milk of goats,14157.75,0.36448727335638004
+Guinea-Bissau,624,2023,Raw milk of goats,14271.73,0.366984406981887
+Haiti,332,2021,Raw milk of goats,51420.19,0.52187582303989011
+Haiti,332,2022,Raw milk of goats,53356.46,0.53152460855237593
+Haiti,332,2020,Raw milk of goats,50371.8,0.51655702485271426
+Haiti,332,2023,Raw milk of goats,53055.68,0.52957549660479131
+Hungary,348,2020,Raw milk of goats,3060.0,0.0015156017830609213
+Hungary,348,2022,Raw milk of goats,3060.0,0.0014964056922098881
+Hungary,348,2021,Raw milk of goats,3190.0,0.0015299760191846523
+Hungary,348,2023,Raw milk of goats,2930.0,0.0014418510808962112
+India,356,2021,Raw milk of goats,6602560.0,0.029731008081177051
+India,356,2023,Raw milk of goats,7805560.0,0.032617360544150119
+India,356,2022,Raw milk of goats,7599602.0,0.032957915784905895
+India,356,2020,Raw milk of goats,6261874.41,0.02982314661761036
+Indonesia,360,2023,Raw milk of goats,356691.91,0.25977763244045554
+Indonesia,360,2021,Raw milk of goats,362379.81,0.233840672182779
+Indonesia,360,2022,Raw milk of goats,358295.83,0.2302939531810608
+Indonesia,360,2020,Raw milk of goats,359345.22,0.23056024684511942
+Iran (Islamic Republic of),364,2023,Raw milk of goats,322154.61,0.038002506565344832
+Iran (Islamic Republic of),364,2020,Raw milk of goats,350831.0,0.04204575385447025
+Iran (Islamic Republic of),364,2022,Raw milk of goats,321125.97,0.038525974386613121
+Iran (Islamic Republic of),364,2021,Raw milk of goats,320374.7,0.036442418926171838
+Iraq,368,2021,Raw milk of goats,22378.79,0.064197028176675414
+Iraq,368,2022,Raw milk of goats,22764.0,0.064191027806524567
+Iraq,368,2023,Raw milk of goats,23149.0,0.063778904939152573
+Iraq,368,2020,Raw milk of goats,21994.0,0.064451282051282047
+Israel,376,2021,Raw milk of goats,25802.0,0.015398764255434955
+Israel,376,2022,Raw milk of goats,27951.0,0.016491588705642459
+Israel,376,2023,Raw milk of goats,19916.0,0.011803479999691816
+Israel,376,2020,Raw milk of goats,25234.0,0.015258174799643488
+Italy,380,2023,Raw milk of goats,57660.0,0.0041655228215168108
+Italy,380,2021,Raw milk of goats,60960.0,0.0043549171772764191
+Italy,380,2020,Raw milk of goats,61240.0,0.0045330996216001755
+Italy,380,2022,Raw milk of goats,59970.0,0.0042922509732179854
+Jamaica,388,2022,Raw milk of goats,196094.36,0.94053048020330243
+Jamaica,388,2021,Raw milk of goats,193759.65,0.9425957380254345
+Jamaica,388,2023,Raw milk of goats,198298.23,0.95019459996186728
+Jamaica,388,2020,Raw milk of goats,190120.89,0.93967652879223718
+Jordan,400,2023,Raw milk of goats,33530.0,0.052170452647215579
+Jordan,400,2020,Raw milk of goats,9264.0,0.022585481806545987
+Jordan,400,2021,Raw milk of goats,11910.0,0.027980209463935837
+Jordan,400,2022,Raw milk of goats,13744.0,0.026487682090769262
+Kazakhstan,398,2021,Raw milk of goats,1114.99,0.00034161508352641834
+Kazakhstan,398,2022,Raw milk of goats,1206.3,0.00036259902976880023
+Kazakhstan,398,2020,Raw milk of goats,1157.38,0.00036610444380470139
+Kazakhstan,398,2023,Raw milk of goats,1294.6,0.00037635051285533813
+Kenya,404,2022,Raw milk of goats,241739.53,0.040819114683992651
+Kenya,404,2021,Raw milk of goats,251302.29,0.040805574127677942
+Kenya,404,2020,Raw milk of goats,267312.97,0.047665942965856994
+Kenya,404,2023,Raw milk of goats,263183.58,0.04337162676067656
+Kuwait,414,2022,Raw milk of goats,6169.93,0.10258932064647636
+Kuwait,414,2023,Raw milk of goats,6095.57,0.10368324303784075
+Kuwait,414,2020,Raw milk of goats,6031.33,0.1042014324105564
+Kuwait,414,2021,Raw milk of goats,6085.44,0.10421226872457173
+Kyrgyzstan,417,2022,Raw milk of goats,548.0,0.00031590640638592119
+Kyrgyzstan,417,2023,Raw milk of goats,648.0,0.00036440095126643392
+Kyrgyzstan,417,2021,Raw milk of goats,586.0,0.00034479755793893435
+Kyrgyzstan,417,2020,Raw milk of goats,628.0,0.0003763631928783454
+Latvia,428,2022,Raw milk of goats,1480.0,0.0015174973597596613
+Latvia,428,2021,Raw milk of goats,1910.0,0.0019249763157364295
+Latvia,428,2023,Raw milk of goats,1500.0,0.0015565332890586086
+Latvia,428,2020,Raw milk of goats,1900.0,0.001918998081001919
+Lebanon,422,2023,Raw milk of goats,21478.0,0.096497376177126018
+Lebanon,422,2020,Raw milk of goats,33589.0,0.11139115410508024
+Lebanon,422,2022,Raw milk of goats,19951.0,0.085319021553198773
+Lebanon,422,2021,Raw milk of goats,21453.0,0.076730212096283848
+Libya,434,2020,Raw milk of goats,20209.88,0.0883406789998447
+Libya,434,2023,Raw milk of goats,20945.72,0.0923962099137968
+Libya,434,2022,Raw milk of goats,20696.61,0.09065370979386
+Libya,434,2021,Raw milk of goats,20523.23,0.0937627007448667
+Lithuania,440,2022,Raw milk of goats,4330.0,0.0028450530244293467
+Lithuania,440,2020,Raw milk of goats,3670.0,0.0024603296975872681
+Lithuania,440,2023,Raw milk of goats,2650.0,0.0017990861999904954
+Lithuania,440,2021,Raw milk of goats,3610.0,0.0024443255760415467
+Luxembourg,442,2022,Raw milk of goats,3250.0,0.0071834316910903348
+Malawi,454,2023,Raw milk of goats,148135.6,0.6599163484185615
+Malawi,454,2021,Raw milk of goats,134066.22,0.653850376263533
+Malawi,454,2022,Raw milk of goats,142574.87,0.66035276370910023
+Malawi,454,2020,Raw milk of goats,131097.91,0.65010015470745963
+Mali,466,2022,Raw milk of goats,281386.0,0.26174175760800406
+Mali,466,2020,Raw milk of goats,255226.0,0.25624868851586685
+Mali,466,2021,Raw milk of goats,267987.0,0.25829848223003365
+Mali,466,2023,Raw milk of goats,295457.0,0.2651888724736074
+Malta,470,2022,Raw milk of goats,1030.0,0.024483004516282388
+Malta,470,2021,Raw milk of goats,920.0,0.021739130434782608
+Malta,470,2023,Raw milk of goats,1070.0,0.026491705867789057
+Malta,470,2020,Raw milk of goats,920.0,0.020471740097908322
+Mauritania,478,2022,Raw milk of goats,106516.7,0.29540804583659075
+Mauritania,478,2020,Raw milk of goats,102994.73,0.28925847716042835
+Mauritania,478,2023,Raw milk of goats,107086.38,0.29544253789111735
+Mauritania,478,2021,Raw milk of goats,106522.97,0.29432863705463835
+Mexico,484,2023,Raw milk of goats,174314.18,0.01253184240820338
+Mexico,484,2020,Raw milk of goats,168497.7,0.012853482555987962
+Mexico,484,2022,Raw milk of goats,173707.04,0.012703151245762106
+Mexico,484,2021,Raw milk of goats,171545.04,0.012791060086850657
+Mongolia,496,2022,Raw milk of goats,43712.49,0.21212909428656937
+Mongolia,496,2023,Raw milk of goats,13491.03,0.053848760876549384
+Mongolia,496,2020,Raw milk of goats,40811.31,0.21653126248158402
+Mongolia,496,2021,Raw milk of goats,34494.26,0.19683564575716928
+Montenegro,499,2023,Raw milk of goats,5576.0,0.034548906281754513
+Montenegro,499,2020,Raw milk of goats,4831.0,0.026011436201716507
+Montenegro,499,2022,Raw milk of goats,5905.0,0.037690634506034396
+Montenegro,499,2021,Raw milk of goats,6200.0,0.034744404469699515
+Morocco,504,2022,Raw milk of goats,46194.63,0.021473226588268689
+Morocco,504,2023,Raw milk of goats,45320.56,0.0221441255666245
+Morocco,504,2020,Raw milk of goats,45740.42,0.016831458774730364
+Morocco,504,2021,Raw milk of goats,46875.29,0.017570400777481395
+Mozambique,508,2023,Raw milk of goats,20488.65,0.88893058812555181
+Mozambique,508,2022,Raw milk of goats,21283.33,0.89450411542004848
+Mozambique,508,2020,Raw milk of goats,18063.4,0.86372373693421445
+Mozambique,508,2021,Raw milk of goats,18683.93,0.849890351725101
+Myanmar,104,2022,Raw milk of goats,9790.7,0.00445358733760335
+Myanmar,104,2021,Raw milk of goats,9613.27,0.0045388483057988678
+Myanmar,104,2020,Raw milk of goats,9426.9,0.0044959175471928981
+Myanmar,104,2023,Raw milk of goats,9798.21,0.0043695388679811861
+Nepal,524,2022,Raw milk of goats,139802.86,0.051324017847543722
+Nepal,524,2023,Raw milk of goats,143296.28,0.0517188537765019
+Nepal,524,2020,Raw milk of goats,132182.48,0.053927058261993559
+Nepal,524,2021,Raw milk of goats,136279.41,0.051738985860992869
+Netherlands (Kingdom of the),528,2020,Raw milk of goats,407000.0,0.027262375242815995
+Netherlands (Kingdom of the),528,2021,Raw milk of goats,387840.0,0.026555125644552688
+Netherlands (Kingdom of the),528,2022,Raw milk of goats,445220.0,0.029713205698646081
+Netherlands (Kingdom of the),528,2023,Raw milk of goats,427260.0,0.028263450871697852
+Niger,562,2021,Raw milk of goats,391879.6,0.26416485014386237
+Niger,562,2023,Raw milk of goats,431905.65,0.2630698682563456
+Niger,562,2022,Raw milk of goats,415294.17,0.26527597293436783
+Niger,562,2020,Raw milk of goats,407345.91,0.26959354547854819
+North Macedonia,807,2021,Raw milk of goats,17034.0,0.043765801319602886
+North Macedonia,807,2022,Raw milk of goats,14113.06,0.036376958958443395
+North Macedonia,807,2020,Raw milk of goats,16034.0,0.034770276336304945
+North Macedonia,807,2023,Raw milk of goats,14583.0,0.049987831255505925
+Norway,578,2023,Raw milk of goats,18753.0,0.013306105709499324
+Norway,578,2020,Raw milk of goats,21445.0,0.013672559883198276
+Norway,578,2021,Raw milk of goats,19638.0,0.012334745315585571
+Norway,578,2022,Raw milk of goats,19364.0,0.013148067171658189
+Oman,512,2023,Raw milk of goats,116609.59,0.31001708303552694
+Oman,512,2021,Raw milk of goats,113337.19,0.31893210643951819
+Oman,512,2020,Raw milk of goats,111735.54,0.320014262883852
+Oman,512,2022,Raw milk of goats,114961.72,0.31785488543474172
+Pakistan,586,2023,Raw milk of goats,1046000.0,0.016196576266751108
+Pakistan,586,2021,Raw milk of goats,991000.0,0.016353675038780158
+Pakistan,586,2022,Raw milk of goats,1018000.0,0.016272911756219633
+Pakistan,586,2020,Raw milk of goats,965000.0,0.016439018905723503
+Palestine,275,2020,Raw milk of goats,20724.44,0.14279586915011183
+Palestine,275,2022,Raw milk of goats,41000.0,0.13486842105263158
+Palestine,275,2021,Raw milk of goats,41034.0,0.13515498654510602
+Papua New Guinea,598,2021,Raw milk of goats,39.89,0.1954434100930916
+Papua New Guinea,598,2020,Raw milk of goats,39.7,0.19463646614698238
+Papua New Guinea,598,2023,Raw milk of goats,39.96,0.19574801606740472
+Papua New Guinea,598,2022,Raw milk of goats,39.9,0.1954924056834885
+Peru,604,2020,Raw milk of goats,20580.56,0.009534176870382733
+Peru,604,2021,Raw milk of goats,20291.57,0.0092015825080177388
+Peru,604,2022,Raw milk of goats,20392.15,0.0089939126187569152
+Peru,604,2023,Raw milk of goats,20389.3,0.00917822744013388
+Poland,616,2022,Raw milk of goats,9150.0,0.000601258503043748
+Poland,616,2023,Raw milk of goats,9200.0,0.00059385949284399312
+Poland,616,2021,Raw milk of goats,8650.0,0.00058091626276756563
+Poland,616,2020,Raw milk of goats,8510.0,0.00057380315517565727
+Portugal,620,2020,Raw milk of goats,31200.0,0.014863371317504478
+Portugal,620,2022,Raw milk of goats,29880.0,0.014712471626299281
+Portugal,620,2021,Raw milk of goats,30710.0,0.014622486536932372
+Portugal,620,2023,Raw milk of goats,28430.0,0.01380981988458624
+Puerto Rico,630,2020,Raw milk of goats,59.56,0.00024605514444461519
+Puerto Rico,630,2023,Raw milk of goats,59.36,0.00026512141140349005
+Puerto Rico,630,2022,Raw milk of goats,58.7,0.00025004398133061733
+Puerto Rico,630,2021,Raw milk of goats,59.57,0.00027920409444344484
+Qatar,634,2021,Raw milk of goats,9418.32,0.2003845431279139
+Qatar,634,2022,Raw milk of goats,9039.73,0.20311443953120506
+Qatar,634,2020,Raw milk of goats,10431.97,0.21136983323172071
+Qatar,634,2023,Raw milk of goats,9253.97,0.21015582330411717
+Republic of Korea,410,2023,Raw milk of goats,9034.1,0.004659281318195839
+Republic of Korea,410,2021,Raw milk of goats,8957.21,0.0043836095294138367
+Republic of Korea,410,2020,Raw milk of goats,9036.31,0.0043074715894312323
+Republic of Korea,410,2022,Raw milk of goats,8926.76,0.0044986023469073934
+Republic of Moldova,498,2023,Raw milk of goats,7377.0,0.028233754205210442
+Republic of Moldova,498,2020,Raw milk of goats,7056.0,0.021930138089007269
+Republic of Moldova,498,2021,Raw milk of goats,7186.0,0.024337212295270735
+Republic of Moldova,498,2022,Raw milk of goats,7133.0,0.026318508187406376
+Romania,642,2020,Raw milk of goats,240800.0,0.055197707736389684
+Romania,642,2022,Raw milk of goats,221600.0,0.05199558882188695
+Romania,642,2023,Raw milk of goats,231900.0,0.053700444609114488
+Romania,642,2021,Raw milk of goats,227800.0,0.052980440495848546
+Russian Federation,643,2020,Raw milk of goats,254357.0,0.00789458677042923
+Russian Federation,643,2021,Raw milk of goats,249284.0,0.007709827429215289
+Russian Federation,643,2023,Raw milk of goats,239620.0,0.0070883700680105322
+Russian Federation,643,2022,Raw milk of goats,233757.0,0.0070882802818601678
+Rwanda,646,2021,Raw milk of goats,50515.86,0.20813551902877953
+Rwanda,646,2023,Raw milk of goats,47849.45,0.2032095674457334
+Rwanda,646,2020,Raw milk of goats,51600.89,0.20341354363933664
+Rwanda,646,2022,Raw milk of goats,47175.6,0.20311070802824957
+Senegal,686,2020,Raw milk of goats,13970.56,0.05652592329897474
+Senegal,686,2021,Raw milk of goats,13866.98,0.055772489101182432
+Senegal,686,2022,Raw milk of goats,15121.34,0.060248023755061206
+Senegal,686,2023,Raw milk of goats,14352.05,0.055749799562455717
+Serbia,688,2020,Raw milk of goats,34712.0,0.021917725183600096
+Serbia,688,2022,Raw milk of goats,34771.0,0.022995065825368179
+Serbia,688,2023,Raw milk of goats,21382.0,0.015091851938641621
+Serbia,688,2021,Raw milk of goats,35399.0,0.0226412318713123
+Slovakia,703,2022,Raw milk of goats,190.0,0.00020496666594748539
+Slovenia,705,2022,Raw milk of goats,2170.0,0.0034548088710576173
+Slovenia,705,2023,Raw milk of goats,1710.0,0.0028136106357772805
+Slovenia,705,2021,Raw milk of goats,2360.0,0.0036706380066569197
+Slovenia,705,2020,Raw milk of goats,2060.0,0.0032533164876816173
+Somalia,706,2022,Raw milk of goats,376233.68,0.1724563496451893
+Somalia,706,2023,Raw milk of goats,375718.76,0.17366446836084282
+Somalia,706,2021,Raw milk of goats,377339.73,0.17174582606344588
+Somalia,706,2020,Raw milk of goats,382279.23,0.17292423517998479
+South Sudan,728,2022,Raw milk of goats,516441.93,0.14997264775014441
+South Sudan,728,2021,Raw milk of goats,471180.5,0.12870469268699225
+South Sudan,728,2020,Raw milk of goats,540067.47,0.17250744358077494
+South Sudan,728,2023,Raw milk of goats,510463.31,0.14506313216211711
+Spain,724,2022,Raw milk of goats,482080.0,0.056828952021690443
+Spain,724,2021,Raw milk of goats,519200.0,0.059660399949899974
+Spain,724,2023,Raw milk of goats,470230.0,0.054903714462854789
+Spain,724,2020,Raw milk of goats,523900.0,0.0603139225117485
+Sri Lanka,144,2023,Raw milk of goats,16045.75,0.029973805668791386
+Sri Lanka,144,2020,Raw milk of goats,15540.09,0.029780551377391391
+Sri Lanka,144,2021,Raw milk of goats,16338.29,0.029976407712566395
+Sri Lanka,144,2022,Raw milk of goats,16466.44,0.030600711636158826
+Sudan,729,2023,Raw milk of goats,1130887.74,0.2506670438941061
+Sudan,729,2022,Raw milk of goats,1119161.91,0.25140989941705
+Sudan,729,2021,Raw milk of goats,1135943.95,0.25034634183225507
+Sudan,729,2020,Raw milk of goats,1165042.57,0.25026478174178007
+Switzerland,756,2022,Raw milk of goats,22186.0,0.0059307982769739838
+Switzerland,756,2023,Raw milk of goats,21562.0,0.0057235843489087676
+Switzerland,756,2021,Raw milk of goats,22300.0,0.0058069892193114946
+Switzerland,756,2020,Raw milk of goats,22800.0,0.0059850374064837905
+Tajikistan,762,2022,Raw milk of goats,55598.76,0.0496506711616648
+Tajikistan,762,2023,Raw milk of goats,57016.2,0.048503117183752976
+Tajikistan,762,2020,Raw milk of goats,53471.64,0.0497701521607551
+Tajikistan,762,2021,Raw milk of goats,54622.67,0.04978266626590936
+Timor-Leste,626,2023,Raw milk of goats,5460.23,1.0
+Timor-Leste,626,2021,Raw milk of goats,6324.41,1.0
+Timor-Leste,626,2022,Raw milk of goats,6492.4,1.0
+Timor-Leste,626,2020,Raw milk of goats,6058.78,1.0
+Tunisia,788,2021,Raw milk of goats,11383.14,0.0078913230039960956
+Tunisia,788,2020,Raw milk of goats,11623.94,0.0082280122509109325
+Tunisia,788,2023,Raw milk of goats,11421.81,0.0080292262511139044
+Tunisia,788,2022,Raw milk of goats,11201.93,0.0079316470432112055
+Turkmenistan,795,2023,Raw milk of goats,9734.0,0.0037305855722036649
+Turkmenistan,795,2020,Raw milk of goats,11091.1,0.004501532282852958
+Turkmenistan,795,2022,Raw milk of goats,9724.0,0.0038920131415560795
+Turkmenistan,795,2021,Raw milk of goats,12515.3,0.00503615694944731
+Türkiye,792,2021,Raw milk of goats,622785.22,0.026843836340590347
+Türkiye,792,2022,Raw milk of goats,540425.93,0.025062078419107271
+Türkiye,792,2020,Raw milk of goats,589616.99,0.025086038377585128
+Türkiye,792,2023,Raw milk of goats,543058.01,0.025280185984048211
+Ukraine,804,2020,Raw milk of goats,191000.0,0.020618334124962216
+Ukraine,804,2023,Raw milk of goats,151800.0,0.020429586563307494
+Ukraine,804,2021,Raw milk of goats,182500.0,0.020943549960408085
+Ukraine,804,2022,Raw milk of goats,159600.0,0.020546887069365055
+United Republic of Tanzania,834,2020,Raw milk of goats,241732.5,0.070349636083434447
+United Republic of Tanzania,834,2022,Raw milk of goats,256135.89,0.064613297098652184
+United Republic of Tanzania,834,2021,Raw milk of goats,249776.4,0.065708318417345854
+United Republic of Tanzania,834,2023,Raw milk of goats,262420.17,0.060778582306648163
+United States of America,840,2023,Raw milk of goats,25698.09,0.00025027658326459489
+United States of America,840,2022,Raw milk of goats,25927.14,0.00025238969428815176
+United States of America,840,2021,Raw milk of goats,26113.7,0.0002544052669482366
+United States of America,840,2020,Raw milk of goats,26373.06,0.00026030048499676512
+Venezuela (Bolivarian Republic of),862,2022,Raw milk of goats,303497.0,0.084103294831101738
+Venezuela (Bolivarian Republic of),862,2023,Raw milk of goats,314442.0,0.084138640031317657
+Venezuela (Bolivarian Republic of),862,2020,Raw milk of goats,322108.78,0.10443758540684925
+Venezuela (Bolivarian Republic of),862,2021,Raw milk of goats,325553.7,0.092460193364145848
+Yemen,887,2023,Raw milk of goats,86653.0,0.19958541107643407
+Yemen,887,2021,Raw milk of goats,80630.97,0.19783539811987233
+Yemen,887,2020,Raw milk of goats,76791.4,0.19783539205228384
+Yemen,887,2022,Raw milk of goats,84663.0,0.19783663283046379
+Afghanistan,4,2023,Raw milk of sheep,191272.91,0.086177109914661043
+Afghanistan,4,2021,Raw milk of sheep,196388.17,0.0908501218265272
+Afghanistan,4,2020,Raw milk of sheep,197306.06,0.0900551525453882
+Afghanistan,4,2022,Raw milk of sheep,194548.06,0.088582340494715917
+Albania,8,2020,Raw milk of sheep,76890.0,0.0709474422381339
+Albania,8,2021,Raw milk of sheep,75670.0,0.072521827469546968
+Albania,8,2023,Raw milk of sheep,66426.0,0.071611766037613808
+Albania,8,2022,Raw milk of sheep,71103.99,0.071155717360292234
+Algeria,12,2020,Raw milk of sheep,592306.0,0.17657749412684551
+Algeria,12,2023,Raw milk of sheep,554786.44,0.16745012533214781
+Algeria,12,2022,Raw milk of sheep,547145.33,0.16476117677890509
+Algeria,12,2021,Raw milk of sheep,524908.0,0.16085095742200314
+Armenia,51,2022,Raw milk of sheep,15000.0,0.024073182474723159
+Armenia,51,2023,Raw milk of sheep,32200.0,0.05442866801893171
+Armenia,51,2021,Raw milk of sheep,22000.0,0.032801550618756524
+Armenia,51,2020,Raw milk of sheep,45000.0,0.0687757909215956
+Austria,40,2020,Raw milk of sheep,11420.0,0.0029644935700082549
+Austria,40,2022,Raw milk of sheep,11690.0,0.0029369645504107732
+Austria,40,2023,Raw milk of sheep,11540.0,0.0031046793490396747
+Austria,40,2021,Raw milk of sheep,10810.0,0.0027950944928105824
+Azerbaijan,31,2020,Raw milk of sheep,30275.0,0.013808450452406341
+Azerbaijan,31,2022,Raw milk of sheep,30496.0,0.013465926076057578
+Azerbaijan,31,2021,Raw milk of sheep,30502.0,0.013718468705502229
+Azerbaijan,31,2023,Raw milk of sheep,29623.0,0.012969846628050036
+Bahrain,48,2023,Raw milk of sheep,158.97,0.01443798396808876
+Bahrain,48,2022,Raw milk of sheep,158.2,0.014069976342517655
+Bahrain,48,2021,Raw milk of sheep,156.16,0.014902313313121307
+Bahrain,48,2020,Raw milk of sheep,156.05,0.014924745045568054
+Bangladesh,50,2023,Raw milk of sheep,70340.0,0.005
+Bangladesh,50,2022,Raw milk of sheep,65370.0,0.005
+Bangladesh,50,2020,Raw milk of sheep,53400.0,0.005
+Bangladesh,50,2021,Raw milk of sheep,59925.0,0.005
+Bolivia (Plurinational State of),68,2023,Raw milk of sheep,31073.83,0.048757654475047173
+Bolivia (Plurinational State of),68,2021,Raw milk of sheep,31383.75,0.050492798613168133
+Bolivia (Plurinational State of),68,2022,Raw milk of sheep,31315.25,0.04969189761948116
+Bolivia (Plurinational State of),68,2020,Raw milk of sheep,31311.79,0.050522019459595023
+Bosnia and Herzegovina,70,2023,Raw milk of sheep,3161.0,0.0054184701092779087
+Bosnia and Herzegovina,70,2021,Raw milk of sheep,6418.0,0.011756129013349745
+Bosnia and Herzegovina,70,2022,Raw milk of sheep,13253.0,0.023108093499464712
+Bosnia and Herzegovina,70,2020,Raw milk of sheep,15883.0,0.024624195368797053
+Bulgaria,100,2020,Raw milk of sheep,76480.0,0.076065443333830626
+Bulgaria,100,2021,Raw milk of sheep,70370.0,0.073835080319388915
+Bulgaria,100,2022,Raw milk of sheep,56660.0,0.0652314068616164
+Bulgaria,100,2023,Raw milk of sheep,52010.0,0.063754933928264979
+Burkina Faso,854,2021,Raw milk of sheep,75300.0,0.17598186428596468
+Burkina Faso,854,2022,Raw milk of sheep,77481.02,0.17807023997085092
+Burkina Faso,854,2020,Raw milk of sheep,73500.0,0.1745366467591988
+Burkina Faso,854,2023,Raw milk of sheep,78130.1,0.17720126819970705
+Burundi,108,2020,Raw milk of sheep,1404.07,0.013055458104250446
+Burundi,108,2022,Raw milk of sheep,1328.5,0.014616821965128014
+Burundi,108,2023,Raw milk of sheep,1355.81,0.013872648430513461
+Burundi,108,2021,Raw milk of sheep,1301.73,0.01165902582338125
+Cameroon,120,2022,Raw milk of sheep,18909.63,0.06666450205507661
+Cameroon,120,2023,Raw milk of sheep,18967.66,0.066998462412828558
+Cameroon,120,2020,Raw milk of sheep,18327.7,0.069080394039087611
+Cameroon,120,2021,Raw milk of sheep,18414.81,0.061730357140702151
+Chad,148,2021,Raw milk of sheep,44435.53,0.10207790319900316
+Chad,148,2022,Raw milk of sheep,46259.66,0.10200202157762125
+Chad,148,2023,Raw milk of sheep,48158.67,0.10261935902894176
+Chad,148,2020,Raw milk of sheep,42683.34,0.10077688697214768
+China,159,2022,Raw milk of sheep,1303269.85,0.029262606844839754
+China,159,2020,Raw milk of sheep,1208049.61,0.030711128181944308
+China,159,2023,Raw milk of sheep,1299773.93,0.027500369035039975
+China,159,2021,Raw milk of sheep,1268569.02,0.03027583313388349
+"China, mainland",156,2021,Raw milk of sheep,1268569.02,0.030613063259680641
+"China, mainland",156,2023,Raw milk of sheep,1299773.93,0.027784722904299938
+"China, mainland",156,2020,Raw milk of sheep,1208049.61,0.031066857570392879
+"China, mainland",156,2022,Raw milk of sheep,1303269.85,0.029577792662723847
+Croatia,191,2021,Raw milk of sheep,5000.0,0.008771929824561403
+Croatia,191,2022,Raw milk of sheep,6000.0,0.011214953271028037
+Croatia,191,2023,Raw milk of sheep,5000.0,0.010438413361169102
+Croatia,191,2020,Raw milk of sheep,7000.0,0.011437908496732025
+Cyprus,196,2021,Raw milk of sheep,44450.0,0.11614841912725372
+Cyprus,196,2020,Raw milk of sheep,37900.0,0.10909614277489925
+Cyprus,196,2022,Raw milk of sheep,44050.0,0.12027960571225732
+Czechia,203,2022,Raw milk of sheep,100.0,2.9941823037837482e-05
+Ecuador,218,2020,Raw milk of sheep,3987.82,0.0017188992076060086
+Ecuador,218,2023,Raw milk of sheep,4259.09,0.0020230147814039789
+Ecuador,218,2021,Raw milk of sheep,4122.02,0.0019169064698669606
+Ecuador,218,2022,Raw milk of sheep,4216.82,0.0020312256592950146
+Egypt,818,2023,Raw milk of sheep,23233.33,0.0041240157435938887
+Egypt,818,2020,Raw milk of sheep,23500.0,0.0042129795625672284
+Egypt,818,2022,Raw milk of sheep,21200.0,0.0031608766959892649
+Egypt,818,2021,Raw milk of sheep,25000.0,0.0040551500405515
+Eritrea,232,2023,Raw milk of sheep,5900.33,0.039926150226662967
+Eritrea,232,2021,Raw milk of sheep,5871.97,0.039770850459145031
+Eritrea,232,2022,Raw milk of sheep,5877.07,0.03976946571032515
+Eritrea,232,2020,Raw milk of sheep,5814.21,0.039417474964638093
+Ethiopia,231,2022,Raw milk of sheep,56348.99,0.013426107692799621
+Ethiopia,231,2020,Raw milk of sheep,60070.56,0.015808426374827433
+Ethiopia,231,2021,Raw milk of sheep,58367.54,0.015399678484325356
+Ethiopia,231,2023,Raw milk of sheep,55772.34,0.014739666898297274
+France,250,2020,Raw milk of sheep,344170.0,0.013092026481521211
+France,250,2023,Raw milk of sheep,338820.0,0.013525478533362608
+France,250,2022,Raw milk of sheep,342090.0,0.013320462869438514
+France,250,2021,Raw milk of sheep,350200.0,0.013558361350849507
+Georgia,268,2021,Raw milk of sheep,7300.0,0.012059756921557063
+Georgia,268,2023,Raw milk of sheep,6730.0,0.01118235547262483
+Georgia,268,2020,Raw milk of sheep,7168.8,0.012231985940246047
+Georgia,268,2022,Raw milk of sheep,7300.0,0.012548086674619518
+Germany,276,2020,Raw milk of sheep,6700.0,0.00020187478400151375
+Greece,300,2020,Raw milk of sheep,945430.0,0.47501168147995559
+Greece,300,2023,Raw milk of sheep,943970.0,0.48100137069365251
+Greece,300,2021,Raw milk of sheep,951650.0,0.469317907216444
+Greece,300,2022,Raw milk of sheep,956450.0,0.4783637254803893
+Guinea,324,2023,Raw milk of sheep,16511.12,0.056342251833054934
+Guinea,324,2020,Raw milk of sheep,14889.42,0.057025658639459555
+Guinea,324,2021,Raw milk of sheep,15425.37,0.056178728930750495
+Guinea,324,2022,Raw milk of sheep,15980.61,0.055342271611717377
+Guinea-Bissau,624,2021,Raw milk of sheep,6632.39,0.17168395959865798
+Guinea-Bissau,624,2023,Raw milk of sheep,6638.28,0.17069726299332463
+Guinea-Bissau,624,2022,Raw milk of sheep,6634.08,0.17079251508382995
+Guinea-Bissau,624,2020,Raw milk of sheep,6640.84,0.17204970778566353
+Hungary,348,2023,Raw milk of sheep,1610.0,0.00079227994547539254
+Hungary,348,2020,Raw milk of sheep,1610.0,0.00079742446755819716
+Hungary,348,2021,Raw milk of sheep,1580.0,0.00075779376498800956
+Hungary,348,2022,Raw milk of sheep,1500.0,0.00073353220206367055
+Indonesia,360,2021,Raw milk of sheep,150202.49,0.096924415367200339
+Indonesia,360,2023,Raw milk of sheep,145000.0,0.10560305868407853
+Indonesia,360,2022,Raw milk of sheep,140748.64,0.090465916699220258
+Indonesia,360,2020,Raw milk of sheep,161082.55,0.10335251569630255
+Iran (Islamic Republic of),364,2023,Raw milk of sheep,398106.25,0.0469620328553728
+Iran (Islamic Republic of),364,2021,Raw milk of sheep,391370.89,0.044518190509078015
+Iran (Islamic Republic of),364,2020,Raw milk of sheep,376202.0,0.045086371191711723
+Iran (Islamic Republic of),364,2022,Raw milk of sheep,399506.63,0.047929422197345563
+Iraq,368,2020,Raw milk of sheep,58069.0,0.17016556776556777
+Iraq,368,2023,Raw milk of sheep,58868.0,0.16219001148896425
+Iraq,368,2021,Raw milk of sheep,58344.44,0.16737007043867647
+Iraq,368,2022,Raw milk of sheep,58592.0,0.1652205544385823
+Israel,376,2023,Raw milk of sheep,20982.0,0.012435258955288896
+Israel,376,2022,Raw milk of sheep,19738.0,0.011645772168150366
+Israel,376,2021,Raw milk of sheep,19565.0,0.011676491072691454
+Israel,376,2020,Raw milk of sheep,18565.0,0.011225648535919052
+Italy,380,2020,Raw milk of sheep,481970.0,0.035676323066992754
+Italy,380,2023,Raw milk of sheep,471290.0,0.03404733351634856
+Italy,380,2021,Raw milk of sheep,477100.0,0.034083513538034446
+Italy,380,2022,Raw milk of sheep,475400.0,0.034025948185223122
+Jordan,400,2022,Raw milk of sheep,97079.7,0.18709373043271629
+Jordan,400,2020,Raw milk of sheep,101092.0,0.2464606570366307
+Jordan,400,2023,Raw milk of sheep,123571.0,0.19226826734473834
+Jordan,400,2021,Raw milk of sheep,104676.0,0.24591573516766982
+Kenya,404,2022,Raw milk of sheep,87815.84,0.01482821135637663
+Kenya,404,2023,Raw milk of sheep,92269.72,0.015205689721038572
+Kenya,404,2020,Raw milk of sheep,96851.3,0.017270050689905194
+Kenya,404,2021,Raw milk of sheep,95721.75,0.015542958105380002
+Kuwait,414,2023,Raw milk of sheep,296.28,0.0050396060167058141
+Kuwait,414,2020,Raw milk of sheep,294.49,0.0050878131076536612
+Kuwait,414,2021,Raw milk of sheep,297.51,0.0050948151765932027
+Kuwait,414,2022,Raw milk of sheep,299.65,0.0049823725604207234
+Lebanon,422,2022,Raw milk of sheep,12069.0,0.051612213479302088
+Lebanon,422,2020,Raw milk of sheep,21993.0,0.072935355391140835
+Lebanon,422,2021,Raw milk of sheep,12680.0,0.045352122751171356
+Lebanon,422,2023,Raw milk of sheep,12337.0,0.055428258212925026
+Libya,434,2023,Raw milk of sheep,61289.71,0.27036248506691246
+Libya,434,2022,Raw milk of sheep,60616.09,0.26550596603494481
+Libya,434,2021,Raw milk of sheep,60588.77,0.27680665811422261
+Libya,434,2020,Raw milk of sheep,60904.2,0.266222183503432
+Luxembourg,442,2022,Raw milk of sheep,90.0,0.00019892580067634773
+Luxembourg,442,2020,Raw milk of sheep,120.0,0.00026818039601305142
+Luxembourg,442,2021,Raw milk of sheep,110.0,0.00024808859018020255
+Malawi,454,2022,Raw milk of sheep,7253.85,0.033597084079622572
+Malawi,454,2020,Raw milk of sheep,6843.38,0.033935570725131585
+Malawi,454,2023,Raw milk of sheep,7486.95,0.033352959753039438
+Malawi,454,2021,Raw milk of sheep,6927.8,0.0337873674418396
+Mali,466,2021,Raw milk of sheep,194098.0,0.18708078676907863
+Mali,466,2020,Raw milk of sheep,184855.0,0.18559571248854176
+Mali,466,2022,Raw milk of sheep,203803.0,0.18957501590620732
+Mali,466,2023,Raw milk of sheep,213995.0,0.19207225675813946
+Malta,470,2022,Raw milk of sheep,2070.0,0.049203708105538389
+Malta,470,2020,Raw milk of sheep,1910.0,0.042501112594570539
+Malta,470,2021,Raw milk of sheep,1860.0,0.043950850661625712
+Malta,470,2023,Raw milk of sheep,2020.0,0.05001237930180738
+Mauritania,478,2022,Raw milk of sheep,79421.48,0.2202635286696816
+Mauritania,478,2021,Raw milk of sheep,79171.45,0.2187549311865736
+Mauritania,478,2023,Raw milk of sheep,79098.9,0.21822737644503154
+Mauritania,478,2020,Raw milk of sheep,78478.2,0.22040433158367934
+Mongolia,496,2023,Raw milk of sheep,572.46,0.0022849450080082443
+Mongolia,496,2020,Raw milk of sheep,20335.48,0.10789330598721292
+Mongolia,496,2021,Raw milk of sheep,17662.83,0.10078994444145498
+Mongolia,496,2022,Raw milk of sheep,21616.91,0.10490309610764073
+Montenegro,499,2021,Raw milk of sheep,12746.0,0.071427770866256457
+Montenegro,499,2022,Raw milk of sheep,7022.54,0.044823706764438066
+Montenegro,499,2023,Raw milk of sheep,6928.81,0.04293091953624166
+Montenegro,499,2020,Raw milk of sheep,10352.0,0.055738022678569504
+Morocco,504,2023,Raw milk of sheep,35526.71,0.017358742416445302
+Morocco,504,2022,Raw milk of sheep,36363.08,0.016903104457971444
+Morocco,504,2021,Raw milk of sheep,37292.7,0.013978530801076226
+Morocco,504,2020,Raw milk of sheep,36709.32,0.013508214533849597
+Myanmar,104,2020,Raw milk of sheep,2341.98,0.0011169471382081941
+Myanmar,104,2022,Raw milk of sheep,2594.39,0.0011801344595181911
+Myanmar,104,2021,Raw milk of sheep,2384.37,0.0011257661269159865
+Myanmar,104,2023,Raw milk of sheep,2591.73,0.001155789166624606
+Nepal,524,2022,Raw milk of sheep,17509.79,0.0064281429898268372
+Nepal,524,2021,Raw milk of sheep,17800.74,0.006758117276668649
+Nepal,524,2023,Raw milk of sheep,13538.43,0.0048863242055788656
+Nepal,524,2020,Raw milk of sheep,17952.15,0.0073240163066848772
+Niger,562,2022,Raw milk of sheep,170414.56,0.10885509952182137
+Niger,562,2020,Raw milk of sheep,168771.82,0.11169817153845329
+Niger,562,2023,Raw milk of sheep,176378.85,0.10743077992312845
+Niger,562,2021,Raw milk of sheep,146091.34,0.098479729331192659
+North Macedonia,807,2023,Raw milk of sheep,31670.0,0.10855891214852038
+North Macedonia,807,2020,Raw milk of sheep,27733.0,0.060139957193136154
+North Macedonia,807,2022,Raw milk of sheep,39835.25,0.10267690028592895
+North Macedonia,807,2021,Raw milk of sheep,35855.0,0.092122977944954887
+Oman,512,2022,Raw milk of sheep,22746.57,0.0628914424852319
+Oman,512,2020,Raw milk of sheep,22152.46,0.063445374300459961
+Oman,512,2023,Raw milk of sheep,23049.65,0.0612795676409619
+Oman,512,2021,Raw milk of sheep,22447.44,0.063167344482201279
+Pakistan,586,2021,Raw milk of sheep,41000.0,0.00067658998646820032
+Pakistan,586,2020,Raw milk of sheep,41000.0,0.00069844536283384837
+Pakistan,586,2022,Raw milk of sheep,42000.0,0.00067137749878312832
+Pakistan,586,2023,Raw milk of sheep,42000.0,0.00065034053843551288
+Palestine,275,2020,Raw milk of sheep,53202.64,0.3665776841198366
+Palestine,275,2021,Raw milk of sheep,90660.0,0.29860971584976631
+Palestine,275,2022,Raw milk of sheep,91000.0,0.29934210526315791
+Poland,616,2020,Raw milk of sheep,540.0,3.641054098646944e-05
+Poland,616,2022,Raw milk of sheep,440.0,2.8912977195546351e-05
+Poland,616,2021,Raw milk of sheep,510.0,3.425055422097786e-05
+Poland,616,2023,Raw milk of sheep,440.0,2.8401975744712714e-05
+Portugal,620,2022,Raw milk of sheep,72180.0,0.03554036820569887
+Portugal,620,2023,Raw milk of sheep,70320.0,0.034157809858744441
+Portugal,620,2020,Raw milk of sheep,74310.0,0.03540054880140249
+Portugal,620,2021,Raw milk of sheep,73930.0,0.035201577000176176
+Qatar,634,2021,Raw milk of sheep,11827.63,0.25164511652141869
+Qatar,634,2023,Raw milk of sheep,11018.2,0.25022113669370272
+Qatar,634,2022,Raw milk of sheep,11035.08,0.24794812338222608
+Qatar,634,2020,Raw milk of sheep,12530.1,0.2538815916242842
+Republic of Moldova,498,2020,Raw milk of sheep,24164.0,0.0751020205191003
+Republic of Moldova,498,2023,Raw milk of sheep,22001.0,0.084203717807894124
+Republic of Moldova,498,2022,Raw milk of sheep,22962.0,0.084722498948440375
+Republic of Moldova,498,2021,Raw milk of sheep,23134.0,0.078349160762426
+Romania,642,2020,Raw milk of sheep,426000.0,0.097650429799426938
+Romania,642,2021,Raw milk of sheep,419700.0,0.0976114612647394
+Romania,642,2023,Raw milk of sheep,448400.0,0.10383475361244905
+Romania,642,2022,Raw milk of sheep,404400.0,0.09488725685727023
+Russian Federation,643,2023,Raw milk of sheep,5790.0,0.00017127811824464142
+Russian Federation,643,2022,Raw milk of sheep,5649.0,0.00017129624059270134
+Russian Federation,643,2020,Raw milk of sheep,4979.0,0.00015453534807364111
+Russian Federation,643,2021,Raw milk of sheep,5379.0,0.00016636110517220936
+Rwanda,646,2020,Raw milk of sheep,6390.93,0.025193397215647749
+Rwanda,646,2021,Raw milk of sheep,6143.54,0.025312622344231459
+Rwanda,646,2022,Raw milk of sheep,5617.43,0.024185387882700592
+Rwanda,646,2023,Raw milk of sheep,5331.57,0.022642392619071878
+Senegal,686,2021,Raw milk of sheep,12004.74,0.048282627566530623
+Senegal,686,2020,Raw milk of sheep,11975.84,0.048455138038904215
+Senegal,686,2022,Raw milk of sheep,12687.55,0.050551063185771024
+Senegal,686,2023,Raw milk of sheep,12839.25,0.04987340582232222
+Serbia,688,2021,Raw milk of sheep,10390.0,0.0066454532371799995
+Serbia,688,2020,Raw milk of sheep,9584.0,0.0060514945309870739
+Serbia,688,2023,Raw milk of sheep,11603.0,0.0081896341803413489
+Serbia,688,2022,Raw milk of sheep,9300.0,0.0061503584071762119
+Slovakia,703,2022,Raw milk of sheep,11670.0,0.012589268376879761
+Slovakia,703,2023,Raw milk of sheep,12210.0,0.0131884511940895
+Slovakia,703,2020,Raw milk of sheep,11390.0,0.01225943944547294
+Slovakia,703,2021,Raw milk of sheep,11440.0,0.01251531594608787
+Slovenia,705,2022,Raw milk of sheep,590.0,0.00093932591425068858
+Slovenia,705,2023,Raw milk of sheep,760.0,0.0012504936159010137
+Slovenia,705,2020,Raw milk of sheep,490.0,0.000773847125710676
+Slovenia,705,2021,Raw milk of sheep,650.0,0.0010109808069182194
+Somalia,706,2023,Raw milk of sheep,334304.36,0.15452193270868828
+Somalia,706,2020,Raw milk of sheep,386934.28,0.1750299497932914
+Somalia,706,2022,Raw milk of sheep,355926.57,0.16314806532985815
+Somalia,706,2021,Raw milk of sheep,373768.06,0.17012018379520122
+South Sudan,728,2022,Raw milk of sheep,135873.61,0.039457146810427453
+South Sudan,728,2021,Raw milk of sheep,132452.16,0.036179796380640387
+South Sudan,728,2020,Raw milk of sheep,137922.35,0.044054925232124967
+South Sudan,728,2023,Raw milk of sheep,135646.43,0.038547914447385784
+Spain,724,2022,Raw milk of sheep,545950.0,0.064358128020747377
+Spain,724,2021,Raw milk of sheep,560300.0,0.064383131918199069
+Spain,724,2023,Raw milk of sheep,529900.0,0.06187074047565394
+Spain,724,2020,Raw milk of sheep,556250.0,0.0640382122488263
+Sudan,729,2021,Raw milk of sheep,408642.83,0.090059230128810591
+Sudan,729,2023,Raw milk of sheep,405926.34,0.089975646642480922
+Sudan,729,2022,Raw milk of sheep,404396.12,0.09084403869127862
+Sudan,729,2020,Raw milk of sheep,416002.42,0.089362189439440229
+Switzerland,756,2022,Raw milk of sheep,6648.0,0.0017771543741694333
+Switzerland,756,2021,Raw milk of sheep,6400.0,0.0016665798656319984
+Switzerland,756,2023,Raw milk of sheep,6577.0,0.0017458498405886729
+Switzerland,756,2020,Raw milk of sheep,6200.0,0.0016275101719385747
+Tunisia,788,2020,Raw milk of sheep,21000.0,0.014864861421267623
+Tunisia,788,2023,Raw milk of sheep,22888.89,0.016090276098697013
+Tunisia,788,2022,Raw milk of sheep,22666.67,0.016049379534146715
+Tunisia,788,2021,Raw milk of sheep,25000.0,0.017331164784049252
+Türkiye,792,2021,Raw milk of sheep,1143761.69,0.049299422389948548
+Türkiye,792,2022,Raw milk of sheep,1067342.14,0.049497647925031585
+Türkiye,792,2023,Raw milk of sheep,933575.73,0.043459386750585957
+Türkiye,792,2020,Raw milk of sheep,1101065.07,0.046846276601083793
+Ukraine,804,2020,Raw milk of sheep,14700.0,0.0015868560818688199
+Ukraine,804,2023,Raw milk of sheep,11500.0,0.0015476959517657192
+Ukraine,804,2021,Raw milk of sheep,14900.0,0.0017099117501922217
+Ukraine,804,2022,Raw milk of sheep,12400.0,0.00159637468458726
+Yemen,887,2022,Raw milk of sheep,68444.0,0.15993681416260072
+Yemen,887,2021,Raw milk of sheep,65184.94,0.15993716256073803
+Yemen,887,2023,Raw milk of sheep,67623.0,0.15575414876832541
+Yemen,887,2020,Raw milk of sheep,62080.9,0.15993716992343712
