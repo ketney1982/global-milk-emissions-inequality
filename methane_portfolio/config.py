@@ -32,13 +32,14 @@ FIGURE_DIR: Path = OUTPUT_DIR / "figures"
 EMISSION_INTENSITY_FILE = "cercetare-485010.faostat_clean.milk_emission_intensity_2020_2023.csv"
 SPECIES_STRUCTURE_FILE  = "cercetare-485010.faostat_clean.milk_species_structure.csv"
 COUNTRY_INTENSITY_FILE  = "cercetare-485010.faostat_clean.milk_intensity_country_year.csv"
+REGION_MAP_FILE = "m49_regions.csv"
 
 # ---------------------------------------------------------------------------
 # Reproducibility
 # ---------------------------------------------------------------------------
 RNG_SEED: int = 20230101
 PYMC_SEED: int = 42
-CHAINS: int = 2
+CHAINS: int = 4
 DRAWS: int = 1000
 TUNE: int = 1000
 TARGET_ACCEPT: float = 0.90
@@ -56,6 +57,7 @@ IDENTITY_TOL: float = 1e-10
 SHAPLEY_RECON_TOL: float = 1e-8
 BASE_YEAR: int = 2020
 END_YEAR: int = 2023
+DEFAULT_WEIGHT_METHOD: str = "avg"
 
 # ---------------------------------------------------------------------------
 # Bayesian model

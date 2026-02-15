@@ -46,6 +46,11 @@ _AGG_DTYPES = {
     "kg_co2e_per_ton_milk": np.float64,
 }
 
+_REGION_DTYPES = {
+    "country_m49": "Int64",
+    "region": "string",
+}
+
 
 # ---------------------------------------------------------------------------
 # Public API
@@ -148,3 +153,30 @@ def load_all(
     agg_df = build_agg_df(agg_raw)
     species = canonical_species(long_df)
     return long_df, agg_df, species
+
+
+def load_region_mapping(data_dir: Path | None = None) -> pd.DataFrame:
+    """Load optional M49→region mapping.
+
+    Returns a DataFrame with columns [country_m49, region].
+    If the mapping file is missing, returns an empty DataFrame with the same columns.
+    """
+    d = Path(data_dir) if data_dir else config.DATA_DIR
+    path = d / config.REGION_MAP_FILE
+    if not path.exists():
+        return pd.DataFrame(columns=["country_m49", "region"])
+
+    regions = pd.read_csv(path, dtype=_REGION_DTYPES)
+    missing_cols = {"country_m49", "region"} - set(regions.columns)
+    if missing_cols:
+        raise ValueError(
+            f"Region mapping is missing required columns: {sorted(missing_cols)}"
+        )
+
+    out = regions[["country_m49", "region"]].copy()
+    out["country_m49"] = out["country_m49"].astype("Int64")
+    out.dropna(subset=["country_m49"], inplace=True)
+    out["country_m49"] = out["country_m49"].astype(np.int64)
+    out.drop_duplicates(subset=["country_m49"], keep="first", inplace=True)
+    out.reset_index(drop=True, inplace=True)
+    return out

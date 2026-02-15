@@ -5,7 +5,11 @@ import pandas as pd
 import pytest
 
 from methane_portfolio.io import load_all
-from methane_portfolio.shapley import build_wide_matrices, shapley_decompose
+from methane_portfolio.shapley import (
+    build_interval_weights,
+    build_wide_matrices,
+    shapley_decompose,
+)
 
 
 @pytest.fixture(scope="module")
@@ -30,6 +34,23 @@ class TestBuildWideMatrices:
         # Shares should sum to ~1 for each country
         sums = W.sum(axis=1)
         np.testing.assert_allclose(sums, 1.0, atol=1e-4)
+
+
+class TestBuildIntervalWeights:
+    """Interval-weight builder behavior."""
+
+    def test_avg_and_sum_alignment(self):
+        idx = pd.Index([100, 200, 300], name="country_m49")
+        prod0 = pd.Series([10.0, 20.0, 30.0], index=idx)
+        prod1 = pd.Series([30.0, 40.0, 50.0], index=idx)
+
+        w_avg = build_interval_weights(prod0, prod1, method="avg")
+        w_sum = build_interval_weights(prod0, prod1, method="sum")
+
+        assert w_avg.index.equals(idx)
+        assert w_sum.index.equals(idx)
+        np.testing.assert_allclose(w_avg.values, np.array([20.0, 30.0, 40.0]))
+        np.testing.assert_allclose(w_sum.values, np.array([40.0, 60.0, 80.0]))
 
 
 class TestShapleyDecomposition:

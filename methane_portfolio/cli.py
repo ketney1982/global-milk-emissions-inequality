@@ -45,7 +45,7 @@ def cmd_validate(args: argparse.Namespace) -> None:
     report = validate_all(long_df, agg_df, raise_on_fail=not args.no_fail)
     n_pass = (report["status"] == "PASS").sum()
     n_total = len(report)
-    print(f"✓ Validation: {n_pass}/{n_total} checks passed")
+    print(f"[OK] Validation: {n_pass}/{n_total} checks passed")
 
 
 def cmd_shapley(args: argparse.Namespace) -> None:
@@ -53,8 +53,13 @@ def cmd_shapley(args: argparse.Namespace) -> None:
     from methane_portfolio.shapley import shapley_decompose
 
     long_df, agg_df, species = load_all(args.data_dir)
-    result = shapley_decompose(long_df, agg_df, species)
-    print(f"✓ Shapley decomposition for {len(result)} countries saved")
+    result = shapley_decompose(
+        long_df,
+        agg_df,
+        species,
+        weight_method=args.weight_method,
+    )
+    print(f"[OK] Shapley decomposition for {len(result)} countries saved")
 
 
 def cmd_bayes(args: argparse.Namespace) -> None:
@@ -74,7 +79,7 @@ def cmd_bayes(args: argparse.Namespace) -> None:
     I_samples, country_list, species_list = posterior_intensity_samples(
         idata, data, n_samples=500,
     )
-    print(f"✓ Bayesian model fitted ({args.chains} chains × {args.draws} draws)")
+    print(f"[OK] Bayesian model fitted ({args.chains} chains x {args.draws} draws)")
     print(f"  Posterior samples: {I_samples.shape[0]} draws × {len(country_list)} countries × {len(species_list)} species")
 
 
@@ -89,7 +94,7 @@ def cmd_optimize(args: argparse.Namespace) -> None:
         alpha=args.alpha,
         delta=args.delta,
     )
-    print(f"✓ Robust optimisation for {len(result)} countries saved")
+    print(f"[OK] Robust optimisation for {len(result)} countries saved")
 
 
 def cmd_uncertainty(args: argparse.Namespace) -> None:
@@ -115,14 +120,14 @@ def cmd_uncertainty(args: argparse.Namespace) -> None:
         long_df, I_samples=I_samples,
         country_list=country_list, species_list=species_list,
     )
-    print(f"✓ Uncertainty propagation for {len(result)} countries saved")
+    print(f"[OK] Uncertainty propagation for {len(result)} countries saved")
 
     # Also run the sensitivity grid
     grid = run_sensitivity_grid(
         long_df, I_samples=I_samples,
         country_list=country_list, species_list=species_list,
     )
-    print(f"✓ Sensitivity grid: {len(grid)} rows saved")
+    print(f"[OK] Sensitivity grid: {len(grid)} rows saved")
 
 
 def cmd_figures(args: argparse.Namespace) -> None:
@@ -167,7 +172,7 @@ def cmd_figures(args: argparse.Namespace) -> None:
         long_df=long_df,
         agg_df=agg_df,
     )
-    print("✓ Figures generated")
+    print("[OK] Figures generated")
 
 
 def cmd_tables(args: argparse.Namespace) -> None:
@@ -193,7 +198,7 @@ def cmd_tables(args: argparse.Namespace) -> None:
         opt_df=opt_df,
         sensitivity_df=sensitivity_df,
     )
-    print("✓ Tables generated")
+    print("[OK] Tables generated")
 
 
 def cmd_report(args: argparse.Namespace) -> None:
@@ -202,7 +207,7 @@ def cmd_report(args: argparse.Namespace) -> None:
 
     long_df, agg_df, species = load_all(args.data_dir)
     path = generate_appendix(long_df=long_df)
-    print(f"✓ Methods appendix written to {path}")
+    print(f"[OK] Methods appendix written to {path}")
 
 
 def cmd_run_all(args: argparse.Namespace) -> None:
@@ -221,13 +226,18 @@ def cmd_run_all(args: argparse.Namespace) -> None:
     step += 1
     from methane_portfolio.validate import validate_all
     validate_all(long_df, agg_df, raise_on_fail=not args.no_fail)
-    print(f"✓ Step {step}/{n_steps}: Validation passed")
+    print(f"[OK] Step {step}/{n_steps}: Validation passed")
 
     # 2. Shapley
     step += 1
     from methane_portfolio.shapley import shapley_decompose
-    shapley_df = shapley_decompose(long_df, agg_df, species)
-    print(f"✓ Step {step}/{n_steps}: Shapley decomposition ({len(shapley_df)} countries)")
+    shapley_df = shapley_decompose(
+        long_df,
+        agg_df,
+        species,
+        weight_method=args.weight_method,
+    )
+    print(f"[OK] Step {step}/{n_steps}: Shapley decomposition ({len(shapley_df)} countries)")
 
     # 3. Bayesian model fitting (optional)
     idata, bayes_data = None, None
@@ -244,9 +254,9 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         I_samples, country_list, species_list = posterior_intensity_samples(
             idata, bayes_data, n_samples=500,
         )
-        print(f"✓ Step {step}/{n_steps}: Bayesian model fitted ({args.chains} chains × {args.draws} draws)")
+        print(f"[OK] Step {step}/{n_steps}: Bayesian model fitted ({args.chains} chains x {args.draws} draws)")
     else:
-        print(f"  ⊘ Skipping Bayesian model fitting (--skip-bayes)")
+        print("  [SKIP] Bayesian model fitting (--skip-bayes)")
 
     # 4. Robust optimisation (posterior-informed if Bayes ran)
     step += 1
@@ -258,7 +268,7 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         species_list=species_list,
         lam=args.lam, alpha=args.alpha, delta=args.delta,
     )
-    print(f"✓ Step {step}/{n_steps}: Robust optimisation ({len(opt_df)} countries)")
+    print(f"[OK] Step {step}/{n_steps}: Robust optimisation ({len(opt_df)} countries)")
 
     # 5. Uncertainty propagation
     step += 1
@@ -267,7 +277,7 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         long_df, I_samples=I_samples,
         country_list=country_list, species_list=species_list,
     )
-    print(f"✓ Step {step}/{n_steps}: Uncertainty propagation ({len(unc_df)} countries)")
+    print(f"[OK] Step {step}/{n_steps}: Uncertainty propagation ({len(unc_df)} countries)")
 
     # 6. Sensitivity grid (optional, depends on Bayes)
     sensitivity_df = None
@@ -278,7 +288,7 @@ def cmd_run_all(args: argparse.Namespace) -> None:
             long_df, I_samples=I_samples,
             country_list=country_list, species_list=species_list,
         )
-        print(f"✓ Step {step}/{n_steps}: Sensitivity grid ({len(sensitivity_df)} rows)")
+        print(f"[OK] Step {step}/{n_steps}: Sensitivity grid ({len(sensitivity_df)} rows)")
     else:
         # Try loading existing sensitivity grid
         sens_path = config.OUTPUT_DIR / "sensitivity_grid.csv"
@@ -293,7 +303,7 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         shapley_df=shapley_df, opt_df=opt_df,
         sensitivity_df=sensitivity_df,
     )
-    print(f"✓ Step {step}/{n_steps}: Tables generated")
+    print(f"[OK] Step {step}/{n_steps}: Tables generated")
 
     # 8. Figures
     step += 1
@@ -307,18 +317,19 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         long_df=long_df,
         agg_df=agg_df,
     )
-    print(f"✓ Step {step}/{n_steps}: Figures generated")
+    print(f"[OK] Step {step}/{n_steps}: Figures generated")
 
     # 9. Report
     step += 1
     from methane_portfolio.report import generate_appendix
     generate_appendix(long_df=long_df)
-    print(f"✓ Step {step}/{n_steps}: Methods appendix written")
+    print(f"[OK] Step {step}/{n_steps}: Methods appendix written")
 
     # Manifest
     write_manifest({
         "pipeline": "run_all",
         "skip_bayes": args.skip_bayes,
+        "weight_method": args.weight_method,
         "chains": args.chains,
         "draws": args.draws,
         "lam": args.lam,
@@ -329,7 +340,7 @@ def cmd_run_all(args: argparse.Namespace) -> None:
     })
 
     elapsed = time.time() - t0
-    print(f"\n✓ Pipeline complete in {elapsed:.1f}s")
+    print(f"\n[OK] Pipeline complete in {elapsed:.1f}s")
 
 
 # ---------------------------------------------------------------------------
@@ -341,6 +352,13 @@ def build_parser() -> argparse.ArgumentParser:
         prog="methane-portfolio",
         description="Bayesian Species Portfolio Optimisation for Milk CH₄",
     )
+
+    # Suppress PyTensor C++ warnings on Windows (since we use nutpie or python fallback)
+    import logging
+    logging.getLogger("pytensor.configdefaults").setLevel(logging.ERROR)
+    import os
+    os.environ["PYTENSOR_FLAGS"] = os.environ.get("PYTENSOR_FLAGS", "") + ",cxx="
+
     p.add_argument("-v", "--verbose", action="store_true", help="Debug logging")
     p.add_argument(
         "--data-dir", type=Path, default=None,
@@ -348,6 +366,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     sub = p.add_subparsers(dest="command", help="Pipeline sub-commands")
+    weight_choices = ("base", "end", "avg", "sum", "trapz")
 
     # validate
     v = sub.add_parser("validate", help="Run data validation checks")
@@ -355,7 +374,13 @@ def build_parser() -> argparse.ArgumentParser:
                    help="Don't raise on validation failure")
 
     # shapley
-    sub.add_parser("shapley", help="Shapley decomposition")
+    sp = sub.add_parser("shapley", help="Shapley decomposition")
+    sp.add_argument(
+        "--weight-method",
+        choices=weight_choices,
+        default=config.DEFAULT_WEIGHT_METHOD,
+        help="Global weighting method across the interval.",
+    )
 
     # bayes
     b = sub.add_parser("bayes", help="Fit Bayesian hierarchical model")
@@ -398,6 +423,12 @@ def build_parser() -> argparse.ArgumentParser:
     ra.add_argument("--lam", type=float, default=0.5)
     ra.add_argument("--alpha", type=float, default=0.90)
     ra.add_argument("--delta", type=float, default=0.10)
+    ra.add_argument(
+        "--weight-method",
+        choices=weight_choices,
+        default=config.DEFAULT_WEIGHT_METHOD,
+        help="Global weighting method for Shapley aggregation.",
+    )
 
     return p
 

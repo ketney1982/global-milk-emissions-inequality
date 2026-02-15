@@ -16,6 +16,7 @@ dependencies = [
     "pandas>=2.0",
     "scipy>=1.11",
     "matplotlib>=3.7",
+    "seaborn>=0.13",
     "pymc>=5.10",
     "arviz>=0.17",
     "xarray>=2023.6",

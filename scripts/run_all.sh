@@ -5,12 +5,13 @@ set -euo pipefail
 
 echo "=== Methane Portfolio Pipeline ==="
 echo ""
+WEIGHT_METHOD="${WEIGHT_METHOD:-avg}"
 
 echo "Step 1/7: Validation"
 methane-portfolio validate
 
 echo "Step 2/7: Shapley Decomposition"
-methane-portfolio shapley
+methane-portfolio shapley --weight-method "${WEIGHT_METHOD}"
 
 echo "Step 3/7: Robust Optimization"
 methane-portfolio optimize --delta 0.10 --lam 0.5 --alpha 0.90

@@ -38,7 +38,8 @@ methane-portfolio tables
 methane-portfolio report
 
 # Bayesian model (requires PyMC + GPU/CPU time)
-methane-portfolio bayes --chains 2 --draws 1000
+# Tip: Increase --chains to match your CPU core count for faster parallel processing
+methane-portfolio bayes --chains 4 --draws 1000
 ```
 
 ## Project Structure

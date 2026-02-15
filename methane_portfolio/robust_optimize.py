@@ -228,13 +228,38 @@ def run_all_countries(
         cname = crow["country"]
 
         csub = sub[sub["country_m49"] == m49]
+        invalid_active = csub[
+            (csub["species_share"] > 0)
+            & (csub["kg_co2e_per_ton_milk"].isna())
+        ]
+        if not invalid_active.empty:
+            logger.warning(
+                "Skipping country %s (%s): active species has NaN intensity.",
+                cname,
+                m49,
+            )
+            continue
+
         # Build w_ref aligned to all_species
         w_ref = np.zeros(len(all_species))
         i_obs = np.zeros(len(all_species))
         for _, row in csub.iterrows():
             idx = all_species.index(row["milk_species"])
             w_ref[idx] = row["species_share"]
-            i_obs[idx] = row["kg_co2e_per_ton_milk"]
+            i_obs[idx] = (
+                0.0 if pd.isna(row["kg_co2e_per_ton_milk"])
+                else row["kg_co2e_per_ton_milk"]
+            )
+
+        active_species = int(np.sum(w_ref > 0))
+        if active_species < 2:
+            logger.warning(
+                "Skipping country %s (%s): fewer than 2 active species (%d).",
+                cname,
+                m49,
+                active_species,
+            )
+            continue
 
         # Get I_scenarios for this country
         if I_samples is not None and country_list is not None and species_list is not None:
@@ -271,15 +296,25 @@ def run_all_countries(
             len(port_base) * (1 - alpha)
         )
         red_cvar = (1.0 - sol["cvar_opt"] / cvar_base) * 100 if cvar_base > 0 else 0.0
+        production_tonnes = float(csub["milk_tonnes"].sum())
+        absolute_reduction_kt = (
+            (baseline - sol["mean_opt"]) * production_tonnes / 1e6
+        )
 
         row_dict = {
             "country_m49": m49,
             "country": cname,
+            "production_tonnes": production_tonnes,
+            "baseline_intensity": baseline,
             "baseline_intensity_kg_co2e_per_t": baseline,
+            "optimized_mean": sol["mean_opt"],
             "optimized_mean_kg_co2e_per_t": sol["mean_opt"],
+            "optimized_cvar": sol["cvar_opt"],
             "optimized_cvar_kg_co2e_per_t": sol["cvar_opt"],
+            "reduction_pct": red_mean,
             "reduction_mean_pct": red_mean,
             "reduction_cvar_pct": red_cvar,
+            "absolute_reduction_kt": absolute_reduction_kt,
             "delta": delta,
             "lambda": lam,
             "alpha": alpha,

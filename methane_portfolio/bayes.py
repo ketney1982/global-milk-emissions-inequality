@@ -199,6 +199,15 @@ def fit_model(
         nuts_sampler or "pymc",
     )
 
+    # Suggest increasing chains if we have more cores available
+    max_cores = multiprocessing.cpu_count()
+    if chains < max_cores:
+        logger.info(
+            "TIP: You have %d CPUs but are only running %d chains. "
+            "Increase --chains to %d to speed up sampling.",
+            max_cores, chains, max_cores
+        )
+
     sample_kwargs: dict = dict(
         draws=draws,
         tune=tune,
