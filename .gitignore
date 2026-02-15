@@ -168,3 +168,5 @@ tmp/
 
 # Agent / AI artifacts
 .gemini/
+
+tests
