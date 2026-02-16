@@ -7,6 +7,8 @@
 import numpy as np
 import pytest
 
+pytest.importorskip("pymc")
+
 from methane_portfolio.io import load_all
 from methane_portfolio.bayes import prepare_bayes_data, build_model
 
@@ -53,9 +55,11 @@ class TestBayesModelBuild:
         assert model is not None
         # Check that free RVs include expected parameters
         rv_names = [rv.name for rv in model.free_RVs]
+        named_vars = set(model.named_vars.keys())
         assert "alpha_s" in rv_names
         assert "beta_s" in rv_names
         assert "gamma_s" in rv_names
-        assert "u_c" in rv_names
+        assert "u_c_raw" in rv_names
+        assert "u_c" in named_vars
         assert "tau" in rv_names
         assert "nu" in rv_names

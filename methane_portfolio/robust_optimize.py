@@ -21,6 +21,7 @@ causal guardrails.
 
 from __future__ import annotations
 
+import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -72,6 +73,8 @@ def solve_robust(
     alpha: float = 0.90,
     delta: float = 0.10,
     allow_expansion: bool = False,
+    baseline_ceiling: float | None = None,
+    no_harm_tol: float = 1e-10,
     method: str = "SLSQP",
     maxiter: int = 2000,
     ftol: float = 1e-12,
@@ -86,6 +89,7 @@ def solve_robust(
     alpha : CVaR confidence level
     delta : TV-distance budget
     allow_expansion : allow species with w_ref=0
+    baseline_ceiling : optional upper bound for E[I'(w)] (do-no-harm)
 
     Returns
     -------
@@ -148,6 +152,18 @@ def solve_robust(
         "type": "ineq",
         "fun": lambda x: tv_base["fun"](x[:S]),
     }
+    constraints: list[dict] = [simplex, tv]
+    if baseline_ceiling is not None:
+        species_mean = I_scenarios.mean(axis=0)
+        constraints.append(
+            {
+                "type": "ineq",
+                "fun": lambda x: float(
+                    baseline_ceiling - (species_mean @ x[:S]) + no_harm_tol
+                ),
+                "jac": lambda x: np.concatenate([-species_mean, [0.0]]),
+            },
+        )
 
     result = minimize(
         objective,
@@ -155,7 +171,7 @@ def solve_robust(
         jac=objective_jac,
         method=method,
         bounds=ext_bounds,
-        constraints=[simplex, tv],
+        constraints=constraints,
         options={"maxiter": maxiter, "ftol": ftol},
     )
 
@@ -210,8 +226,12 @@ def run_all_countries(
     alpha: float = 0.90,
     delta: float = 0.10,
     allow_expansion: bool = False,
+    do_no_harm: bool = config.OptimConfig.do_no_harm,
+    no_harm_tol: float = config.OptimConfig.no_harm_tol,
     log_skips: bool = True,
     output_dir: Path | None = None,
+    save_csv: bool = True,
+    save_audit: bool = True,
 ) -> pd.DataFrame:
     """Run robust optimisation for all countries with data in ``year``.
 
@@ -227,14 +247,19 @@ def run_all_countries(
     year : reference year
     lam, alpha, delta : optimisation parameters
     allow_expansion : allow zero-share species
+    do_no_harm : enforce optimized_mean <= baseline_intensity
     output_dir : where to save results
+    save_csv : if False, skip writing robust_optimization_results.csv
+    save_audit : if True, write robust_optimization_audit.json alongside CSV
 
     Returns
     -------
     DataFrame with per-country optimisation results
     """
-    out = output_dir or config.OUTPUT_DIR
-    out.mkdir(parents=True, exist_ok=True)
+    out: Path | None = None
+    if save_csv:
+        out = output_dir or config.OUTPUT_DIR
+        out.mkdir(parents=True, exist_ok=True)
 
     sub = long_df[long_df["year"] == year].copy()
     all_species = sorted(sub["milk_species"].unique())
@@ -243,6 +268,7 @@ def run_all_countries(
     skipped_nan_intensity: list[tuple[str, int]] = []
     fixed_low_species: list[tuple[str, int, int]] = []
     expansion_disabled_no_posterior: list[tuple[str, int]] = []
+    reverted_no_harm: list[tuple[str, int, float, float, str]] = []
 
     # Get unique countries
     countries = sub.groupby(["country_m49", "country"]).size().reset_index(name="_n")
@@ -310,25 +336,74 @@ def run_all_countries(
         if active_species < 2 and not effective_allow_expansion:
             # No decision freedom: keep baseline mix and include country in outputs.
             fixed_low_species.append((str(cname), int(m49), active_species))
-            sol = {
+            sol_raw = {
                 "w_opt": w_ref.copy(),
                 "mean_opt": baseline,
                 "cvar_opt": float(cvar_base),
                 "success": True,
                 "message": "Fixed baseline (insufficient active species or expansion unavailable)",
             }
+            sol_final = sol_raw.copy()
+            no_harm_applied = False
+            no_harm_action = "not_applicable_fixed_baseline"
         else:
-            sol = solve_robust(
+            sol_raw = solve_robust(
                 w_ref, I_scen,
                 lam=lam, alpha=alpha, delta=delta,
                 allow_expansion=effective_allow_expansion,
+                baseline_ceiling=None,
+                no_harm_tol=no_harm_tol,
             )
+            sol_final = sol_raw
+            no_harm_applied = False
+            no_harm_action = "not_needed"
 
-        red_mean = (1.0 - sol["mean_opt"] / baseline) * 100
-        red_cvar = (1.0 - sol["cvar_opt"] / cvar_base) * 100 if cvar_base > 0 else 0.0
+            if do_no_harm and sol_raw["mean_opt"] > baseline + no_harm_tol:
+                no_harm_applied = True
+                sol_constrained = solve_robust(
+                    w_ref, I_scen,
+                    lam=lam, alpha=alpha, delta=delta,
+                    allow_expansion=effective_allow_expansion,
+                    baseline_ceiling=baseline,
+                    no_harm_tol=no_harm_tol,
+                )
+                if sol_constrained["mean_opt"] <= baseline + no_harm_tol:
+                    sol_final = sol_constrained
+                    no_harm_action = "constrained_solution"
+                else:
+                    sol_final = {
+                        "w_opt": w_ref.copy(),
+                        "mean_opt": baseline,
+                        "cvar_opt": float(cvar_base),
+                        "success": True,
+                        "message": (
+                            "Reverted to baseline (do-no-harm guard: "
+                            f"raw_mean_opt={sol_raw['mean_opt']:.6g} > baseline={baseline:.6g})"
+                        ),
+                    }
+                    no_harm_action = "baseline_revert"
+                reverted_no_harm.append(
+                    (
+                        str(cname),
+                        int(m49),
+                        float(sol_raw["mean_opt"]),
+                        float(baseline),
+                        no_harm_action,
+                    ),
+                )
+            elif not do_no_harm:
+                no_harm_action = "disabled"
+
+        red_mean_raw = (1.0 - sol_raw["mean_opt"] / baseline) * 100
+        red_cvar_raw = (1.0 - sol_raw["cvar_opt"] / cvar_base) * 100 if cvar_base > 0 else 0.0
+        red_mean = (1.0 - sol_final["mean_opt"] / baseline) * 100
+        red_cvar = (1.0 - sol_final["cvar_opt"] / cvar_base) * 100 if cvar_base > 0 else 0.0
         production_tonnes = float(csub["milk_tonnes"].sum())
         absolute_reduction_kt = (
-            (baseline - sol["mean_opt"]) * production_tonnes / 1e6
+            (baseline - sol_final["mean_opt"]) * production_tonnes / 1e6
+        )
+        absolute_reduction_kt_raw = (
+            (baseline - sol_raw["mean_opt"]) * production_tonnes / 1e6
         )
 
         row_dict = {
@@ -337,31 +412,73 @@ def run_all_countries(
             "production_tonnes": production_tonnes,
             "baseline_intensity": baseline,
             "baseline_intensity_kg_co2e_per_t": baseline,
-            "optimized_mean": sol["mean_opt"],
-            "optimized_mean_kg_co2e_per_t": sol["mean_opt"],
-            "optimized_cvar": sol["cvar_opt"],
-            "optimized_cvar_kg_co2e_per_t": sol["cvar_opt"],
+            "raw_optimized_mean": sol_raw["mean_opt"],
+            "raw_optimized_mean_kg_co2e_per_t": sol_raw["mean_opt"],
+            "raw_optimized_cvar": sol_raw["cvar_opt"],
+            "raw_optimized_cvar_kg_co2e_per_t": sol_raw["cvar_opt"],
+            "raw_reduction_mean_pct": red_mean_raw,
+            "raw_reduction_cvar_pct": red_cvar_raw,
+            "raw_absolute_reduction_kt": absolute_reduction_kt_raw,
+            "optimized_mean": sol_final["mean_opt"],
+            "optimized_mean_kg_co2e_per_t": sol_final["mean_opt"],
+            "optimized_cvar": sol_final["cvar_opt"],
+            "optimized_cvar_kg_co2e_per_t": sol_final["cvar_opt"],
             "reduction_pct": red_mean,
             "reduction_mean_pct": red_mean,
             "reduction_cvar_pct": red_cvar,
             "absolute_reduction_kt": absolute_reduction_kt,
+            "no_harm_enabled": bool(do_no_harm),
+            "no_harm_applied": bool(no_harm_applied),
+            "no_harm_action": no_harm_action,
+            "no_harm_excess_raw": float(max(0.0, sol_raw["mean_opt"] - baseline)),
             "delta": delta,
             "lambda": lam,
             "alpha": alpha,
-            "solver_success": sol["success"],
-            "solver_message": str(sol.get("message", "")),
+            "solver_success_raw": sol_raw["success"],
+            "solver_message_raw": str(sol_raw.get("message", "")),
+            "solver_success": sol_final["success"],
+            "solver_message": str(sol_final.get("message", "")),
         }
         # Add optimal weights
         for si, sp in enumerate(all_species):
-            row_dict[f"w_opt_{sp}"] = sol["w_opt"][si]
+            row_dict[f"w_opt_{sp}"] = sol_final["w_opt"][si]
             row_dict[f"w_base_{sp}"] = w_ref[si]
 
         results.append(row_dict)
 
     df = pd.DataFrame(results)
-    df.sort_values("reduction_mean_pct", ascending=False, inplace=True)
-    df.reset_index(drop=True, inplace=True)
-    df.to_csv(out / "robust_optimization_results.csv", index=False)
+    if not df.empty:
+        df.sort_values("reduction_mean_pct", ascending=False, inplace=True)
+        df.reset_index(drop=True, inplace=True)
+    if save_csv and out is not None:
+        df.to_csv(out / "robust_optimization_results.csv", index=False)
+        if save_audit:
+            trigger_df = df[df["no_harm_applied"] == True]  # noqa: E712
+            audit = {
+                "do_no_harm_enabled": bool(do_no_harm),
+                "n_countries": int(len(df)),
+                "n_no_harm_applied": int(len(trigger_df)),
+                "n_negative_raw_reductions": int((df["raw_reduction_mean_pct"] < 0).sum()),
+                "n_negative_final_reductions": int((df["reduction_mean_pct"] < 0).sum()),
+                "total_raw_absolute_reduction_kt": float(df["raw_absolute_reduction_kt"].sum()),
+                "total_final_absolute_reduction_kt": float(df["absolute_reduction_kt"].sum()),
+                "no_harm_actions": (
+                    trigger_df["no_harm_action"].value_counts(dropna=False).to_dict()
+                    if not trigger_df.empty
+                    else {}
+                ),
+                "countries_no_harm_applied": trigger_df[
+                    ["country_m49", "country", "no_harm_action", "no_harm_excess_raw"]
+                ].to_dict(orient="records"),
+                "note": (
+                    "Raw optimisation outputs are preserved in raw_* columns. "
+                    "Final outputs may apply do-no-harm guard but never alter source input data."
+                ),
+            }
+            (out / "robust_optimization_audit.json").write_text(
+                json.dumps(audit, indent=2),
+                encoding="utf-8",
+            )
 
     if log_skips:
         if skipped_nan_intensity:
@@ -387,6 +504,16 @@ def run_all_countries(
                 len(expansion_disabled_no_posterior),
                 preview,
                 " ..." if len(expansion_disabled_no_posterior) > 8 else "",
+            )
+        if reverted_no_harm:
+            preview = ", ".join(
+                [f"{c} ({m})" for c, m, _, _, _ in reverted_no_harm[:8]],
+            )
+            logger.warning(
+                "Do-no-harm guard triggered for %d countries (raw optimised posterior mean exceeded observed baseline). Sample: %s%s",
+                len(reverted_no_harm),
+                preview,
+                " ..." if len(reverted_no_harm) > 8 else "",
             )
 
     return df

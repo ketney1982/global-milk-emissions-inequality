@@ -25,8 +25,8 @@ python -m venv .venv
 # Install
 pip install -e ".[dev]"
 
-# Run the full pipeline (without Bayesian model fitting)
-methane-portfolio run-all
+# Run the full pipeline without Bayesian model fitting (fast path)
+methane-portfolio run-all --skip-bayes
 # Optional: allow expansion into species with baseline zero share
 methane-portfolio run-all --allow-expansion
 
@@ -43,7 +43,7 @@ methane-portfolio report
 
 # Bayesian model (requires PyMC + GPU/CPU time)
 # Tip: Increase --chains to match your CPU core count for faster parallel processing
-methane-portfolio bayes --chains 4 --draws 1000
+methane-portfolio bayes --chains 4 --draws 5000 --tune 5000 --target-accept 0.95
 
 # Reproducibility manifest (runs pipeline + writes checksums)
 python scripts/reproduce.py --skip-bayes
@@ -84,6 +84,7 @@ python scripts/reproduce.py --skip-bayes
 - **Structural-consistent inference**: National intensity modelled as mixture $I_{ct} = \sum w_{cts} I_{cts}$
 - **Bayesian partial pooling + regime shift**: Student-t likelihood with $\gamma_s \cdot \mathbf{1}[t \geq 2022]$
 - **Robust portfolio optimization**: Minimizes $\lambda E[I] + (1-\lambda) \text{CVaR}_\alpha(I)$ via Rockafellar-Uryasev
+- **Editorial traceability**: `robust_optimization_results.csv` keeps both raw (`raw_*`) and guarded outputs, with `robust_optimization_audit.json` documenting every do-no-harm intervention
 - **Causal guardrails**: All results are labelled as accounting counterfactuals; causal language triggers errors
 
 ## Dependencies
@@ -120,6 +121,12 @@ python scripts/reproduce.py --skip-bayes
 
 ```bash
 python scripts/prepublish_check.py
+```
+
+- Editorial integrity check (raw vs final optimisation traceability):
+
+```bash
+python scripts/editorial_integrity_check.py
 ```
 
 ## License

@@ -101,8 +101,12 @@ def table3_bayes_summary(
     if not summary:
         return pd.DataFrame()
 
-    df = pd.DataFrame(summary)
-    df.to_csv(out / "Table3_bayes_summary.csv")
+    df = (
+        pd.DataFrame(summary)
+        .rename_axis("parameter")
+        .reset_index()
+    )
+    df.to_csv(out / "Table3_bayes_summary.csv", index=False)
     _to_latex(df, out / "Table3_bayes_summary.tex",
               "Bayesian Model Parameter Estimates")
     return df
@@ -122,7 +126,7 @@ def table4_optimization(
 
     df.to_csv(out / "Table4_optimization.csv", index=False)
     _to_latex(df, out / "Table4_optimization.tex",
-              f"Top-{n} Countries by Robust Optimisation Gain")
+              f"Top-{n} Countries by Robust Optimisation Gain (all analysed countries)")
     return df
 
 
@@ -149,7 +153,7 @@ def table5_sensitivity(
 
     agg.to_csv(out / "Table5_sensitivity.csv", index=False)
     _to_latex(agg, out / "Table5_sensitivity.tex",
-              "Sensitivity Analysis Summary")
+              "Sensitivity Analysis Summary (top producers subset)")
     return agg
 
 

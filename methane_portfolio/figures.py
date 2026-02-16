@@ -410,21 +410,32 @@ def fig4_pareto_risk(
     out = output_dir or config.FIGURE_DIR
 
     if countries is None:
-        top = (
+        mean_by_country = (
             sensitivity_df
-            .groupby("country")["reduction_mean_pct"]
-            .mean()
-            .nlargest(6)
-            .index.tolist()
+            .groupby("country", as_index=False)
+            .agg(
+                mean_reduction_pct=("reduction_mean_pct", "mean"),
+                mean_cvar_pct=("reduction_cvar_pct", "mean"),
+            )
         )
-        countries = top
+        top_positive = mean_by_country.nlargest(4, "mean_reduction_pct")
+        top_negative = mean_by_country.nsmallest(4, "mean_reduction_pct")
+        countries = (
+            pd.Index(
+                pd.concat(
+                    [top_positive["country"], top_negative["country"]],
+                    ignore_index=True,
+                ),
+            )
+            .drop_duplicates()
+            .tolist()
+        )
 
     fig, ax = plt.subplots(figsize=(6, 5), constrained_layout=True)
     _setup_ax(ax, "Pareto Frontier: Mean vs Risk Reduction")
 
-    palette_list = [PALETTE["struct"], PALETTE["within"], PALETTE["highlight"],
-                    PALETTE["secondary"], PALETTE["tertiary"], PALETTE["net"]]
-    markers = ["o", "s", "D", "^", "v", "P"]
+    palette_list = [mpl.colormaps["tab20"](i) for i in range(20)]
+    markers = ["o", "s", "D", "^", "v", "P", "X", "<", ">", "*"]
 
     for i, c in enumerate(countries):
         csub = sensitivity_df[sensitivity_df["country"] == c]
@@ -440,6 +451,8 @@ def fig4_pareto_risk(
 
     ax.set_xlabel("Mean Intensity Reduction (%)", fontsize=9)
     ax.set_ylabel("CVaR Intensity Reduction (%)", fontsize=9)
+    ax.axvline(0.0, color="#9a9a9a", linewidth=0.6, linestyle="--", alpha=0.8, zorder=1)
+    ax.axhline(0.0, color="#9a9a9a", linewidth=0.6, linestyle="--", alpha=0.8, zorder=1)
     ax.legend(fontsize=7, loc="lower right", framealpha=0.9,
               edgecolor="#cccccc")
 

@@ -44,9 +44,9 @@ REGION_MAP_FILE = "m49_regions.csv"
 RNG_SEED: int = 20230101
 PYMC_SEED: int = 42
 CHAINS: int = 4
-DRAWS: int = 1000
-TUNE: int = 1000
-TARGET_ACCEPT: float = 0.90
+DRAWS: int = 5000
+TUNE: int = 5000
+TARGET_ACCEPT: float = 0.95
 
 # ---------------------------------------------------------------------------
 # Validation tolerances
@@ -81,6 +81,8 @@ class OptimConfig:
     solver_method: str = "SLSQP"
     solver_maxiter: int = 2000
     solver_ftol: float = 1e-12
+    do_no_harm: bool = True
+    no_harm_tol: float = 1e-10
 
 # ---------------------------------------------------------------------------
 # Sensitivity grid

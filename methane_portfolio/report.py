@@ -14,7 +14,6 @@ import json
 import logging
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from methane_portfolio import config
@@ -33,7 +32,7 @@ _TEMPLATE = r"""# Methods Appendix
 - **Emission Intensity** (species-level): `{intensity_file}`
 - **Species Structure** (shares): `{structure_file}`
 - **Aggregate Intensity** (country-year): `{agg_file}`
-- Coverage: {n_countries} countries, years {base_year}â€“{end_year}, {n_species} species
+{coverage_section}
 
 ---
 
@@ -60,8 +59,8 @@ $$\Delta_{{struct}} = \frac{{1}}{{2}} \left[ \sum_s (\Delta w_s) I_s^0 + \sum_s 
 $$\Delta_{{within}} = \frac{{1}}{{2}} \left[ \sum_s w_s^0 (\Delta I_s) + \sum_s w_s^1 (\Delta I_s) \right]$$
 
 - **Reconstruction tolerance**: {recon_tol:.2e}
-- **Global production-weighted structure effect**: {global_struct:+.6f} kg COâ‚‚e/t
-- **Global production-weighted within effect**: {global_within:+.6f} kg COâ‚‚e/t
+- **Global production-weighted structure effect**: {global_struct:+.6f} kg CO2e/t
+- **Global production-weighted within effect**: {global_within:+.6f} kg CO2e/t
 
 ---
 
@@ -75,13 +74,14 @@ $$\mu_{{cts}} = \alpha_s + u_c + \beta_s (t - 2020) + \gamma_s \cdot \mathbf{{1}
 
 | Parameter | Prior |
 |-----------|-------|
-| $\alpha_s$ | $\mathcal{{N}}(0, 5)$ |
-| $\beta_s$ | $\mathcal{{N}}(0, 1)$ |
-| $\gamma_s$ | $\mathcal{{N}}(0, 1)$ |
-| $\sigma_s$ | $\text{{HalfNormal}}(1)$ |
-| $u_c$ | $\mathcal{{N}}(0, \tau)$ |
-| $\tau$ | $\text{{HalfNormal}}(1)$ |
-| $\nu$ | $\Gamma(2, 0.1)$ |
+| $\alpha_s$ | $\mathcal{{N}}(\bar y, \sigma_\alpha)$ with $\sigma_\alpha \in [0.5, 2.5]$ |
+| $\beta_s$ | $\mathcal{{N}}(0, 0.5)$ |
+| $\gamma_s$ | $\mathcal{{N}}(0, 0.5)$ |
+| $\sigma_s$ | $\text{{HalfNormal}}(0.5)$ |
+| $z_c$ | $\mathcal{{N}}(0, 1)$ |
+| $u_c$ | $u_c = \tau \cdot z_c$ (non-centred parameterisation) |
+| $\tau$ | $\text{{HalfNormal}}(0.5)$ |
+| $\nu$ | $\Gamma(6, 1)$ |
 
 ### Sampling
 
@@ -103,8 +103,9 @@ Subject to:
 - $\sum_s w_s = 1$, $w_s \geq 0$
 - $\frac{{1}}{{2}} \| w - w_{{ref}} \|_1 \leq \delta$
 - $w_s = 0$ for species not in current mix (unless expansion allowed)
+- **Do-no-harm guard**: optimized mean intensity must not exceed baseline intensity
 
-CVaR is computed via the Rockafellarâ€“Uryasev linear relaxation.
+CVaR is computed via the Rockafellar-Uryasev linear relaxation.
 
 ### Default parameters
 
@@ -113,6 +114,9 @@ CVaR is computed via the Rockafellarâ€“Uryasev linear relaxation.
 | $\lambda$ | {lam} |
 | $\alpha$ | {opt_alpha} |
 | $\delta$ | {delta} |
+
+{optimisation_scope_section}
+{optimisation_transparency_section}
 
 ---
 
@@ -197,20 +201,70 @@ def generate_appendix(
     if diag_path.exists():
         with open(diag_path, "r", encoding="utf-8") as f:
             diag = json.load(f)
+        converged = diag.get("converged", "N/A")
         diagnostics_section = (
             f"### Diagnostics\n\n"
-            f"- Max RĚ‚: {diag.get('max_rhat', 'N/A')}\n"
+            f"- Max R-hat: {diag.get('max_rhat', 'N/A')}\n"
             f"- Min ESS (bulk): {diag.get('min_ess_bulk', 'N/A')}\n"
             f"- Min ESS (tail): {diag.get('min_ess_tail', 'N/A')}\n"
             f"- Divergences: {diag.get('divergences', 'N/A')}\n"
+            f"- Convergence flag (R-hat/ESS/divergences): {converged}\n"
         )
 
     # Data dimensions
-    n_countries = 0
+    n_countries_input = 0
     n_species = 0
     if long_df is not None:
-        n_countries = long_df["country_m49"].nunique()
+        n_countries_input = long_df["country_m49"].nunique()
         n_species = long_df["milk_species"].nunique()
+    n_countries_analysis = n_countries_shapley or n_countries_input
+    n_excluded_analysis = max(0, int(n_countries_input - n_countries_analysis))
+    n_sensitivity_countries = 20
+    sens_path = out / "sensitivity_grid.csv"
+    if sens_path.exists():
+        try:
+            sens_df = pd.read_csv(sens_path, usecols=["country_m49"])
+            if not sens_df.empty:
+                n_sensitivity_countries = int(sens_df["country_m49"].nunique())
+        except Exception:
+            logger.warning("Could not parse sensitivity_grid.csv country set; keeping default scope count.")
+
+    coverage_section = (
+        f"- Input panel coverage: {n_countries_input or '?'} countries, years "
+        f"{config.BASE_YEAR}-{config.END_YEAR}, {n_species or '?'} species\n"
+        f"- Interval-analysis coverage (Shapley + optimisation): {n_countries_analysis or '?'} countries\n"
+        f"- Countries excluded from interval analyses due to active-share NaN intensity at endpoints: {n_excluded_analysis}"
+    )
+
+    optimisation_scope_section = (
+        "- `Table4_optimization.csv` is ranked from `robust_optimization_results.csv` "
+        "over all analysed countries.\n"
+        f"- `sensitivity_grid.csv` is computed on the top {n_sensitivity_countries} producers only "
+        "(runtime-control subset used for parameter grid sweeps)."
+    )
+    opt_audit_path = out / "robust_optimization_audit.json"
+    if opt_audit_path.exists():
+        try:
+            with open(opt_audit_path, "r", encoding="utf-8") as f:
+                opt_audit = json.load(f)
+            optimisation_transparency_section = (
+                "- `robust_optimization_results.csv` preserves both raw (`raw_*`) and final (`optimized_*`) outputs.\n"
+                f"- Do-no-harm applied to {opt_audit.get('n_no_harm_applied', 'N/A')} / {opt_audit.get('n_countries', 'N/A')} countries.\n"
+                f"- Negative reductions: raw={opt_audit.get('n_negative_raw_reductions', 'N/A')}, "
+                f"final={opt_audit.get('n_negative_final_reductions', 'N/A')}.\n"
+                "- Full traceability file: `outputs/robust_optimization_audit.json`."
+            )
+        except Exception:
+            logger.warning("Could not parse robust_optimization_audit.json; using fallback transparency text.")
+            optimisation_transparency_section = (
+                "- `robust_optimization_results.csv` preserves both raw (`raw_*`) and final (`optimized_*`) outputs.\n"
+                "- `no_harm_applied` flags where the guard changed the unconstrained solution."
+            )
+    else:
+        optimisation_transparency_section = (
+            "- `robust_optimization_results.csv` preserves both raw (`raw_*`) and final (`optimized_*`) outputs.\n"
+            "- `no_harm_applied` flags where the guard changed the unconstrained solution."
+        )
 
     from methane_portfolio import __version__
 
@@ -218,10 +272,9 @@ def generate_appendix(
         intensity_file=config.EMISSION_INTENSITY_FILE,
         structure_file=config.SPECIES_STRUCTURE_FILE,
         agg_file=config.COUNTRY_INTENSITY_FILE,
-        n_countries=n_countries or n_countries_shapley,
+        coverage_section=coverage_section,
         base_year=config.BASE_YEAR,
         end_year=config.END_YEAR,
-        n_species=n_species or "?",
         share_tol=config.SHARE_SUM_TOL,
         share_status=share_status,
         milk_tol=config.MILK_MATCH_REL_TOL,
@@ -241,6 +294,8 @@ def generate_appendix(
         lam=0.5,
         opt_alpha=0.90,
         delta=0.10,
+        optimisation_scope_section=optimisation_scope_section,
+        optimisation_transparency_section=optimisation_transparency_section,
         kappa=config.DIRICHLET_KAPPA,
         n_draws=config.N_DIRICHLET_DRAWS,
         disclaimer=causal_disclaimer(),

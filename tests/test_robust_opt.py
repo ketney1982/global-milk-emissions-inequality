@@ -4,6 +4,7 @@
 
 """Tests for robust portfolio optimisation."""
 
+import json
 import logging
 import numpy as np
 import pandas as pd
@@ -16,6 +17,7 @@ from methane_portfolio.optimize import (
     tv_distance_constraint,
 )
 from methane_portfolio.robust_optimize import run_all_countries, solve_robust
+from methane_portfolio.uncertainty import run_sensitivity_grid
 
 
 class TestOptimizeHelpers:
@@ -202,6 +204,169 @@ class TestRunAllCountriesLowSpecies:
             if "posterior intensities were unavailable" in rec.getMessage()
         ]
         assert warn_records
+
+
+class TestRunAllCountriesGuards:
+    """Regression guards for do-no-harm and output persistence."""
+
+    def test_do_no_harm_reverts_harmful_solution(self, tmp_path):
+        long_df = pd.DataFrame(
+            [
+                {
+                    "country_m49": 1,
+                    "country": "RiskLand",
+                    "year": 2023,
+                    "milk_species": "Raw milk of cattle",
+                    "species_share": 0.5,
+                    "milk_tonnes": 100.0,
+                    "kg_co2e_per_ton_milk": 1.0,
+                },
+                {
+                    "country_m49": 1,
+                    "country": "RiskLand",
+                    "year": 2023,
+                    "milk_species": "Raw milk of goat",
+                    "species_share": 0.5,
+                    "milk_tonnes": 100.0,
+                    "kg_co2e_per_ton_milk": 1.0,
+                },
+            ],
+        )
+        # Posterior scenarios intentionally much higher than observed baseline.
+        i_samples = np.array(
+            [
+                [[10.0, 20.0]],
+                [[11.0, 19.0]],
+                [[9.5, 18.5]],
+            ],
+        )
+
+        out = run_all_countries(
+            long_df,
+            I_samples=i_samples,
+            country_list=[1],
+            species_list=["Raw milk of cattle", "Raw milk of goat"],
+            year=2023,
+            output_dir=tmp_path,
+            save_csv=False,
+            do_no_harm=True,
+        )
+
+        row = out.iloc[0]
+        assert np.isclose(row["baseline_intensity"], 1.0)
+        assert row["raw_optimized_mean"] > row["baseline_intensity"]
+        assert row["raw_reduction_mean_pct"] < 0
+        assert np.isclose(row["optimized_mean"], row["baseline_intensity"])
+        assert np.isclose(row["reduction_mean_pct"], 0.0)
+        assert bool(row["no_harm_applied"]) is True
+        assert row["no_harm_action"] in {"baseline_revert", "constrained_solution"}
+        assert "do-no-harm" in row["solver_message"]
+
+    def test_sensitivity_grid_does_not_overwrite_main_optimization_csv(self, tmp_path):
+        long_df = pd.DataFrame(
+            [
+                {
+                    "country_m49": 1,
+                    "country": "A",
+                    "year": 2023,
+                    "milk_species": "Raw milk of cattle",
+                    "species_share": 0.8,
+                    "milk_tonnes": 80.0,
+                    "kg_co2e_per_ton_milk": 10.0,
+                },
+                {
+                    "country_m49": 1,
+                    "country": "A",
+                    "year": 2023,
+                    "milk_species": "Raw milk of goat",
+                    "species_share": 0.2,
+                    "milk_tonnes": 20.0,
+                    "kg_co2e_per_ton_milk": 4.0,
+                },
+                {
+                    "country_m49": 2,
+                    "country": "B",
+                    "year": 2023,
+                    "milk_species": "Raw milk of cattle",
+                    "species_share": 0.6,
+                    "milk_tonnes": 60.0,
+                    "kg_co2e_per_ton_milk": 8.0,
+                },
+                {
+                    "country_m49": 2,
+                    "country": "B",
+                    "year": 2023,
+                    "milk_species": "Raw milk of goat",
+                    "species_share": 0.4,
+                    "milk_tonnes": 40.0,
+                    "kg_co2e_per_ton_milk": 5.0,
+                },
+            ],
+        )
+
+        run_all_countries(long_df, year=2023, output_dir=tmp_path, save_csv=True)
+        main_csv = tmp_path / "robust_optimization_results.csv"
+        before = main_csv.read_bytes()
+
+        run_sensitivity_grid(
+            long_df,
+            year=2023,
+            n_countries_max=1,
+            output_dir=tmp_path,
+        )
+        after = main_csv.read_bytes()
+
+        assert before == after
+
+    def test_audit_json_records_guard_application(self, tmp_path):
+        long_df = pd.DataFrame(
+            [
+                {
+                    "country_m49": 1,
+                    "country": "RiskLand",
+                    "year": 2023,
+                    "milk_species": "Raw milk of cattle",
+                    "species_share": 0.5,
+                    "milk_tonnes": 100.0,
+                    "kg_co2e_per_ton_milk": 1.0,
+                },
+                {
+                    "country_m49": 1,
+                    "country": "RiskLand",
+                    "year": 2023,
+                    "milk_species": "Raw milk of goat",
+                    "species_share": 0.5,
+                    "milk_tonnes": 100.0,
+                    "kg_co2e_per_ton_milk": 1.0,
+                },
+            ],
+        )
+        i_samples = np.array(
+            [
+                [[10.0, 20.0]],
+                [[11.0, 19.0]],
+                [[9.5, 18.5]],
+            ],
+        )
+
+        run_all_countries(
+            long_df,
+            I_samples=i_samples,
+            country_list=[1],
+            species_list=["Raw milk of cattle", "Raw milk of goat"],
+            year=2023,
+            output_dir=tmp_path,
+            save_csv=True,
+            save_audit=True,
+            do_no_harm=True,
+        )
+
+        audit_path = tmp_path / "robust_optimization_audit.json"
+        assert audit_path.exists()
+        audit = json.loads(audit_path.read_text(encoding="utf-8"))
+        assert audit["do_no_harm_enabled"] is True
+        assert audit["n_no_harm_applied"] == 1
+        assert audit["n_negative_raw_reductions"] >= audit["n_negative_final_reductions"]
 
 
 class TestCliAllowExpansion:

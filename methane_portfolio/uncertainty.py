@@ -200,7 +200,7 @@ def run_sensitivity_grid(
             lam=l, alpha=a, delta=d,
             allow_expansion=allow_expansion,
             log_skips=False,
-            output_dir=None,  # don't save intermediate
+            save_csv=False,
         )
         res["delta"] = d
         res["lambda"] = l

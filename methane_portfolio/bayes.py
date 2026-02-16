@@ -6,24 +6,16 @@
 
 Model specification
 -------------------
-Response: y = log(kg_co2e_per_ton_milk)  where I > 0 and share > 0.
+Response: y = log(kg_co2e_per_ton_milk), filtered to I > 0 and share > 0.
 
 Likelihood:
-    y ~ StudentT(Î˝, ÎĽ, Ď_s)
+    y ~ StudentT(nu, mu, sigma_s)
 
 Linear predictor:
-    ÎĽ_cts = Î±_s + u_c + Î˛_s Â· (t â’ 2020) + Îł_s Â· 1[t â‰Ą 2022]
+    mu_cts = alpha_s + u_c + beta_s * (t - 2020) + gamma_s * 1[t >= 2022]
 
 Random effects:
-    u_c ~ Normal(0, Ď„)    (country random effects â†’ partial pooling)
-
-Hyperpriors:
-    Î˝      ~ Gamma(2, 0.1)    (degrees of freedom)
-    Î±_s    ~ Normal(0, 5)     (species intercepts)
-    Î˛_s    ~ Normal(0, 1)     (species trends)
-    Îł_s    ~ Normal(0, 1)     (regime shift)
-    Ď_s    ~ HalfNormal(1)    (species-level scale)
-    Ď„      ~ HalfNormal(1)    (country random effect scale)
+    u_c = tau * z_c, z_c ~ Normal(0, 1)
 """
 
 from __future__ import annotations
@@ -89,6 +81,12 @@ def prepare_bayes_data(long_df: pd.DataFrame) -> dict:
 
 def build_model(data: dict) -> pm.Model:
     """Construct the PyMC hierarchical model."""
+    y_mean = float(np.mean(data["y"]))
+    y_sd = float(np.std(data["y"], ddof=1))
+    if not np.isfinite(y_sd):
+        y_sd = 1.0
+    alpha_sigma = float(np.clip(1.5 * max(y_sd, 0.25), 0.5, 2.5))
+
     with pm.Model() as model:
         # Data containers
         sp = pm.Data("species_id", data["species_id"], dims="obs")
@@ -97,17 +95,23 @@ def build_model(data: dict) -> pm.Model:
         reg = pm.Data("regime", data["regime"], dims="obs")
 
         # Hyperpriors
-        nu = pm.Gamma("nu", alpha=2, beta=0.1)
-        tau = pm.HalfNormal("tau", sigma=1.0)
+        nu = pm.Gamma("nu", alpha=6.0, beta=1.0)
+        tau = pm.HalfNormal("tau", sigma=0.5)
 
         # Species-level priors
-        alpha_s = pm.Normal("alpha_s", mu=0, sigma=5, shape=data["n_species"])
-        beta_s = pm.Normal("beta_s", mu=0, sigma=1, shape=data["n_species"])
-        gamma_s = pm.Normal("gamma_s", mu=0, sigma=1, shape=data["n_species"])
-        sigma_s = pm.HalfNormal("sigma_s", sigma=1.0, shape=data["n_species"])
+        alpha_s = pm.Normal(
+            "alpha_s",
+            mu=y_mean,
+            sigma=alpha_sigma,
+            shape=data["n_species"],
+        )
+        beta_s = pm.Normal("beta_s", mu=0, sigma=0.5, shape=data["n_species"])
+        gamma_s = pm.Normal("gamma_s", mu=0, sigma=0.5, shape=data["n_species"])
+        sigma_s = pm.HalfNormal("sigma_s", sigma=0.5, shape=data["n_species"])
 
-        # Country random effects
-        u_c = pm.Normal("u_c", mu=0, sigma=tau, shape=data["n_countries"])
+        # Non-centred country random effects improve NUTS geometry.
+        u_c_raw = pm.Normal("u_c_raw", mu=0, sigma=1, shape=data["n_countries"])
+        u_c = pm.Deterministic("u_c", u_c_raw * tau)
 
         # Linear predictor
         mu = (
@@ -142,12 +146,12 @@ def _detect_sampler() -> tuple[str | None, bool]:
     """
     try:
         import nutpie  # noqa: F401
-        logger.info("nutpie sampler detected â€” using Rust-based NUTS (fast)")
+        logger.info("nutpie sampler detected - using Rust-based NUTS (fast)")
         return "nutpie", True
     except ImportError:
         logger.info(
-            "nutpie not installed â€” falling back to PyMC default sampler. "
-            "Install nutpie for 5-20Ă— speedup: pip install nutpie"
+            "nutpie not installed - falling back to PyMC default sampler. "
+            "Install nutpie for 5-20x speedup: pip install nutpie"
         )
         return None, False
 
@@ -202,8 +206,17 @@ def fit_model(
     if cores is None:
         cores = min(chains, multiprocessing.cpu_count())
 
+    if draws < config.DRAWS or tune < config.TUNE or target_accept < config.TARGET_ACCEPT:
+        logger.warning(
+            "Sampling settings below recommended defaults (draws=%d, tune=%d, target_accept=%.2f). "
+            "Low settings can produce weak ESS/R-hat diagnostics.",
+            config.DRAWS,
+            config.TUNE,
+            config.TARGET_ACCEPT,
+        )
+
     logger.info(
-        "Sampling %d chains Ă— %d draws (tune=%d, target_accept=%.2f, cores=%d, sampler=%s)",
+        "Sampling %d chains x %d draws (tune=%d, target_accept=%.2f, cores=%d, sampler=%s)",
         chains, draws, tune, target_accept, cores,
         nuts_sampler or "pymc",
     )
@@ -226,12 +239,16 @@ def fit_model(
         return_inferencedata=True,
         idata_kwargs={"log_likelihood": True},
         cores=cores,
+        init="jitter+adapt_diag",
+        compute_convergence_checks=True,
     )
     if nuts_sampler:
         sample_kwargs["nuts_sampler"] = nuts_sampler
     # nutpie currently ignores idata_kwargs and emits a warning; avoid noisy output.
     if use_nutpie:
         sample_kwargs.pop("idata_kwargs", None)
+    else:
+        sample_kwargs["nuts"] = {"max_treedepth": 15}
 
     with model:
         idata = pm.sample(**sample_kwargs)
@@ -245,6 +262,14 @@ def fit_model(
     diag = _compute_diagnostics(idata)
     with open(out / "bayes_diagnostics.json", "w", encoding="utf-8") as f:
         json.dump(diag, f, indent=2, default=_json_default)
+    if not diag.get("converged", False):
+        logger.warning(
+            "Bayesian diagnostics indicate weak convergence: max_rhat=%.3f, min_ess_bulk=%.1f, min_ess_tail=%.1f, divergences=%d",
+            diag["max_rhat"],
+            diag["min_ess_bulk"],
+            diag["min_ess_tail"],
+            diag["divergences"],
+        )
 
     # PPC summary
     ppc_summary = _ppc_summary(idata, data)
@@ -257,11 +282,21 @@ def _compute_diagnostics(idata: az.InferenceData) -> dict:
     """R-hat, ESS, divergences."""
     summary = az.summary(idata, var_names=["alpha_s", "beta_s", "gamma_s",
                                             "sigma_s", "tau", "nu"])
+    max_rhat = float(summary["r_hat"].max())
+    min_ess_bulk = float(summary["ess_bulk"].min())
+    min_ess_tail = float(summary["ess_tail"].min())
+    divergences = int(idata.sample_stats["diverging"].sum().item())
     return {
-        "max_rhat": float(summary["r_hat"].max()),
-        "min_ess_bulk": float(summary["ess_bulk"].min()),
-        "min_ess_tail": float(summary["ess_tail"].min()),
-        "divergences": int(idata.sample_stats["diverging"].sum().item()),
+        "max_rhat": max_rhat,
+        "min_ess_bulk": min_ess_bulk,
+        "min_ess_tail": min_ess_tail,
+        "divergences": divergences,
+        "converged": bool(
+            max_rhat < 1.10
+            and min_ess_bulk >= 100
+            and min_ess_tail >= 100
+            and divergences == 0
+        ),
         "summary_table": summary.to_dict(),
     }
 

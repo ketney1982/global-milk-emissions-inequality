@@ -8,7 +8,7 @@ Usage examples::
 
     methane-portfolio validate
     methane-portfolio shapley
-    methane-portfolio bayes --chains 4 --draws 2000
+    methane-portfolio bayes --chains 4 --draws 5000 --tune 5000 --target-accept 0.95
     methane-portfolio optimize --delta 0.15
     methane-portfolio figures
     methane-portfolio tables
@@ -383,7 +383,9 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         "alpha": args.alpha,
         "delta": args.delta,
         "allow_expansion": args.allow_expansion,
-        "n_countries": int(long_df["country_m49"].nunique()),
+        "n_countries": int(shapley_df["country_m49"].nunique()),
+        "n_countries_input": int(long_df["country_m49"].nunique()),
+        "n_countries_optimized": int(opt_df["country_m49"].nunique()),
         "n_species": int(long_df["milk_species"].nunique()),
     })
 
