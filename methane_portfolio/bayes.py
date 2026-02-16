@@ -15,7 +15,7 @@ Linear predictor:
     mu_cts = alpha_s + u_c + beta_s * (t - 2020) + gamma_s * 1[t >= 2022]
 
 Random effects:
-    u_c = tau * z_c, z_c ~ Normal(0, 1)
+    u_c ~ ZeroSumNormal(0, tau)
 """
 
 from __future__ import annotations
@@ -28,7 +28,6 @@ import arviz as az
 import numpy as np
 import pandas as pd
 import pymc as pm
-import xarray as xr
 
 from methane_portfolio import config
 
@@ -79,13 +78,34 @@ def prepare_bayes_data(long_df: pd.DataFrame) -> dict:
 # Model construction
 # ---------------------------------------------------------------------------
 
+def _safe_std(values: np.ndarray, fallback: float) -> float:
+    """Finite standard deviation helper with fallback."""
+    if values.size <= 1:
+        return fallback
+    sd = float(np.std(values, ddof=1))
+    if np.isfinite(sd) and sd > 0:
+        return sd
+    return fallback
+
+
+def _country_intercept_scale(data: dict, y_sd: float) -> float:
+    """Estimate a weakly informative prior scale for country random effects."""
+    country_means = (
+        data["df"]
+        .groupby("country_id", observed=True)["log_intensity"]
+        .mean()
+        .to_numpy(dtype=float)
+    )
+    empirical_sd = _safe_std(country_means, fallback=max(y_sd, 0.25))
+    return float(np.clip(empirical_sd, 0.15, 1.0))
+
+
 def build_model(data: dict) -> pm.Model:
     """Construct the PyMC hierarchical model."""
     y_mean = float(np.mean(data["y"]))
-    y_sd = float(np.std(data["y"], ddof=1))
-    if not np.isfinite(y_sd):
-        y_sd = 1.0
+    y_sd = _safe_std(data["y"], fallback=1.0)
     alpha_sigma = float(np.clip(1.5 * max(y_sd, 0.25), 0.5, 2.5))
+    tau_sigma = _country_intercept_scale(data, y_sd=y_sd)
 
     with pm.Model() as model:
         # Data containers
@@ -96,7 +116,7 @@ def build_model(data: dict) -> pm.Model:
 
         # Hyperpriors
         nu = pm.Gamma("nu", alpha=6.0, beta=1.0)
-        tau = pm.HalfNormal("tau", sigma=0.5)
+        tau = pm.HalfNormal("tau", sigma=tau_sigma)
 
         # Species-level priors
         alpha_s = pm.Normal(
@@ -109,9 +129,10 @@ def build_model(data: dict) -> pm.Model:
         gamma_s = pm.Normal("gamma_s", mu=0, sigma=0.5, shape=data["n_species"])
         sigma_s = pm.HalfNormal("sigma_s", sigma=0.5, shape=data["n_species"])
 
-        # Non-centred country random effects improve NUTS geometry.
-        u_c_raw = pm.Normal("u_c_raw", mu=0, sigma=1, shape=data["n_countries"])
-        u_c = pm.Deterministic("u_c", u_c_raw * tau)
+        # Non-centred zero-sum country effects reduce funnel geometry between
+        # tau and country intercepts, improving convergence stability.
+        u_c_raw = pm.ZeroSumNormal("u_c_raw", sigma=1.0, shape=data["n_countries"])
+        u_c = pm.Deterministic("u_c", tau * u_c_raw)
 
         # Linear predictor
         mu = (
@@ -270,10 +291,38 @@ def fit_model(
             diag["min_ess_tail"],
             diag["divergences"],
         )
+        if diag.get("rhat_fail_params"):
+            logger.warning(
+                "R-hat >= %.2f parameters (first %d): %s",
+                config.BAYES_RHAT_THRESHOLD,
+                config.BAYES_DIAG_MAX_REPORT_PARAMS,
+                ", ".join(diag["rhat_fail_params"]),
+            )
+        if diag.get("ess_bulk_fail_params") or diag.get("ess_tail_fail_params"):
+            logger.warning(
+                "ESS < %d parameters (bulk/tail, first %d): %s / %s",
+                config.BAYES_ESS_MIN,
+                config.BAYES_DIAG_MAX_REPORT_PARAMS,
+                ", ".join(diag.get("ess_bulk_fail_params", [])) or "none",
+                ", ".join(diag.get("ess_tail_fail_params", [])) or "none",
+            )
 
     # PPC summary
     ppc_summary = _ppc_summary(idata, data)
     ppc_summary.to_csv(out / "bayes_ppc_summary.csv", index=False)
+    ppc_outliers = _ppc_outliers(ppc_summary, data, top_n=25)
+    ppc_outliers.to_csv(out / "bayes_ppc_outliers.csv", index=False)
+    ppc_diag = _ppc_diagnostics(ppc_summary)
+    with open(out / "bayes_ppc_diagnostics.json", "w", encoding="utf-8") as f:
+        json.dump(ppc_diag, f, indent=2, default=_json_default)
+    if abs(ppc_diag["residual_mean"]) > config.BAYES_PPC_MEAN_BIAS_WARN:
+        logger.warning(
+            "PPC residual mean is %.3f (>|%.3f|). Median=%.3f, 90%% coverage=%.2f%%. Inspect high-residual observations.",
+            ppc_diag["residual_mean"],
+            config.BAYES_PPC_MEAN_BIAS_WARN,
+            ppc_diag["residual_median"],
+            100.0 * ppc_diag["coverage_90ci"],
+        )
 
     return idata, data
 
@@ -286,17 +335,52 @@ def _compute_diagnostics(idata: az.InferenceData) -> dict:
     min_ess_bulk = float(summary["ess_bulk"].min())
     min_ess_tail = float(summary["ess_tail"].min())
     divergences = int(idata.sample_stats["diverging"].sum().item())
+
+    strict_rhat = config.BAYES_RHAT_THRESHOLD
+    strict_ess = config.BAYES_ESS_MIN
+    relaxed_rhat = config.BAYES_RHAT_THRESHOLD_RELAXED
+    relaxed_ess = config.BAYES_ESS_MIN_RELAXED
+    max_report = config.BAYES_DIAG_MAX_REPORT_PARAMS
+
+    rhat_fail = summary.index[summary["r_hat"] >= strict_rhat].tolist()
+    ess_bulk_fail = summary.index[summary["ess_bulk"] < strict_ess].tolist()
+    ess_tail_fail = summary.index[summary["ess_tail"] < strict_ess].tolist()
+
+    strict_ok = bool(
+        max_rhat < strict_rhat
+        and min_ess_bulk >= strict_ess
+        and min_ess_tail >= strict_ess
+        and divergences == 0
+    )
+    relaxed_ok = bool(
+        max_rhat < relaxed_rhat
+        and min_ess_bulk >= relaxed_ess
+        and min_ess_tail >= relaxed_ess
+        and divergences == 0
+    )
+
     return {
         "max_rhat": max_rhat,
         "min_ess_bulk": min_ess_bulk,
         "min_ess_tail": min_ess_tail,
         "divergences": divergences,
-        "converged": bool(
-            max_rhat < 1.10
-            and min_ess_bulk >= 100
-            and min_ess_tail >= 100
-            and divergences == 0
-        ),
+        "thresholds": {
+            "rhat_strict": strict_rhat,
+            "rhat_relaxed": relaxed_rhat,
+            "ess_strict": strict_ess,
+            "ess_relaxed": relaxed_ess,
+        },
+        "converged": strict_ok,
+        "converged_relaxed": relaxed_ok,
+        "n_rhat_fail": int(len(rhat_fail)),
+        "n_ess_bulk_fail": int(len(ess_bulk_fail)),
+        "n_ess_tail_fail": int(len(ess_tail_fail)),
+        "rhat_fail_params": rhat_fail[:max_report],
+        "ess_bulk_fail_params": ess_bulk_fail[:max_report],
+        "ess_tail_fail_params": ess_tail_fail[:max_report],
+        "worst_rhat_param": str(summary["r_hat"].idxmax()),
+        "worst_ess_bulk_param": str(summary["ess_bulk"].idxmin()),
+        "worst_ess_tail_param": str(summary["ess_tail"].idxmin()),
         "summary_table": summary.to_dict(),
     }
 
@@ -306,18 +390,88 @@ def _ppc_summary(idata: az.InferenceData, data: dict) -> pd.DataFrame:
     y_obs = data["y"]
     y_rep = idata.posterior_predictive["y_obs"].values  # (chain, draw, obs)
     y_rep_mean = y_rep.mean(axis=(0, 1))
+    y_rep_median = np.median(y_rep, axis=(0, 1))
+    y_rep_p05 = np.percentile(y_rep, 5, axis=(0, 1))
+    y_rep_p95 = np.percentile(y_rep, 95, axis=(0, 1))
     residuals = y_obs - y_rep_mean
 
     return pd.DataFrame({
         "obs_idx": np.arange(len(y_obs)),
         "y_obs": y_obs,
         "y_rep_mean": y_rep_mean,
+        "y_rep_median": y_rep_median,
+        "y_rep_p05": y_rep_p05,
+        "y_rep_p95": y_rep_p95,
         "residual": residuals,
+        "residual_median_pred": y_obs - y_rep_median,
         "within_90ci": (
-            (y_obs >= np.percentile(y_rep, 5, axis=(0, 1)))
-            & (y_obs <= np.percentile(y_rep, 95, axis=(0, 1)))
+            (y_obs >= y_rep_p05)
+            & (y_obs <= y_rep_p95)
         ),
     })
+
+
+def _ppc_outliers(
+    ppc_summary: pd.DataFrame,
+    data: dict,
+    *,
+    top_n: int = 25,
+) -> pd.DataFrame:
+    """Join PPC residuals with source rows and keep largest absolute errors."""
+    df = data["df"].reset_index(drop=True).copy()
+    ppc = ppc_summary.reset_index(drop=True).copy()
+    ppc["obs_idx"] = np.arange(ppc.shape[0], dtype=int)
+    merged = pd.concat([ppc, df], axis=1)
+    merged["abs_residual"] = merged["residual"].abs()
+    cols = [
+        "obs_idx",
+        "country_m49",
+        "country",
+        "year",
+        "milk_species",
+        "species_share",
+        "kg_co2e_per_ton_milk",
+        "y_obs",
+        "y_rep_mean",
+        "y_rep_median",
+        "y_rep_p05",
+        "y_rep_p95",
+        "residual",
+        "residual_median_pred",
+        "abs_residual",
+        "within_90ci",
+    ]
+    available_cols = [c for c in cols if c in merged.columns]
+    out = merged.sort_values("abs_residual", ascending=False)
+    return out.loc[:, available_cols].head(top_n).reset_index(drop=True)
+
+
+def _trimmed_mean(values: np.ndarray, trim_frac: float = 0.10) -> float:
+    """Return symmetric trimmed mean."""
+    if values.size == 0:
+        return float("nan")
+    arr = np.sort(np.asarray(values, dtype=float))
+    k = int(np.floor(trim_frac * arr.size))
+    if 2 * k >= arr.size:
+        return float(np.mean(arr))
+    return float(np.mean(arr[k:arr.size - k]))
+
+
+def _ppc_diagnostics(ppc_summary: pd.DataFrame) -> dict:
+    """Aggregate diagnostics for posterior predictive residuals."""
+    residual = ppc_summary["residual"].to_numpy(dtype=float)
+    abs_residual = np.abs(residual)
+    return {
+        "residual_mean": float(np.mean(residual)),
+        "residual_median": float(np.median(residual)),
+        "residual_trimmed_mean_10pct": _trimmed_mean(residual, trim_frac=0.10),
+        "residual_max_abs": float(np.max(abs_residual)),
+        "residual_q95_abs": float(np.percentile(abs_residual, 95)),
+        "coverage_90ci": float(ppc_summary["within_90ci"].mean()),
+        "n_abs_residual_gt_2": int((abs_residual > 2.0).sum()),
+        "n_abs_residual_gt_3": int((abs_residual > 3.0).sum()),
+        "n_obs": int(ppc_summary.shape[0]),
+    }
 
 
 # ---------------------------------------------------------------------------

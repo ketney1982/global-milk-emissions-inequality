@@ -45,8 +45,8 @@ RNG_SEED: int = 20230101
 PYMC_SEED: int = 42
 CHAINS: int = 4
 DRAWS: int = 5000
-TUNE: int = 5000
-TARGET_ACCEPT: float = 0.95
+TUNE: int = 10000
+TARGET_ACCEPT: float = 0.98
 
 # ---------------------------------------------------------------------------
 # Validation tolerances
@@ -67,6 +67,12 @@ DEFAULT_WEIGHT_METHOD: str = "avg"
 # Bayesian model
 # ---------------------------------------------------------------------------
 REGIME_SHIFT_YEAR: int = 2022  # 1[t >= 2022]
+BAYES_RHAT_THRESHOLD: float = 1.01
+BAYES_RHAT_THRESHOLD_RELAXED: float = 1.10
+BAYES_ESS_MIN: int = 400
+BAYES_ESS_MIN_RELAXED: int = 100
+BAYES_DIAG_MAX_REPORT_PARAMS: int = 20
+BAYES_PPC_MEAN_BIAS_WARN: float = 0.05
 
 # ---------------------------------------------------------------------------
 # Optimization

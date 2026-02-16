@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import methane_portfolio.robust_optimize as robust_optimize
 from methane_portfolio.cli import build_parser
 from methane_portfolio.optimize import (
     mean_intensity,
@@ -103,6 +104,82 @@ class TestSolveRobust:
         sol = solve_robust(w_ref, I_scenarios, delta=delta, allow_expansion=False)
         tv = 0.5 * np.abs(sol["w_opt"] - w_ref).sum()
         assert tv <= delta + 1e-10
+
+    def test_iteration_limit_retries_with_higher_maxiter(self, monkeypatch):
+        """Iteration-limit failures should trigger an SLSQP retry."""
+
+        class _Res:
+            def __init__(self, *, x, success, message):
+                self.x = x
+                self.success = success
+                self.message = message
+
+        calls: list[tuple[str, int]] = []
+
+        def _fake_minimize(*args, **kwargs):
+            method = kwargs["method"]
+            maxiter = kwargs["options"]["maxiter"]
+            calls.append((method, int(maxiter)))
+            if len(calls) == 1:
+                return _Res(
+                    x=np.array([0.6, 0.4, 0.0]),
+                    success=False,
+                    message="Iteration limit reached",
+                )
+            return _Res(
+                x=np.array([0.58, 0.42, 0.0]),
+                success=True,
+                message="Optimization terminated successfully",
+            )
+
+        monkeypatch.setattr(robust_optimize, "minimize", _fake_minimize)
+        w_ref = np.array([0.6, 0.4])
+        I_scenarios = np.array([[8.0, 3.0], [9.0, 2.8], [7.5, 3.1]])
+        sol = solve_robust(w_ref, I_scenarios, maxiter=10)
+
+        assert calls[0] == ("SLSQP", 10)
+        assert calls[1] == ("SLSQP", 6000)
+        assert len(calls) == 2
+        assert sol["success"] is True
+        assert sol["solver_method"] == "SLSQP"
+        assert len(sol["solver_attempts"]) == 2
+
+    def test_iteration_limit_can_fallback_to_trust_constr(self, monkeypatch):
+        """Second iteration-limit failure should escalate to trust-constr."""
+
+        class _Res:
+            def __init__(self, *, x, success, message):
+                self.x = x
+                self.success = success
+                self.message = message
+
+        calls: list[tuple[str, int]] = []
+
+        def _fake_minimize(*args, **kwargs):
+            method = kwargs["method"]
+            maxiter = kwargs["options"]["maxiter"]
+            calls.append((method, int(maxiter)))
+            if len(calls) < 3:
+                return _Res(
+                    x=np.array([0.6, 0.4, 0.0]),
+                    success=False,
+                    message="Iteration limit reached",
+                )
+            return _Res(
+                x=np.array([0.57, 0.43, 0.0]),
+                success=True,
+                message="`gtol` termination condition is satisfied.",
+            )
+
+        monkeypatch.setattr(robust_optimize, "minimize", _fake_minimize)
+        w_ref = np.array([0.6, 0.4])
+        I_scenarios = np.array([[8.0, 3.0], [9.0, 2.8], [7.5, 3.1]])
+        sol = solve_robust(w_ref, I_scenarios, maxiter=10)
+
+        assert [m for m, _ in calls] == ["SLSQP", "SLSQP", "trust-constr"]
+        assert sol["success"] is True
+        assert sol["solver_method"] == "trust-constr"
+        assert len(sol["solver_attempts"]) == 3
 
 
 class TestRunAllCountriesLowSpecies:

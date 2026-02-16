@@ -78,9 +78,8 @@ $$\mu_{{cts}} = \alpha_s + u_c + \beta_s (t - 2020) + \gamma_s \cdot \mathbf{{1}
 | $\beta_s$ | $\mathcal{{N}}(0, 0.5)$ |
 | $\gamma_s$ | $\mathcal{{N}}(0, 0.5)$ |
 | $\sigma_s$ | $\text{{HalfNormal}}(0.5)$ |
-| $z_c$ | $\mathcal{{N}}(0, 1)$ |
-| $u_c$ | $u_c = \tau \cdot z_c$ (non-centred parameterisation) |
-| $\tau$ | $\text{{HalfNormal}}(0.5)$ |
+| $u_c$ | $\text{{ZeroSumNormal}}(0, \tau)$ (centered, sum-to-zero) |
+| $\tau$ | $\text{{HalfNormal}}(\sigma_\tau)$, $\sigma_\tau = \mathrm{{clip}}(\mathrm{{sd}}(\bar y_c), 0.15, 1.0)$ |
 | $\nu$ | $\Gamma(6, 1)$ |
 
 ### Sampling
@@ -92,6 +91,7 @@ $$\mu_{{cts}} = \alpha_s + u_c + \beta_s (t - 2020) + \gamma_s \cdot \mathbf{{1}
 - Seed: {pymc_seed}
 
 {diagnostics_section}
+{ppc_diagnostics_section}
 
 ---
 
@@ -198,17 +198,41 @@ def generate_appendix(
     # Read diagnostics
     diag_path = out / "bayes_diagnostics.json"
     diagnostics_section = "*Bayesian model not yet fitted.*"
+    ppc_diagnostics_section = ""
     if diag_path.exists():
         with open(diag_path, "r", encoding="utf-8") as f:
             diag = json.load(f)
         converged = diag.get("converged", "N/A")
+        converged_relaxed = diag.get("converged_relaxed", "N/A")
+        thresholds = diag.get("thresholds", {})
         diagnostics_section = (
             f"### Diagnostics\n\n"
             f"- Max R-hat: {diag.get('max_rhat', 'N/A')}\n"
             f"- Min ESS (bulk): {diag.get('min_ess_bulk', 'N/A')}\n"
             f"- Min ESS (tail): {diag.get('min_ess_tail', 'N/A')}\n"
             f"- Divergences: {diag.get('divergences', 'N/A')}\n"
-            f"- Convergence flag (R-hat/ESS/divergences): {converged}\n"
+            f"- Convergence flag (strict, R-hat<{thresholds.get('rhat_strict', 'N/A')}, "
+            f"ESS≥{thresholds.get('ess_strict', 'N/A')}): {converged}\n"
+            f"- Convergence flag (relaxed, R-hat<{thresholds.get('rhat_relaxed', 'N/A')}, "
+            f"ESS≥{thresholds.get('ess_relaxed', 'N/A')}): {converged_relaxed}\n"
+        )
+        if diag.get("rhat_fail_params"):
+            diagnostics_section += (
+                f"- Parameters failing strict R-hat: {', '.join(diag['rhat_fail_params'])}\n"
+            )
+
+    ppc_diag_path = out / "bayes_ppc_diagnostics.json"
+    if ppc_diag_path.exists():
+        with open(ppc_diag_path, "r", encoding="utf-8") as f:
+            ppc_diag = json.load(f)
+        ppc_diagnostics_section = (
+            "\n### Posterior Predictive Checks\n\n"
+            f"- Residual mean: {ppc_diag.get('residual_mean', 'N/A')}\n"
+            f"- Residual median: {ppc_diag.get('residual_median', 'N/A')}\n"
+            f"- Residual trimmed mean (10%): {ppc_diag.get('residual_trimmed_mean_10pct', 'N/A')}\n"
+            f"- Max |residual|: {ppc_diag.get('residual_max_abs', 'N/A')}\n"
+            f"- 90% CI coverage: {ppc_diag.get('coverage_90ci', 'N/A')}\n"
+            f"- Count |residual| > 3: {ppc_diag.get('n_abs_residual_gt_3', 'N/A')} / {ppc_diag.get('n_obs', 'N/A')}\n"
         )
 
     # Data dimensions
@@ -291,6 +315,7 @@ def generate_appendix(
         target_accept=config.TARGET_ACCEPT,
         pymc_seed=config.PYMC_SEED,
         diagnostics_section=diagnostics_section,
+        ppc_diagnostics_section=ppc_diagnostics_section,
         lam=0.5,
         opt_alpha=0.90,
         delta=0.10,

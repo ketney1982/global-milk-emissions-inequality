@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import logging
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -65,6 +66,58 @@ class RobustResult:
 # Core solver
 # ---------------------------------------------------------------------------
 
+def _solver_options(method: str, maxiter: int, ftol: float) -> dict:
+    """Build method-specific scipy.optimize options."""
+    m = method.lower()
+    if m == "slsqp":
+        return {"maxiter": int(maxiter), "ftol": float(ftol)}
+    if m == "trust-constr":
+        tol = max(float(ftol), 1e-10)
+        return {
+            "maxiter": int(maxiter),
+            "gtol": tol,
+            "xtol": tol,
+            "barrier_tol": tol,
+            "verbose": 0,
+        }
+    return {"maxiter": int(maxiter)}
+
+
+def _is_iteration_limit_message(message: object) -> bool:
+    """Detect common solver iteration-limit failures."""
+    msg = str(message).lower()
+    return (
+        "iteration limit reached" in msg
+        or "maximum number of iterations" in msg
+        or "maxiter" in msg
+    )
+
+
+def _solver_attempt_plan(method: str, maxiter: int) -> list[tuple[str, int]]:
+    """Primary solver + fallback attempts for difficult countries."""
+    primary = (method, int(maxiter))
+    if method.lower() != "slsqp":
+        return [primary]
+    return [
+        primary,
+        ("SLSQP", max(int(maxiter) * 3, 6000)),
+        ("trust-constr", max(int(maxiter) * 5, 10000)),
+    ]
+
+
+def _format_solver_attempts(attempts: list[dict]) -> str:
+    """Compact attempt summary for result logging/audit."""
+    if not attempts:
+        return ""
+    if len(attempts) == 1:
+        return str(attempts[0]["message"])
+    parts = [
+        f"{a['method']}@{a['maxiter']}:{'ok' if a['success'] else 'fail'} ({a['message']})"
+        for a in attempts
+    ]
+    return " | ".join(parts)
+
+
 def solve_robust(
     w_ref: np.ndarray,
     I_scenarios: np.ndarray,
@@ -75,9 +128,9 @@ def solve_robust(
     allow_expansion: bool = False,
     baseline_ceiling: float | None = None,
     no_harm_tol: float = 1e-10,
-    method: str = "SLSQP",
-    maxiter: int = 2000,
-    ftol: float = 1e-12,
+    method: str = config.OptimConfig.solver_method,
+    maxiter: int = config.OptimConfig.solver_maxiter,
+    ftol: float = config.OptimConfig.solver_ftol,
 ) -> dict:
     """Solve the robust species-portfolio problem for one country.
 
@@ -165,15 +218,50 @@ def solve_robust(
             },
         )
 
-    result = minimize(
-        objective,
-        x0,
-        jac=objective_jac,
-        method=method,
-        bounds=ext_bounds,
-        constraints=constraints,
-        options={"maxiter": maxiter, "ftol": ftol},
-    )
+    attempt_plan = _solver_attempt_plan(method, maxiter)
+    attempts: list[dict] = []
+    result = None
+    for i, (solver_method, solver_maxiter) in enumerate(attempt_plan):
+        with warnings.catch_warnings():
+            # SciPy emits frequent benign warnings for this piecewise-linear
+            # objective and rank-deficient trust-constr Jacobians.
+            warnings.filterwarnings(
+                "ignore",
+                message="delta_grad == 0.0.*",
+                category=UserWarning,
+            )
+            warnings.filterwarnings(
+                "ignore",
+                message="Singular Jacobian matrix.*",
+                category=UserWarning,
+            )
+            current = minimize(
+                objective,
+                x0,
+                jac=objective_jac,
+                method=solver_method,
+                bounds=ext_bounds,
+                constraints=constraints,
+                options=_solver_options(solver_method, solver_maxiter, ftol),
+            )
+        attempts.append(
+            {
+                "method": solver_method,
+                "maxiter": int(solver_maxiter),
+                "success": bool(current.success),
+                "message": str(current.message),
+            },
+        )
+        result = current
+        if current.success:
+            break
+        if i >= len(attempt_plan) - 1:
+            break
+        if not _is_iteration_limit_message(current.message):
+            break
+
+    if result is None:
+        raise RuntimeError("Optimizer did not execute.")
 
     w_opt = result.x[:S]
     if not np.all(np.isfinite(w_opt)):
@@ -206,8 +294,10 @@ def solve_robust(
         "w_opt": w_opt,
         "mean_opt": float(mean_opt),
         "cvar_opt": float(cvar_opt),
-        "success": result.success,
-        "message": result.message,
+        "success": bool(result.success),
+        "message": _format_solver_attempts(attempts),
+        "solver_method": str(attempts[-1]["method"]) if attempts else str(method),
+        "solver_attempts": attempts,
     }
 
 
@@ -226,6 +316,9 @@ def run_all_countries(
     alpha: float = 0.90,
     delta: float = 0.10,
     allow_expansion: bool = False,
+    solver_method: str = config.OptimConfig.solver_method,
+    solver_maxiter: int = config.OptimConfig.solver_maxiter,
+    solver_ftol: float = config.OptimConfig.solver_ftol,
     do_no_harm: bool = config.OptimConfig.do_no_harm,
     no_harm_tol: float = config.OptimConfig.no_harm_tol,
     log_skips: bool = True,
@@ -247,6 +340,7 @@ def run_all_countries(
     year : reference year
     lam, alpha, delta : optimisation parameters
     allow_expansion : allow zero-share species
+    solver_method, solver_maxiter, solver_ftol : solver controls
     do_no_harm : enforce optimized_mean <= baseline_intensity
     output_dir : where to save results
     save_csv : if False, skip writing robust_optimization_results.csv
@@ -353,6 +447,9 @@ def run_all_countries(
                 allow_expansion=effective_allow_expansion,
                 baseline_ceiling=None,
                 no_harm_tol=no_harm_tol,
+                method=solver_method,
+                maxiter=solver_maxiter,
+                ftol=solver_ftol,
             )
             sol_final = sol_raw
             no_harm_applied = False
@@ -366,6 +463,9 @@ def run_all_countries(
                     allow_expansion=effective_allow_expansion,
                     baseline_ceiling=baseline,
                     no_harm_tol=no_harm_tol,
+                    method=solver_method,
+                    maxiter=solver_maxiter,
+                    ftol=solver_ftol,
                 )
                 if sol_constrained["mean_opt"] <= baseline + no_harm_tol:
                     sol_final = sol_constrained

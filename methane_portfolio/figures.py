@@ -353,19 +353,22 @@ def fig3_regime_shift(
 
     if species_list is None:
         species_list = [f"Species {i}" for i in range(gamma_flat.shape[1])]
+    species_order = sorted(species_list)
+    index_by_species = {sp: i for i, sp in enumerate(species_list)}
+    species_idx = [index_by_species[sp] for sp in species_order]
 
     fig, ax = plt.subplots(figsize=(7, 4), constrained_layout=True)
     _setup_ax(ax, "Posterior Regime-Shift Parameters (\u03b3\u209b, t \u2265 2022)")
 
     parts = ax.violinplot(
-        [gamma_flat[:, i] for i in range(len(species_list))],
-        positions=range(len(species_list)),
+        [gamma_flat[:, src_idx] for src_idx in species_idx],
+        positions=range(len(species_order)),
         showmeans=True, showmedians=True,
     )
     # Style violins
-    colors = _get_species_colors(species_list)
+    colors = _get_species_colors(species_order)
     for i, pc in enumerate(parts["bodies"]):
-        sp = sorted(species_list)[i] if i < len(species_list) else None
+        sp = species_order[i] if i < len(species_order) else None
         pc.set_facecolor(colors.get(sp, PALETTE["struct"]))
         pc.set_alpha(0.55)
         pc.set_edgecolor("grey")
@@ -377,20 +380,29 @@ def fig3_regime_shift(
             parts[key].set_color("#2C3E50")
             parts[key].set_linewidth(0.8)
 
-    ax.set_xticks(range(len(species_list)))
+    ax.set_xticks(range(len(species_order)))
     ax.set_xticklabels(
-        [s.replace("Raw milk of ", "") for s in sorted(species_list)],
+        [s.replace("Raw milk of ", "") for s in species_order],
         fontsize=8, rotation=30, ha="right",
     )
     ax.axhline(0, color="black", linewidth=0.6, linestyle="--", alpha=0.5)
     ax.set_ylabel("\u03b3\u209b (log-scale shift)", fontsize=9)
+    ax.text(
+        0.99,
+        0.98,
+        "labels: posterior mean",
+        transform=ax.transAxes,
+        ha="right",
+        va="top",
+        fontsize=6,
+        color="#2C3E50",
+    )
 
-    # Add HDI annotations
-    for i in range(len(species_list)):
-        q05 = np.percentile(gamma_flat[:, i], 3)
-        q97 = np.percentile(gamma_flat[:, i], 97)
-        median = np.median(gamma_flat[:, i])
-        ax.text(i, q97 + 0.05, f"{median:.2f}",
+    # Add 94% HDI upper anchor and posterior mean annotation.
+    for i, src_idx in enumerate(species_idx):
+        hdi_high = np.percentile(gamma_flat[:, src_idx], 97)
+        post_mean = np.mean(gamma_flat[:, src_idx])
+        ax.text(i, hdi_high + 0.05, f"{post_mean:.2f}",
                 ha="center", va="bottom", fontsize=6, fontweight="bold")
 
     _panel_label(ax, "c")

@@ -8,7 +8,7 @@ Usage examples::
 
     methane-portfolio validate
     methane-portfolio shapley
-    methane-portfolio bayes --chains 4 --draws 5000 --tune 5000 --target-accept 0.95
+    methane-portfolio bayes --chains 4 --draws 5000 --tune 10000 --target-accept 0.98
     methane-portfolio optimize --delta 0.15
     methane-portfolio figures
     methane-portfolio tables

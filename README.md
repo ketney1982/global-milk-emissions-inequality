@@ -43,7 +43,7 @@ methane-portfolio report
 
 # Bayesian model (requires PyMC + GPU/CPU time)
 # Tip: Increase --chains to match your CPU core count for faster parallel processing
-methane-portfolio bayes --chains 4 --draws 5000 --tune 5000 --target-accept 0.95
+methane-portfolio bayes --chains 8 --draws 10000 --tune 20000 --target-accept 0.995
 
 # Reproducibility manifest (runs pipeline + writes checksums)
 python scripts/reproduce.py --skip-bayes
