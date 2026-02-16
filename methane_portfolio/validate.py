@@ -1,9 +1,13 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Validation of accounting identities and data consistency.
 
 Checks:
 1. Species shares sum to 1 per (country_m49, year).
 2. Species-level milk tonnes sum matches aggregate milk_total_tonnes.
-3. Mixture identity: I_ct == Σ_s w_cts · I_cts   (within tolerance).
+3. Mixture identity: I_ct == ÎŁ_s w_cts Â· I_cts   (within tolerance).
 
 Results are written to ``outputs/validation_report.csv``.
 """
@@ -145,7 +149,7 @@ def _check_identity(
     agg_df: pd.DataFrame,
     raise_on_fail: bool,
 ) -> pd.DataFrame:
-    """Identity:  I_ct == Σ_s  w_cts · I_cts.
+    """Identity:  I_ct == ÎŁ_s  w_cts Â· I_cts.
 
     The mixture intensity from species shares and species intensities
     must match the reported aggregate intensity.

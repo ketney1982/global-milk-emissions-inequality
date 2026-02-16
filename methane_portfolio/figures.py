@@ -1,7 +1,11 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Publication-ready figures (Nature-style, matplotlib only).
 
-All figures are saved as PNG (600 DPI) and PDF to outputs/figures/.
-No seaborn is used.  Colors are drawn from a curated palette.
+All figures are saved to outputs/figures/ using ``config.FIGURE_FORMAT``.
+No seaborn is used. Colors are drawn from a curated palette.
 """
 
 from __future__ import annotations
@@ -17,7 +21,6 @@ import numpy as np
 import pandas as pd
 
 from methane_portfolio import config
-from methane_portfolio.utils import causal_disclaimer
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +62,7 @@ def _apply_nature_style() -> None:
     """Set global matplotlib rcParams for Nature house style."""
     plt.rcParams.update({
         "font.family": "sans-serif",
-        "font.sans-serif": ["Arial", "Helvetica Neue", "Helvetica", "DejaVu Sans"],
+        "font.sans-serif": ["DejaVu Sans", "Arial", "Helvetica Neue", "Helvetica"],
         "font.size": 8,
         "axes.linewidth": 0.6,
         "axes.labelsize": 9,
@@ -91,22 +94,66 @@ def _setup_ax(ax: mpl.axes.Axes, title: str = "") -> None:
 
 
 def _panel_label(ax: mpl.axes.Axes, label: str) -> None:
-    """Add a bold panel label (a, b, c…) at top-left."""
+    """Add a bold panel label (a, b, câ€¦) at top-left."""
     ax.text(-0.12, 1.05, label, transform=ax.transAxes,
             fontsize=12, fontweight="bold", va="top", ha="left")
 
 
+def _pick_spread_labels(
+    df: pd.DataFrame,
+    x_col: str,
+    y_col: str,
+    score_col: str,
+    *,
+    max_labels: int = 10,
+    min_dist: float = 0.10,
+) -> pd.DataFrame:
+    """Select high-priority points while keeping labels spatially separated."""
+    if df.empty:
+        return df.iloc[0:0]
+
+    work = df[
+        np.isfinite(df[x_col]) & np.isfinite(df[y_col]) & np.isfinite(df[score_col])
+    ].copy()
+    if work.empty:
+        return work
+
+    work.sort_values(score_col, ascending=False, inplace=True)
+
+    x = work[x_col].to_numpy(dtype=float)
+    y = work[y_col].to_numpy(dtype=float)
+    x_span = max(x.max() - x.min(), 1e-12)
+    y_span = max(y.max() - y.min(), 1e-12)
+
+    selected_idx: list[object] = []
+    selected_coords: list[tuple[float, float]] = []
+    min_dist_sq = float(min_dist * min_dist)
+
+    for idx, row in work.iterrows():
+        xn = float((row[x_col] - x.min()) / x_span)
+        yn = float((row[y_col] - y.min()) / y_span)
+
+        if all((xn - sx) ** 2 + (yn - sy) ** 2 >= min_dist_sq for sx, sy in selected_coords):
+            selected_idx.append(idx)
+            selected_coords.append((xn, yn))
+            if len(selected_idx) >= max_labels:
+                break
+
+    return work.loc[selected_idx]
+
+
 def _save(fig: mpl.figure.Figure, name: str, output_dir: Path) -> None:
-    """Save figure as PNG and PDF."""
+    """Save figure using configured output format (default PNG)."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    for fmt in ("png", "pdf"):
-        fig.savefig(
-            output_dir / f"{name}.{fmt}",
-            dpi=config.FIGURE_DPI,
-            bbox_inches="tight",
-            facecolor="white",
-            edgecolor="none",
-        )
+    fmt = str(config.FIGURE_FORMAT).strip().lower().lstrip(".") or "png"
+    fig.savefig(
+        output_dir / f"{name}.{fmt}",
+        format=fmt,
+        dpi=config.FIGURE_DPI,
+        bbox_inches="tight",
+        facecolor="white",
+        edgecolor="none",
+    )
     plt.close(fig)
     logger.info("Saved figure %s", name)
 
@@ -125,7 +172,7 @@ def fig1_global_shapley(
     with open(gpath, "r", encoding="utf-8") as f:
         g = json.load(f)
 
-    # Convert to ×10⁻³ scale for readability
+    # Convert to Ă—10â»Âł scale for readability
     scale = 1e3
     vals = [g["global_struct"] * scale, g["global_within"] * scale, g["net"] * scale]
     labels = [
@@ -136,8 +183,8 @@ def fig1_global_shapley(
     colors = [PALETTE["struct"], PALETTE["within"], PALETTE["net"]]
     hatches = ["//", "\\\\", ""]
 
-    fig, ax = plt.subplots(figsize=(5, 3), constrained_layout=True)
-    _setup_ax(ax, f"Shapley Decomposition of \u0394I ({g['base_year']}\u2192{g['end_year']})")
+    fig, ax = plt.subplots(figsize=(5.8, 3.6))
+    _setup_ax(ax)
 
     bars = ax.barh(labels, vals, color=colors, edgecolor="white",
                    linewidth=0.8, height=0.55, zorder=3)
@@ -147,9 +194,16 @@ def fig1_global_shapley(
 
     ax.axvline(0, color="black", linewidth=0.6)
     ax.set_xlabel(
-        "\u0394 Emission Intensity (\u00d710\u207b\u00b3 kg CO\u2082e / t milk, production-weighted)",
-        fontsize=8,
+        "\u0394 Emission intensity (\u00d710\u207b\u00b3 kg CO\u2082e / t milk)",
+        fontsize=9,
+        labelpad=6,
     )
+    ax.margins(y=0.15)
+    xmin = float(min(vals))
+    xmax = float(max(vals))
+    span = max(xmax - xmin, 1e-9)
+    pad = max(0.35, span * 0.10)
+    ax.set_xlim(xmin - pad, xmax + pad)
 
     # Value labels with safe placement
     for bar, v in zip(bars, vals):
@@ -159,10 +213,13 @@ def fig1_global_shapley(
                 f"{v:+.2f}", ha=ha, va="center",
                 fontsize=8, fontweight="bold")
 
-    ax.text(0.02, 0.02,
-            "Accounting counterfactual; does not imply causal effects.",
-            transform=ax.transAxes, fontsize=6, color="grey", style="italic")
+    fig.text(
+        0.99, 0.01,
+        f"Accounting counterfactual ({g['base_year']}\u2192{g['end_year']}); no causal claim.",
+        ha="right", va="bottom", fontsize=6, color="grey", style="italic",
+    )
 
+    fig.subplots_adjust(left=0.30, right=0.98, top=0.96, bottom=0.19)
     _panel_label(ax, "a")
     _save(fig, "Fig1_global_shapley", out)
 
@@ -176,7 +233,7 @@ def fig2_country_quadrants(
     agg_df: pd.DataFrame,
     output_dir: Path | None = None,
 ) -> None:
-    """Scatter of Δstruct vs Δwithin, point size = production."""
+    """Scatter of Î”struct vs Î”within, point size = production."""
     out = output_dir or config.FIGURE_DIR
     merged = shapley_df.merge(
         agg_df[agg_df["year"] == config.BASE_YEAR][
@@ -185,15 +242,15 @@ def fig2_country_quadrants(
         on="country_m49", how="left",
     )
 
-    # Exclude Mongolia (massive outlier: Δstruct = −15.19)
+    # Exclude Mongolia (massive outlier: Î”struct = â’15.19)
     mongolia = merged[merged["country"].str.contains("Mongolia", case=False, na=False)]
     merged_clean = merged[~merged["country"].str.contains("Mongolia", case=False, na=False)].copy()
 
     prod = merged_clean["milk_total_tonnes"].fillna(1e3)
     sizes = 10 + 250 * np.sqrt(prod / prod.max())
 
-    fig, ax = plt.subplots(figsize=(6, 5.5), constrained_layout=True)
-    _setup_ax(ax, "Country-Level Shapley Decomposition")
+    fig, ax = plt.subplots(figsize=(6.8, 5.8), constrained_layout=True)
+    _setup_ax(ax)
 
     sc = ax.scatter(
         merged_clean["delta_struct"], merged_clean["delta_within"],
@@ -211,39 +268,60 @@ def fig2_country_quadrants(
     # Quadrant lines
     ax.axhline(0, color="black", linewidth=0.5, linestyle="--", alpha=0.7)
     ax.axvline(0, color="black", linewidth=0.5, linestyle="--", alpha=0.7)
+    ax.margins(x=0.10, y=0.10)
 
-    # Quadrant labels
-    xlim = ax.get_xlim()
-    ylim = ax.get_ylim()
-    qprops = dict(fontsize=6, color="#888888", style="italic", alpha=0.7, ha="center")
-    ax.text(xlim[1] * 0.6, ylim[1] * 0.85, "Worsening both", **qprops)
-    ax.text(xlim[0] * 0.6, ylim[0] * 0.85, "Improving both", **qprops)
-    ax.text(xlim[1] * 0.6, ylim[0] * 0.85, "Worsening structure\nImproving intensity", **qprops)
-    ax.text(xlim[0] * 0.6, ylim[1] * 0.85, "Improving structure\nWorsening intensity", **qprops)
+    ax.text(
+        0.01, 0.98,
+        "Dashed lines mark zero effect",
+        transform=ax.transAxes,
+        fontsize=6,
+        color="#7a7a7a",
+        style="italic",
+        ha="left",
+        va="top",
+    )
 
     ax.set_xlabel("\u0394 Structure (species mix shift)", fontsize=9)
     ax.set_ylabel("\u0394 Within (species intensity change)", fontsize=9)
 
-    # Label outliers (top 5 and bottom 5 by |delta_total|)
-    top = merged_clean.nlargest(5, "delta_total", keep="first")
-    bot = merged_clean.nsmallest(5, "delta_total", keep="first")
-    for _, r in pd.concat([top, bot]).iterrows():
+    # Label only spread-out high-impact points to reduce overlaps.
+    merged_clean = merged_clean.copy()
+    merged_clean["label_priority"] = merged_clean["delta_total"].abs()
+    label_pool = merged_clean.nlargest(25, "label_priority")
+    label_rows = _pick_spread_labels(
+        label_pool,
+        "delta_struct",
+        "delta_within",
+        "label_priority",
+        max_labels=9,
+        min_dist=0.12,
+    )
+    for _, r in label_rows.iterrows():
+        dx = 7 if r["delta_struct"] >= 0 else -7
+        dy = 6 if r["delta_within"] >= 0 else -6
+        ha = "left" if dx > 0 else "right"
+        va = "bottom" if dy > 0 else "top"
         ax.annotate(
             r["country"][:20],
             (r["delta_struct"], r["delta_within"]),
-            fontsize=6, alpha=0.85, fontweight="bold",
-            textcoords="offset points", xytext=(6, 6),
-            arrowprops=dict(arrowstyle="-", lw=0.4, color="grey"),
+            fontsize=6.5,
+            alpha=0.95,
+            fontweight="semibold",
+            textcoords="offset points",
+            xytext=(dx, dy),
+            ha=ha,
+            va=va,
+            bbox=dict(facecolor="white", edgecolor="none", alpha=0.65, pad=0.15),
         )
 
     # Mongolia annotation
     if not mongolia.empty:
         m = mongolia.iloc[0]
-        ax.text(0.98, 0.98,
+        ax.text(0.98, 0.10,
                 f"Mongolia excluded\n(\u0394struct={m['delta_struct']:.1f}, "
                 f"\u0394within={m['delta_within']:.1f})",
                 transform=ax.transAxes, fontsize=6, color="grey",
-                style="italic", ha="right", va="top",
+                style="italic", ha="right", va="bottom",
                 bbox=dict(boxstyle="round,pad=0.3", facecolor="#f0f0f0",
                           edgecolor="#cccccc", alpha=0.8))
 
@@ -263,7 +341,7 @@ def fig3_regime_shift(
     species_list: list[str] | None = None,
     output_dir: Path | None = None,
 ) -> None:
-    """Violin-like posterior distributions of γ_s by species."""
+    """Violin-like posterior distributions of Îł_s by species."""
     out = output_dir or config.FIGURE_DIR
 
     if idata is None:
@@ -386,7 +464,7 @@ def fig5_low_hanging_fruit(
     agg_df: pd.DataFrame,
     output_dir: Path | None = None,
 ) -> None:
-    """Scatter: x = reduction_mean_pct (log), y = baseline intensity, size = prod."""
+    """Scatter: x = reduction_mean_pct, y = baseline intensity, size = production."""
     out = output_dir or config.FIGURE_DIR
 
     merged = opt_df.merge(
@@ -402,8 +480,8 @@ def fig5_low_hanging_fruit(
     prod = merged_plot["milk_total_tonnes"].fillna(1e3)
     sizes = 10 + 250 * np.sqrt(prod / prod.max())
 
-    fig, ax = plt.subplots(figsize=(7, 5), constrained_layout=True)
-    _setup_ax(ax, "Low-Hanging Fruit: Reduction Potential vs Baseline Intensity")
+    fig, ax = plt.subplots(figsize=(7.2, 5.4), constrained_layout=True)
+    _setup_ax(ax)
 
     sc = ax.scatter(
         merged_plot["reduction_mean_pct"],
@@ -414,25 +492,47 @@ def fig5_low_hanging_fruit(
         zorder=3,
     )
 
-    # Log scale for x-axis to spread clustered data
-    ax.set_xscale("log")
-    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.0f}%" if x >= 1 else f"{x:.1f}%"))
+    cbar = fig.colorbar(sc, ax=ax, shrink=0.78, pad=0.02)
+    cbar.set_label("Reduction potential (%)", fontsize=8)
+    cbar.ax.tick_params(labelsize=7)
 
-    ax.set_xlabel("Mean Intensity Reduction (%, log scale)", fontsize=9)
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.1f}%"))
+    ax.set_xlim(left=0.0)
+    ax.margins(x=0.06, y=0.08)
+
+    ax.set_xlabel("Mean intensity reduction potential (%)", fontsize=9)
     ax.set_ylabel("Baseline Intensity (kg CO\u2082e / t milk)", fontsize=9)
 
-    # Annotate top-15 countries by reduction potential
-    top15 = merged_plot.nlargest(15, "reduction_mean_pct")
-    for _, r in top15.iterrows():
+    # Annotate only spread-out high-potential countries to avoid clutter.
+    merged_plot = merged_plot.copy()
+    merged_plot["label_priority"] = (
+        merged_plot["reduction_mean_pct"] * np.sqrt(prod / prod.max())
+    )
+    label_pool = merged_plot.nlargest(30, "label_priority")
+    label_rows = _pick_spread_labels(
+        label_pool,
+        "reduction_mean_pct",
+        "baseline_intensity_kg_co2e_per_t",
+        "label_priority",
+        max_labels=8,
+        min_dist=0.13,
+    )
+    for _, r in label_rows.iterrows():
         name = r["country"]
-        if len(name) > 18:
-            name = name[:16] + "\u2026"
+        if len(name) > 15:
+            name = name[:13] + "\u2026"
+        dx = 7 if r["reduction_mean_pct"] >= merged_plot["reduction_mean_pct"].median() else -7
+        dy = 5 if r["baseline_intensity_kg_co2e_per_t"] >= merged_plot["baseline_intensity_kg_co2e_per_t"].median() else -5
         ax.annotate(
             name,
             (r["reduction_mean_pct"], r["baseline_intensity_kg_co2e_per_t"]),
-            fontsize=6, fontweight="bold",
-            textcoords="offset points", xytext=(8, 4),
-            arrowprops=dict(arrowstyle="-", lw=0.4, color="grey"),
+            fontsize=6.5,
+            fontweight="semibold",
+            textcoords="offset points",
+            xytext=(dx, dy),
+            ha="left" if dx > 0 else "right",
+            va="bottom" if dy > 0 else "top",
+            bbox=dict(facecolor="white", edgecolor="none", alpha=0.65, pad=0.15),
         )
 
     # Reference lines for global means
@@ -451,7 +551,7 @@ def fig5_low_hanging_fruit(
 
 
 # ===================================================================
-# Figure 6: Elasticity heatmap
+# Figure 6: Elasticity distribution
 # ===================================================================
 
 def fig6_elasticity(
@@ -461,74 +561,133 @@ def fig6_elasticity(
     n_countries: int = 25,
     output_dir: Path | None = None,
 ) -> None:
-    """Heatmap of elasticity (dI/dw_s) for top-producing countries."""
+    """Species-level distribution of elasticity for top-producing countries."""
     out = output_dir or config.FIGURE_DIR
     sub = long_df[long_df["year"] == year]
-    species = sorted(sub["milk_species"].unique())
+    if sub.empty:
+        logger.warning("No rows for year=%s; skipping Fig6.", year)
+        return
 
     # Top countries by production
     top = (
         agg_df[agg_df["year"] == year]
         .nlargest(n_countries, "milk_total_tonnes")
     )
+    if top.empty:
+        logger.warning("No aggregate rows for year=%s; skipping Fig6.", year)
+        return
+
     top_m49 = top["country_m49"].tolist()
-    top_names = top.set_index("country_m49")["country"]
-
-    # Build elasticity matrix
-    elast = np.full((len(top_m49), len(species)), np.nan)
-    for ci, m49 in enumerate(top_m49):
-        csub = sub[sub["country_m49"] == m49]
-        agg_row = agg_df[
-            (agg_df["country_m49"] == m49) & (agg_df["year"] == year)
-        ]
-        if agg_row.empty:
-            continue
-        I_total = agg_row.iloc[0]["kg_co2e_per_ton_milk"]
-        for _, r in csub.iterrows():
-            si = species.index(r["milk_species"])
-            elast[ci, si] = r["kg_co2e_per_ton_milk"] - I_total
-
-    # Symmetric colormap limits
-    vmax = np.nanmax(np.abs(elast)) * 0.9
-    vmin = -vmax
-
-    # Taller figure to fit full country names
-    fig_height = max(6, n_countries * 0.38)
-    fig, ax = plt.subplots(figsize=(7, fig_height), constrained_layout=True)
-    _setup_ax(ax, f"Elasticity dI/dw (Top {n_countries} Producers, {year})")
-
-    im = ax.pcolormesh(
-        np.arange(len(species) + 1), np.arange(len(top_m49) + 1),
-        elast, cmap="coolwarm", vmin=vmin, vmax=vmax,
-        edgecolors="white", linewidth=0.5,
+    top_total = (
+        top.set_index("country_m49")["kg_co2e_per_ton_milk"]
+        .to_dict()
     )
-    cbar = fig.colorbar(im, ax=ax, shrink=0.7, pad=0.02)
-    cbar.set_label("Elasticity (kg CO\u2082e / t milk)", fontsize=8)
-    cbar.ax.tick_params(labelsize=7)
 
-    # Cell value annotations for significant values
-    for ci in range(len(top_m49)):
-        for si in range(len(species)):
-            val = elast[ci, si]
-            if np.isnan(val):
+    rows: list[dict[str, object]] = []
+    for m49 in top_m49:
+        csub = sub[sub["country_m49"] == m49]
+        total_intensity = top_total.get(m49)
+        if not np.isfinite(total_intensity):
+            continue
+        for _, r in csub.iterrows():
+            i_species = r["kg_co2e_per_ton_milk"]
+            if not np.isfinite(i_species):
                 continue
-            if abs(val) > vmax * 0.15:  # only annotate significant
-                color = "white" if abs(val) > vmax * 0.6 else "black"
-                ax.text(si + 0.5, ci + 0.5, f"{val:.3f}",
-                        ha="center", va="center", fontsize=5.5,
-                        color=color, fontweight="bold")
+            rows.append(
+                {
+                    "milk_species": r["milk_species"],
+                    "elasticity": float(i_species - total_intensity),
+                },
+            )
 
-    # Full species and country names
-    short_species = [s.replace("Raw milk of ", "") for s in species]
-    ax.set_xticks(np.arange(len(species)) + 0.5)
-    ax.set_xticklabels(short_species, fontsize=7, rotation=45, ha="right")
+    elast_df = pd.DataFrame(rows)
+    if elast_df.empty:
+        logger.warning("No finite elasticity values; skipping Fig6.")
+        return
 
-    ylabels = [str(top_names.get(m, m)) for m in top_m49]  # Full names
-    ax.set_yticks(np.arange(len(top_m49)) + 0.5)
-    ax.set_yticklabels(ylabels, fontsize=7)
+    species_order = (
+        elast_df.groupby("milk_species", observed=True)["elasticity"]
+        .median()
+        .sort_values(ascending=True)
+        .index
+        .tolist()
+    )
+    species_short = [s.replace("Raw milk of ", "") for s in species_order]
+    data = [
+        elast_df[elast_df["milk_species"] == sp]["elasticity"].to_numpy(dtype=float)
+        for sp in species_order
+    ]
 
-    # Invert y-axis so top producer is at top
-    ax.invert_yaxis()
+    fig, ax = plt.subplots(figsize=(7.4, 4.8), constrained_layout=True)
+    _setup_ax(ax)
+
+    bp = ax.boxplot(
+        data,
+        vert=False,
+        labels=species_short,
+        patch_artist=True,
+        showfliers=False,
+        widths=0.62,
+        medianprops={"color": "#1f1f1f", "linewidth": 1.0},
+        whiskerprops={"color": "#666666", "linewidth": 0.8},
+        capprops={"color": "#666666", "linewidth": 0.8},
+    )
+    species_colors = _get_species_colors(species_order)
+    for box, sp in zip(bp["boxes"], species_order):
+        box.set_facecolor(species_colors.get(sp, PALETTE["struct"]))
+        box.set_alpha(0.45)
+        box.set_edgecolor("#555555")
+        box.set_linewidth(0.8)
+
+    rng = np.random.default_rng(config.RNG_SEED)
+    for yi, sp in enumerate(species_order, start=1):
+        vals = elast_df[elast_df["milk_species"] == sp]["elasticity"].to_numpy(dtype=float)
+        if vals.size == 0:
+            continue
+        jitter = yi + rng.uniform(-0.10, 0.10, size=vals.size)
+        ax.scatter(
+            vals,
+            jitter,
+            s=10,
+            color=species_colors.get(sp, PALETTE["struct"]),
+            alpha=0.30,
+            edgecolors="none",
+            zorder=2,
+        )
+
+    lo = float(np.percentile(elast_df["elasticity"], 2))
+    hi = float(np.percentile(elast_df["elasticity"], 98))
+    if hi <= lo:
+        lo = float(np.min(elast_df["elasticity"]))
+        hi = float(np.max(elast_df["elasticity"]))
+    pad = max(0.15, (hi - lo) * 0.08)
+    ax.set_xlim(lo - pad, hi + pad)
+    n_out = int(((elast_df["elasticity"] < (lo - pad)) | (elast_df["elasticity"] > (hi + pad))).sum())
+
+    ax.axvline(0.0, color="black", linewidth=0.7, linestyle="--", alpha=0.8, zorder=1)
+    ax.set_xlabel("Elasticity = species intensity - country intensity (kg CO\u2082e / t milk)", fontsize=9)
+    ax.set_ylabel("Species", fontsize=9)
+    if n_out > 0:
+        ax.text(
+            0.01, 0.03,
+            f"{n_out} extreme values clipped from x-range",
+            transform=ax.transAxes,
+            ha="left",
+            va="bottom",
+            fontsize=6,
+            color="grey",
+            style="italic",
+        )
+    ax.text(
+        0.99, 0.03,
+        f"Top {len(top_m49)} producers, year {year}",
+        transform=ax.transAxes,
+        ha="right",
+        va="bottom",
+        fontsize=6,
+        color="grey",
+        style="italic",
+    )
 
     _panel_label(ax, "f")
     _save(fig, "Fig6_elasticity", out)

@@ -1,3 +1,7 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Tests for data validation and accounting identities."""
 
 import numpy as np
@@ -54,7 +58,7 @@ class TestValidateMilkTotals:
 
 
 class TestValidateIdentity:
-    """Mixture identity: I_ct = Σ w_cts · I_cts."""
+    """Mixture identity: I_ct = ÎŁ w_cts Â· I_cts."""
 
     def test_identity_holds(self, data):
         long_df, agg_df, _ = data

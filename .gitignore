@@ -169,4 +169,40 @@ tmp/
 # Agent / AI artifacts
 .gemini/
 
-tests
+# Public-release safety (credentials / local machine artifacts)
+# -------------------------------------------------------------
+# Local env variants (keep only sanitized examples in repo)
+.env.*
+!.env.example
+*.env
+
+# Credential / key material
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.crt
+*.cer
+*.der
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+.netrc
+.pypirc
+.npmrc
+
+# Cloud / tooling local configs
+.aws/
+.azure/
+.gcp/
+.kube/
+
+# Local private/scratch folders
+secrets/
+.secrets/
+private/
+
+# Local run verification artifacts
+verify_output*.txt

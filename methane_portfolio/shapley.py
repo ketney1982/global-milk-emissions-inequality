@@ -1,18 +1,22 @@
-"""Exact two-factor Shapley decomposition of ΔI (2020→2023).
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
+"""Exact two-factor Shapley decomposition of Î”I (2020â†’2023).
 
 The two factors are:
   - **structure** (w): change in species portfolio shares
   - **within** (i): change in species-level emission intensities
 
 For each country the national intensity is a mixture:
-    I_ct = Σ_s  w_cts · I_cts
+    I_ct = ÎŁ_s  w_cts Â· I_cts
 
-The change ΔI = I_{c,2023} − I_{c,2020} is decomposed into:
-    ΔI = Δ_struct + Δ_within
+The change Î”I = I_{c,2023} â’ I_{c,2020} is decomposed into:
+    Î”I = Î”_struct + Î”_within
 
 using the exact two-factor Shapley formula:
-    Δ_struct  = 0.5 * [Σ_s (w'_s − w_s) * I_s  +  Σ_s (w'_s − w_s) * I'_s]
-    Δ_within  = 0.5 * [Σ_s w_s  * (I'_s − I_s)   +  Σ_s w'_s * (I'_s − I_s)]
+    Î”_struct  = 0.5 * [ÎŁ_s (w'_s â’ w_s) * I_s  +  ÎŁ_s (w'_s â’ w_s) * I'_s]
+    Î”_within  = 0.5 * [ÎŁ_s w_s  * (I'_s â’ I_s)   +  ÎŁ_s w'_s * (I'_s â’ I_s)]
 
 where primed = 2023, unprimed = 2020.
 """

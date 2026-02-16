@@ -1,3 +1,7 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Advanced manuscript tables and figures.
 
 Run:
@@ -161,7 +165,7 @@ def _plot_phase_diagram(df_phase: pd.DataFrame, path: Path) -> None:
     y_med = float(np.median(work["reduction_pct"]))
     ax.axhline(y_med, color="black", linewidth=0.8, linestyle=":")
 
-    ax.set_xlabel("Δ_struct (2020→2023)")
+    ax.set_xlabel("Î”_struct (2020â†’2023)")
     ax.set_ylabel("Reduction potential (%)")
     ax.set_title("Structural Phase Diagram")
     ax.grid(True, linewidth=0.35, alpha=0.35, color="#D9D9D9", zorder=1)
@@ -186,8 +190,8 @@ def _plot_concentration_curve(shapley_df: pd.DataFrame, path: Path) -> None:
     g_t = weighted_gini(x_total, w)
     g_s = weighted_gini(x_struct, w)
 
-    ax.plot(p_t, L_t, color="#1B7FA6", linewidth=2.0, label=f"|w·Δ_total| (Gini={g_t:.3f})")
-    ax.plot(p_s, L_s, color="#C0392B", linewidth=2.0, label=f"|w·Δ_struct| (Gini={g_s:.3f})")
+    ax.plot(p_t, L_t, color="#1B7FA6", linewidth=2.0, label=f"|wÂ·Î”_total| (Gini={g_t:.3f})")
+    ax.plot(p_s, L_s, color="#C0392B", linewidth=2.0, label=f"|wÂ·Î”_struct| (Gini={g_s:.3f})")
     ax.plot([0, 1], [0, 1], color="black", linewidth=0.8, linestyle="--", alpha=0.8, label="Equality line")
 
     ax.set_xlabel("Cumulative weight share")

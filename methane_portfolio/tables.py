@@ -1,3 +1,7 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Manuscript tables generation.
 
 Produces 5 publication tables saved as CSV and LaTeX.
@@ -15,6 +19,7 @@ import pandas as pd
 from methane_portfolio import config
 
 logger = logging.getLogger(__name__)
+_LATEX_FALLBACK_WARNED = False
 
 
 def table1_descriptive(
@@ -57,7 +62,7 @@ def table2_shapley_top(
     n: int = 20,
     output_dir: Path | None = None,
 ) -> pd.DataFrame:
-    """Table 2: Top-N countries by |ΔI| with Shapley components."""
+    """Table 2: Top-N countries by |Î”I| with Shapley components."""
     out = output_dir or config.OUTPUT_DIR
     out.mkdir(parents=True, exist_ok=True)
 
@@ -180,10 +185,76 @@ def make_all_tables(
 
 def _to_latex(df: pd.DataFrame, path: Path, caption: str) -> None:
     """Write DataFrame as a simple LaTeX table."""
-    latex = df.to_latex(
-        index=False,
-        float_format="%.4f",
-        caption=caption,
-        label=f"tab:{path.stem.lower()}",
-    )
+    global _LATEX_FALLBACK_WARNED
+    try:
+        latex = df.to_latex(
+            index=False,
+            float_format="%.4f",
+            caption=caption,
+            label=f"tab:{path.stem.lower()}",
+        )
+    except ImportError as exc:
+        # pandas >=2 routes LaTeX export through Styler, which requires Jinja2.
+        # Keep pipeline functional even if optional dependency is missing.
+        if not _LATEX_FALLBACK_WARNED:
+            logger.info(
+                "LaTeX export fallback active (missing Jinja2). "
+                "Using internal formatter; install jinja2 to restore native pandas LaTeX formatting. Example error: %s",
+                exc,
+            )
+            _LATEX_FALLBACK_WARNED = True
+        latex = _to_latex_fallback(df, caption=caption, label=f"tab:{path.stem.lower()}")
     path.write_text(latex, encoding="utf-8")
+
+
+def _latex_escape(text: object) -> str:
+    s = str(text)
+    replacements = {
+        "\\": r"\textbackslash{}",
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
+    }
+    for src, dst in replacements.items():
+        s = s.replace(src, dst)
+    return s
+
+
+def _to_latex_fallback(df: pd.DataFrame, *, caption: str, label: str) -> str:
+    cols = list(df.columns)
+    colspec = "l" * len(cols) if cols else "l"
+    lines: list[str] = [
+        r"\begin{table}[htbp]",
+        r"\centering",
+        rf"\caption{{{_latex_escape(caption)}}}",
+        rf"\label{{{_latex_escape(label)}}}",
+        rf"\begin{{tabular}}{{{colspec}}}",
+        r"\hline",
+        " & ".join(_latex_escape(c) for c in cols) + r" \\",
+        r"\hline",
+    ]
+    for _, row in df.iterrows():
+        vals: list[str] = []
+        for value in row.tolist():
+            if isinstance(value, (float, np.floating)):
+                if np.isfinite(value):
+                    vals.append(f"{float(value):.4f}")
+                else:
+                    vals.append("NA")
+            else:
+                vals.append(_latex_escape(value))
+        lines.append(" & ".join(vals) + r" \\")
+    lines.extend(
+        [
+            r"\hline",
+            r"\end{tabular}",
+            r"\end{table}",
+        ],
+    )
+    return "\n".join(lines) + "\n"

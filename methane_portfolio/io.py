@@ -1,3 +1,7 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Data loading and canonical dataframe construction.
 
 Produces two canonical DataFrames:
@@ -156,7 +160,7 @@ def load_all(
 
 
 def load_region_mapping(data_dir: Path | None = None) -> pd.DataFrame:
-    """Load optional M49→region mapping.
+    """Load optional M49â†’region mapping.
 
     Returns a DataFrame with columns [country_m49, region].
     If the mapping file is missing, returns an empty DataFrame with the same columns.

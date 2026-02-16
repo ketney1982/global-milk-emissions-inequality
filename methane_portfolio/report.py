@@ -1,3 +1,7 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Auto-generate Methods Appendix in Markdown.
 
 Reads the run manifest, validation report, and key summaries to produce
@@ -29,7 +33,7 @@ _TEMPLATE = r"""# Methods Appendix
 - **Emission Intensity** (species-level): `{intensity_file}`
 - **Species Structure** (shares): `{structure_file}`
 - **Aggregate Intensity** (country-year): `{agg_file}`
-- Coverage: {n_countries} countries, years {base_year}–{end_year}, {n_species} species
+- Coverage: {n_countries} countries, years {base_year}â€“{end_year}, {n_species} species
 
 ---
 
@@ -56,8 +60,8 @@ $$\Delta_{{struct}} = \frac{{1}}{{2}} \left[ \sum_s (\Delta w_s) I_s^0 + \sum_s 
 $$\Delta_{{within}} = \frac{{1}}{{2}} \left[ \sum_s w_s^0 (\Delta I_s) + \sum_s w_s^1 (\Delta I_s) \right]$$
 
 - **Reconstruction tolerance**: {recon_tol:.2e}
-- **Global production-weighted structure effect**: {global_struct:+.6f} kg CO₂e/t
-- **Global production-weighted within effect**: {global_within:+.6f} kg CO₂e/t
+- **Global production-weighted structure effect**: {global_struct:+.6f} kg COâ‚‚e/t
+- **Global production-weighted within effect**: {global_within:+.6f} kg COâ‚‚e/t
 
 ---
 
@@ -100,7 +104,7 @@ Subject to:
 - $\frac{{1}}{{2}} \| w - w_{{ref}} \|_1 \leq \delta$
 - $w_s = 0$ for species not in current mix (unless expansion allowed)
 
-CVaR is computed via the Rockafellar–Uryasev linear relaxation.
+CVaR is computed via the Rockafellarâ€“Uryasev linear relaxation.
 
 ### Default parameters
 
@@ -195,7 +199,7 @@ def generate_appendix(
             diag = json.load(f)
         diagnostics_section = (
             f"### Diagnostics\n\n"
-            f"- Max R̂: {diag.get('max_rhat', 'N/A')}\n"
+            f"- Max RĚ‚: {diag.get('max_rhat', 'N/A')}\n"
             f"- Min ESS (bulk): {diag.get('min_ess_bulk', 'N/A')}\n"
             f"- Min ESS (tail): {diag.get('min_ess_tail', 'N/A')}\n"
             f"- Divergences: {diag.get('divergences', 'N/A')}\n"

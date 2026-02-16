@@ -1,3 +1,7 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Central configuration for the methane-portfolio pipeline.
 
 All tunable parameters live here.  The run manifest (outputs/run_manifest.json)
@@ -101,7 +105,7 @@ FAIR_SHARE_CAP_PCT: float = 5.0       # max % of global gain per country
 # Figures
 # ---------------------------------------------------------------------------
 FIGURE_DPI: int = 600
-FIGURE_FORMAT: str = "png"  # also saved as PDF
+FIGURE_FORMAT: str = "png"  # default figure output format
 
 # ---------------------------------------------------------------------------
 # Causal guardrails

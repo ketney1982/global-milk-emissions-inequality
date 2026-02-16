@@ -1,3 +1,7 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Command-line interface for the methane-portfolio pipeline.
 
 Usage examples::
@@ -18,6 +22,7 @@ import argparse
 import logging
 import sys
 import time
+import warnings
 from pathlib import Path
 
 from methane_portfolio import config
@@ -30,6 +35,14 @@ def _setup_logging(verbose: bool) -> None:
         level=level,
         format="%(asctime)s | %(name)-30s | %(levelname)-5s | %(message)s",
         datefmt="%H:%M:%S",
+    )
+    # Reduce noise from optional ArviZ preview subpackages.
+    logging.getLogger("arviz.preview").setLevel(logging.WARNING)
+    logging.getLogger("fontTools.subset").setLevel(logging.WARNING)
+    warnings.filterwarnings(
+        "ignore",
+        message="ArviZ is undergoing a major refactor.*",
+        category=FutureWarning,
     )
 
 
@@ -84,15 +97,34 @@ def cmd_bayes(args: argparse.Namespace) -> None:
 
 
 def cmd_optimize(args: argparse.Namespace) -> None:
+    import arviz as az
+    from methane_portfolio.bayes import posterior_intensity_samples, prepare_bayes_data
     from methane_portfolio.io import load_all
     from methane_portfolio.robust_optimize import run_all_countries
 
     long_df, agg_df, species = load_all(args.data_dir)
+    I_samples, country_list, species_list = None, None, None
+    if args.allow_expansion:
+        nc_path = config.OUTPUT_DIR / "bayes_posterior.nc"
+        if nc_path.exists():
+            idata = az.from_netcdf(str(nc_path))
+            bayes_data = prepare_bayes_data(long_df)
+            I_samples, country_list, species_list = posterior_intensity_samples(
+                idata, bayes_data, n_samples=500,
+            )
+            print("  Loaded existing Bayesian posterior for expansion-enabled optimisation")
+        else:
+            print("  [WARN] --allow-expansion requested but bayes_posterior.nc is missing; expansion may be disabled")
+
     result = run_all_countries(
         long_df,
+        I_samples=I_samples,
+        country_list=country_list,
+        species_list=species_list,
         lam=args.lam,
         alpha=args.alpha,
         delta=args.delta,
+        allow_expansion=args.allow_expansion,
     )
     print(f"[OK] Robust optimisation for {len(result)} countries saved")
 
@@ -257,6 +289,19 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         print(f"[OK] Step {step}/{n_steps}: Bayesian model fitted ({args.chains} chains x {args.draws} draws)")
     else:
         print("  [SKIP] Bayesian model fitting (--skip-bayes)")
+        if args.allow_expansion:
+            nc_path = config.OUTPUT_DIR / "bayes_posterior.nc"
+            if nc_path.exists():
+                import arviz as az
+                from methane_portfolio.bayes import prepare_bayes_data, posterior_intensity_samples
+                idata = az.from_netcdf(str(nc_path))
+                bayes_data = prepare_bayes_data(long_df)
+                I_samples, country_list, species_list = posterior_intensity_samples(
+                    idata, bayes_data, n_samples=500,
+                )
+                print("  Loaded existing Bayesian posterior for --allow-expansion")
+            else:
+                print("  [WARN] --allow-expansion requested but bayes_posterior.nc is missing")
 
     # 4. Robust optimisation (posterior-informed if Bayes ran)
     step += 1
@@ -267,6 +312,7 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         country_list=country_list,
         species_list=species_list,
         lam=args.lam, alpha=args.alpha, delta=args.delta,
+        allow_expansion=args.allow_expansion,
     )
     print(f"[OK] Step {step}/{n_steps}: Robust optimisation ({len(opt_df)} countries)")
 
@@ -287,6 +333,7 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         sensitivity_df = run_sensitivity_grid(
             long_df, I_samples=I_samples,
             country_list=country_list, species_list=species_list,
+            allow_expansion=args.allow_expansion,
         )
         print(f"[OK] Step {step}/{n_steps}: Sensitivity grid ({len(sensitivity_df)} rows)")
     else:
@@ -335,6 +382,7 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         "lam": args.lam,
         "alpha": args.alpha,
         "delta": args.delta,
+        "allow_expansion": args.allow_expansion,
         "n_countries": int(long_df["country_m49"].nunique()),
         "n_species": int(long_df["milk_species"].nunique()),
     })
@@ -396,6 +444,11 @@ def build_parser() -> argparse.ArgumentParser:
     o.add_argument("--lam", type=float, default=0.5)
     o.add_argument("--alpha", type=float, default=0.90)
     o.add_argument("--delta", type=float, default=0.10)
+    o.add_argument(
+        "--allow-expansion",
+        action="store_true",
+        help="Allow expansion into species with baseline share 0.",
+    )
 
     # uncertainty
     sub.add_parser("uncertainty", help="Uncertainty propagation")
@@ -423,6 +476,11 @@ def build_parser() -> argparse.ArgumentParser:
     ra.add_argument("--lam", type=float, default=0.5)
     ra.add_argument("--alpha", type=float, default=0.90)
     ra.add_argument("--delta", type=float, default=0.10)
+    ra.add_argument(
+        "--allow-expansion",
+        action="store_true",
+        help="Allow expansion into species with baseline share 0.",
+    )
     ra.add_argument(
         "--weight-method",
         choices=weight_choices,

@@ -27,11 +27,15 @@ pip install -e ".[dev]"
 
 # Run the full pipeline (without Bayesian model fitting)
 methane-portfolio run-all
+# Optional: allow expansion into species with baseline zero share
+methane-portfolio run-all --allow-expansion
 
 # Or step by step
 methane-portfolio validate
 methane-portfolio shapley
 methane-portfolio optimize --delta 0.10
+# Optional: allow expansion into species with baseline zero share
+methane-portfolio optimize --delta 0.10 --allow-expansion
 methane-portfolio uncertainty
 methane-portfolio figures
 methane-portfolio tables
@@ -40,6 +44,9 @@ methane-portfolio report
 # Bayesian model (requires PyMC + GPU/CPU time)
 # Tip: Increase --chains to match your CPU core count for faster parallel processing
 methane-portfolio bayes --chains 4 --draws 1000
+
+# Reproducibility manifest (runs pipeline + writes checksums)
+python scripts/reproduce.py --skip-bayes
 ```
 
 ## Project Structure
@@ -64,7 +71,7 @@ methane-portfolio bayes --chains 4 --draws 1000
 ├── tests/                             # pytest tests
 ├── scripts/                           # Shell scripts
 ├── outputs/                           # Generated outputs
-│   ├── figures/                       # PNG + PDF figures
+│   ├── figures/                       # Generated figures (PNG by default)
 │   ├── *.csv                          # Result tables
 │   ├── *.json                         # Summaries and manifests
 │   └── methods_appendix.md            # Auto-generated appendix
@@ -91,6 +98,32 @@ pytest tests/ -v
 pytest tests/ -v -m "not slow"
 ```
 
+## Reproducibility for Manuscript
+
+- Run a controlled pipeline execution and generate a checksum manifest:
+
+```bash
+python scripts/reproduce.py --skip-bayes
+```
+
+- Manifest output: `outputs/reproducibility_manifest.json`
+- It includes: run parameters, git commit/dirty state, package versions (`pip freeze`), and SHA-256 checksums for key outputs.
+
+## Public Release Hygiene
+
+- Before making the repository public:
+1. Verify no personal or institutional contact details remain in source headers/comments.
+2. Verify no credentials/secrets are present (`.env`, API tokens, private keys).
+3. Regenerate `outputs/reproducibility_manifest.json` in the final public commit.
+
+- Automated prepublish scan:
+
+```bash
+python scripts/prepublish_check.py
+```
+
 ## License
 
 MIT
+
+This research was supported by the Google Cloud Research Credits program. All computations and data processing for this project were performed using infrastructure provided by Google Cloud.

@@ -1,3 +1,7 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Advanced analytics for global contribution concentration and structure.
 
 This module intentionally exposes pure, testable functions only.
@@ -65,7 +69,7 @@ def inequality_decomposition(
     """ANOVA-like weighted variance decomposition between/within regions.
 
     Uses absolute weighted contributions:
-        x_c = |w_c * Δ_c|
+        x_c = |w_c * Î”_c|
     """
     comp_col = _component_column(component)
     required = {weights_col, region_col, comp_col}
@@ -122,7 +126,7 @@ def loo_influence(
     component: Literal["struct", "within", "total"],
     weights_col: str = "weight_interval",
 ) -> pd.DataFrame:
-    """Vectorized leave-one-out influence on global Δ."""
+    """Vectorized leave-one-out influence on global Î”."""
     comp_col = _component_column(component)
     required = {comp_col, weights_col}
     missing = required - set(df.columns)

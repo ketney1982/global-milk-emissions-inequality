@@ -1,14 +1,18 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Robust portfolio optimisation with CVaR risk measure.
 
 For each country we solve:
-    minimise  λ · E[I'(w)]  +  (1−λ) · CVaR_α(I'(w))
-    s.t.      Σ w_s = 1
-              w_s ≥ 0
-              0.5 · ‖w − w_ref‖₁  ≤  δ
+    minimise  Î» Â· E[I'(w)]  +  (1â’Î») Â· CVaR_Î±(I'(w))
+    s.t.      ÎŁ w_s = 1
+              w_s â‰Ą 0
+              0.5 Â· â€–w â’ w_refâ€–â‚  â‰¤  Î´
               w_s = 0   for species not in current mix (unless allow_expansion)
 
-CVaR is handled via the Rockafellar–Uryasev linear relaxation:
-    CVaR_α ≈ min_t  { t  +  (1/(K(1−α))) · Σ_k max(0, I'_k − t) }
+CVaR is handled via the Rockafellarâ€“Uryasev linear relaxation:
+    CVaR_Î± â‰ min_t  { t  +  (1/(K(1â’Î±))) Â· ÎŁ_k max(0, I'_k â’ t) }
 which is folded into the objective.
 
 NOTE: all results are labelled as **accounting counterfactuals** per the
@@ -132,7 +136,7 @@ def solve_robust(
         return np.concatenate([grad_w, [grad_t]])
 
     # Constraints
-    # 1. Simplex: Σ w_s = 1  (only first S variables)
+    # 1. Simplex: ÎŁ w_s = 1  (only first S variables)
     simplex = {
         "type": "eq",
         "fun": lambda x: x[:S].sum() - 1.0,
@@ -156,9 +160,25 @@ def solve_robust(
     )
 
     w_opt = result.x[:S]
-    # Clip tiny negatives from numerics
+    if not np.all(np.isfinite(w_opt)):
+        w_opt = w_ref.copy()
+
+    # Numerical guardrails: preserve feasible simplex/bounds after optimizer noise.
     w_opt = np.clip(w_opt, 0.0, None)
-    w_opt /= w_opt.sum()
+    if not allow_expansion:
+        w_opt[w_ref == 0.0] = 0.0
+
+    w_sum = float(w_opt.sum())
+    if w_sum <= 0:
+        w_opt = w_ref.copy()
+    else:
+        w_opt = w_opt / w_sum
+
+    tv_dist = 0.5 * float(np.abs(w_opt - w_ref).sum())
+    if tv_dist > delta and tv_dist > 0:
+        # Project by shrinking the move toward baseline; keeps simplex + non-negativity.
+        step = delta / tv_dist
+        w_opt = w_ref + step * (w_opt - w_ref)
 
     # Evaluate at optimum
     port_opt = I_scenarios @ w_opt
@@ -190,6 +210,7 @@ def run_all_countries(
     alpha: float = 0.90,
     delta: float = 0.10,
     allow_expansion: bool = False,
+    log_skips: bool = True,
     output_dir: Path | None = None,
 ) -> pd.DataFrame:
     """Run robust optimisation for all countries with data in ``year``.
@@ -219,6 +240,9 @@ def run_all_countries(
     all_species = sorted(sub["milk_species"].unique())
 
     results: list[dict] = []
+    skipped_nan_intensity: list[tuple[str, int]] = []
+    fixed_low_species: list[tuple[str, int, int]] = []
+    expansion_disabled_no_posterior: list[tuple[str, int]] = []
 
     # Get unique countries
     countries = sub.groupby(["country_m49", "country"]).size().reset_index(name="_n")
@@ -233,11 +257,7 @@ def run_all_countries(
             & (csub["kg_co2e_per_ton_milk"].isna())
         ]
         if not invalid_active.empty:
-            logger.warning(
-                "Skipping country %s (%s): active species has NaN intensity.",
-                cname,
-                m49,
-            )
+            skipped_nan_intensity.append((str(cname), int(m49)))
             continue
 
         # Build w_ref aligned to all_species
@@ -252,18 +272,12 @@ def run_all_countries(
             )
 
         active_species = int(np.sum(w_ref > 0))
-        if active_species < 2:
-            logger.warning(
-                "Skipping country %s (%s): fewer than 2 active species (%d).",
-                cname,
-                m49,
-                active_species,
-            )
-            continue
 
         # Get I_scenarios for this country
+        has_country_posterior = False
         if I_samples is not None and country_list is not None and species_list is not None:
             if m49 in country_list:
+                has_country_posterior = True
                 cidx = country_list.index(m49)
                 # Align species
                 I_scen = np.zeros((I_samples.shape[0], len(all_species)))
@@ -278,23 +292,39 @@ def run_all_countries(
         else:
             I_scen = _lognormal_fallback(i_obs, w_ref)
 
+        effective_allow_expansion = allow_expansion and has_country_posterior
+        if allow_expansion and not has_country_posterior:
+            expansion_disabled_no_posterior.append((str(cname), int(m49)))
+
         baseline = float(w_ref @ i_obs) if i_obs.sum() > 0 else 0.0
         if baseline <= 0 or w_ref.sum() < 1e-12:
             continue
 
-        sol = solve_robust(
-            w_ref, I_scen,
-            lam=lam, alpha=alpha, delta=delta,
-            allow_expansion=allow_expansion,
-        )
-
-        red_mean = (1.0 - sol["mean_opt"] / baseline) * 100
         # Baseline CVaR
         port_base = I_scen @ w_ref
         t_base = np.percentile(port_base, alpha * 100)
         cvar_base = t_base + np.maximum(0.0, port_base - t_base).sum() / (
             len(port_base) * (1 - alpha)
         )
+
+        if active_species < 2 and not effective_allow_expansion:
+            # No decision freedom: keep baseline mix and include country in outputs.
+            fixed_low_species.append((str(cname), int(m49), active_species))
+            sol = {
+                "w_opt": w_ref.copy(),
+                "mean_opt": baseline,
+                "cvar_opt": float(cvar_base),
+                "success": True,
+                "message": "Fixed baseline (insufficient active species or expansion unavailable)",
+            }
+        else:
+            sol = solve_robust(
+                w_ref, I_scen,
+                lam=lam, alpha=alpha, delta=delta,
+                allow_expansion=effective_allow_expansion,
+            )
+
+        red_mean = (1.0 - sol["mean_opt"] / baseline) * 100
         red_cvar = (1.0 - sol["cvar_opt"] / cvar_base) * 100 if cvar_base > 0 else 0.0
         production_tonnes = float(csub["milk_tonnes"].sum())
         absolute_reduction_kt = (
@@ -319,6 +349,7 @@ def run_all_countries(
             "lambda": lam,
             "alpha": alpha,
             "solver_success": sol["success"],
+            "solver_message": str(sol.get("message", "")),
         }
         # Add optimal weights
         for si, sp in enumerate(all_species):
@@ -331,6 +362,33 @@ def run_all_countries(
     df.sort_values("reduction_mean_pct", ascending=False, inplace=True)
     df.reset_index(drop=True, inplace=True)
     df.to_csv(out / "robust_optimization_results.csv", index=False)
+
+    if log_skips:
+        if skipped_nan_intensity:
+            preview = ", ".join([f"{c} ({m})" for c, m in skipped_nan_intensity[:8]])
+            logger.warning(
+                "Skipped %d countries because active species had NaN intensity. Sample: %s%s",
+                len(skipped_nan_intensity),
+                preview,
+                " ..." if len(skipped_nan_intensity) > 8 else "",
+            )
+        if fixed_low_species:
+            preview = ", ".join([f"{c} ({m})" for c, m, _ in fixed_low_species[:8]])
+            logger.info(
+                "Included %d countries with fewer than 2 active species; optimisation fixed to baseline because expansion was unavailable. Sample: %s%s",
+                len(fixed_low_species),
+                preview,
+                " ..." if len(fixed_low_species) > 8 else "",
+            )
+        if allow_expansion and expansion_disabled_no_posterior:
+            preview = ", ".join([f"{c} ({m})" for c, m in expansion_disabled_no_posterior[:8]])
+            logger.warning(
+                "allow_expansion requested, but posterior intensities were unavailable for %d countries; those countries used allow_expansion=False. Sample: %s%s",
+                len(expansion_disabled_no_posterior),
+                preview,
+                " ..." if len(expansion_disabled_no_posterior) > 8 else "",
+            )
+
     return df
 
 

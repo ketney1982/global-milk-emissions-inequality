@@ -1,3 +1,7 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Bayesian hierarchical model for species-level emission intensities.
 
 Model specification
@@ -5,21 +9,21 @@ Model specification
 Response: y = log(kg_co2e_per_ton_milk)  where I > 0 and share > 0.
 
 Likelihood:
-    y ~ StudentT(ν, μ, σ_s)
+    y ~ StudentT(Î˝, ÎĽ, Ď_s)
 
 Linear predictor:
-    μ_cts = α_s + u_c + β_s · (t − 2020) + γ_s · 1[t ≥ 2022]
+    ÎĽ_cts = Î±_s + u_c + Î˛_s Â· (t â’ 2020) + Îł_s Â· 1[t â‰Ą 2022]
 
 Random effects:
-    u_c ~ Normal(0, τ)    (country random effects → partial pooling)
+    u_c ~ Normal(0, Ď„)    (country random effects â†’ partial pooling)
 
 Hyperpriors:
-    ν      ~ Gamma(2, 0.1)    (degrees of freedom)
-    α_s    ~ Normal(0, 5)     (species intercepts)
-    β_s    ~ Normal(0, 1)     (species trends)
-    γ_s    ~ Normal(0, 1)     (regime shift)
-    σ_s    ~ HalfNormal(1)    (species-level scale)
-    τ      ~ HalfNormal(1)    (country random effect scale)
+    Î˝      ~ Gamma(2, 0.1)    (degrees of freedom)
+    Î±_s    ~ Normal(0, 5)     (species intercepts)
+    Î˛_s    ~ Normal(0, 1)     (species trends)
+    Îł_s    ~ Normal(0, 1)     (regime shift)
+    Ď_s    ~ HalfNormal(1)    (species-level scale)
+    Ď„      ~ HalfNormal(1)    (country random effect scale)
 """
 
 from __future__ import annotations
@@ -138,12 +142,12 @@ def _detect_sampler() -> tuple[str | None, bool]:
     """
     try:
         import nutpie  # noqa: F401
-        logger.info("nutpie sampler detected — using Rust-based NUTS (fast)")
+        logger.info("nutpie sampler detected â€” using Rust-based NUTS (fast)")
         return "nutpie", True
     except ImportError:
         logger.info(
-            "nutpie not installed — falling back to PyMC default sampler. "
-            "Install nutpie for 5-20× speedup: pip install nutpie"
+            "nutpie not installed â€” falling back to PyMC default sampler. "
+            "Install nutpie for 5-20Ă— speedup: pip install nutpie"
         )
         return None, False
 
@@ -181,6 +185,11 @@ def fit_model(
         message=".*g\\+\\+.*|.*cxx.*|.*Performance may be severely degraded.*",
         category=UserWarning,
     )
+    warnings.filterwarnings(
+        "ignore",
+        message="ArviZ is undergoing a major refactor.*",
+        category=FutureWarning,
+    )
 
     out = output_dir or config.OUTPUT_DIR
     out.mkdir(parents=True, exist_ok=True)
@@ -194,7 +203,7 @@ def fit_model(
         cores = min(chains, multiprocessing.cpu_count())
 
     logger.info(
-        "Sampling %d chains × %d draws (tune=%d, target_accept=%.2f, cores=%d, sampler=%s)",
+        "Sampling %d chains Ă— %d draws (tune=%d, target_accept=%.2f, cores=%d, sampler=%s)",
         chains, draws, tune, target_accept, cores,
         nuts_sampler or "pymc",
     )
@@ -220,6 +229,9 @@ def fit_model(
     )
     if nuts_sampler:
         sample_kwargs["nuts_sampler"] = nuts_sampler
+    # nutpie currently ignores idata_kwargs and emits a warning; avoid noisy output.
+    if use_nutpie:
+        sample_kwargs.pop("idata_kwargs", None)
 
     with model:
         idata = pm.sample(**sample_kwargs)

@@ -1,9 +1,13 @@
+# Autor: Ketney Otto
+# Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
+# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+
 """Uncertainty propagation: Dirichlet share perturbation + posterior draws.
 
 Combines two sources of uncertainty:
 1. **Posterior draws** of species intensities I_cts from the Bayesian model.
 2. **Dirichlet perturbation** of observed shares w_cts around
-   Dir(κ · w_obs) to capture share-measurement uncertainty.
+   Dir(Îş Â· w_obs) to capture share-measurement uncertainty.
 
 Also provides a sensitivity grid over (delta, kappa, lambda, alpha).
 """
@@ -159,6 +163,7 @@ def run_sensitivity_grid(
     alphas: tuple[float, ...] = config.ALPHA_GRID,
     year: int = config.END_YEAR,
     n_countries_max: int = 20,
+    allow_expansion: bool = False,
     output_dir: Path | None = None,
 ) -> pd.DataFrame:
     """Run the optimisation over a grid of hyper-parameters.
@@ -193,6 +198,8 @@ def run_sensitivity_grid(
             species_list=species_list,
             year=year,
             lam=l, alpha=a, delta=d,
+            allow_expansion=allow_expansion,
+            log_skips=False,
             output_dir=None,  # don't save intermediate
         )
         res["delta"] = d
