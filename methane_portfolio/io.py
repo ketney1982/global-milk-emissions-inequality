@@ -18,6 +18,17 @@ import pandas as pd
 
 from methane_portfolio import config
 
+logger = __import__("logging").getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# China deduplication
+# ---------------------------------------------------------------------------
+# FAO reports both "China" (m49=159, aggregate) and "China, mainland"
+# (m49=156).  The aggregate largely duplicates mainland values and keeping
+# both double-counts production in global totals.  We drop the aggregate
+# (m49=159) and retain "China, mainland" (m49=156).
+_CHINA_AGGREGATE_M49 = 159
+
 
 # ---------------------------------------------------------------------------
 # dtype enforcement
@@ -102,6 +113,16 @@ def build_long_df(
         on=merge_keys,
         how="inner",
     )
+    # Drop China aggregate (m49=159) to avoid double-counting with China, mainland (m49=156)
+    n_before = len(long)
+    long = long[long["country_m49"] != _CHINA_AGGREGATE_M49].copy()
+    n_dropped = n_before - len(long)
+    if n_dropped > 0:
+        logger.info(
+            "Dropped %d rows for 'China' aggregate (m49=%d) to avoid "
+            "double-counting with 'China, mainland' (m49=156).",
+            n_dropped, _CHINA_AGGREGATE_M49,
+        )
     # Canonical species ordering
     long["milk_species"] = pd.Categorical(
         long["milk_species"],
@@ -128,6 +149,15 @@ def build_agg_df(agg_raw: pd.DataFrame) -> pd.DataFrame:
              ch4_total_ktco2e, kg_co2e_per_ton_milk
     """
     df = agg_raw.copy()
+    # Drop China aggregate (m49=159) — see build_long_df for rationale
+    n_before = len(df)
+    df = df[df["country_m49"] != _CHINA_AGGREGATE_M49].copy()
+    n_dropped = n_before - len(df)
+    if n_dropped > 0:
+        logger.info(
+            "Dropped %d aggregate rows for 'China' (m49=%d).",
+            n_dropped, _CHINA_AGGREGATE_M49,
+        )
     df.sort_values(["country_m49", "year"], inplace=True)
     df.reset_index(drop=True, inplace=True)
     return df[

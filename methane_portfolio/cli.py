@@ -412,19 +412,15 @@ def cmd_run_all(args: argparse.Namespace) -> None:
     )
     print(f"[OK] Step {step}/{n_steps}: Figures generated")
 
-    # 9. Report
-    step += 1
-    from methane_portfolio.report import generate_appendix
-    generate_appendix(long_df=long_df)
-    print(f"[OK] Step {step}/{n_steps}: Methods appendix written")
-
-    # Manifest
+    # 9. Manifest (written before report so the appendix can read actual params)
     write_manifest({
         "pipeline": "run_all",
         "skip_bayes": args.skip_bayes,
         "weight_method": args.weight_method,
         "chains": args.chains,
         "draws": args.draws,
+        "tune": args.tune,
+        "target_accept": args.target_accept,
         "lam": args.lam,
         "alpha": args.alpha,
         "delta": args.delta,
@@ -434,6 +430,18 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         "n_countries_optimized": int(opt_df["country_m49"].nunique()),
         "n_species": int(long_df["milk_species"].nunique()),
     })
+
+    # 10. Report
+    step += 1
+    from methane_portfolio.report import generate_appendix
+    generate_appendix(
+        long_df=long_df,
+        chains=args.chains,
+        draws=args.draws,
+        tune=args.tune,
+        target_accept=args.target_accept,
+    )
+    print(f"[OK] Step {step}/{n_steps}: Methods appendix written")
 
     elapsed = time.time() - t0
     print(f"\n[OK] Pipeline complete in {elapsed:.1f}s")

@@ -10,7 +10,7 @@ import pytest
 pytest.importorskip("pymc")
 
 from methane_portfolio.io import load_all
-from methane_portfolio.bayes import prepare_bayes_data, build_model
+from methane_portfolio.bayes import prepare_bayes_data, build_model, ConvergenceError
 
 
 @pytest.fixture(scope="module")
@@ -63,3 +63,26 @@ class TestBayesModelBuild:
         assert "u_c" in named_vars
         assert "tau" in rv_names
         assert "nu" in rv_names
+
+    def test_non_centered_parameterization(self, data):
+        """Verify u_c_raw uses Normal (not ZeroSumNormal) for non-centered param."""
+        import pymc as pm
+        long_df, _, _ = data
+        bd = prepare_bayes_data(long_df)
+        model = build_model(bd)
+        # u_c_raw should be a free RV (Normal), u_c should be a Deterministic
+        rv_names = [rv.name for rv in model.free_RVs]
+        det_names = [d.name for d in model.deterministics]
+        assert "u_c_raw" in rv_names
+        assert "u_c" in det_names
+
+    def test_china_not_double_counted(self, data):
+        """Ensure 'China' aggregate (m49=159) is dropped from loaded data."""
+        long_df, _, _ = data
+        assert 159 not in long_df["country_m49"].values
+
+    def test_convergence_error_is_runtime_error(self):
+        """ConvergenceError should be catchable as RuntimeError."""
+        assert issubclass(ConvergenceError, RuntimeError)
+        with pytest.raises(ConvergenceError):
+            raise ConvergenceError("test")

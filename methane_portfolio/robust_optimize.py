@@ -569,6 +569,21 @@ def run_all_countries(
     if not df.empty:
         df.sort_values("reduction_mean_pct", ascending=False, inplace=True)
         df.reset_index(drop=True, inplace=True)
+
+    # Post-optimization diagnostic: warn if too many countries required do-no-harm revert
+    if not df.empty:
+        n_revert = sum(1 for _, r in df.iterrows() if r.get("no_harm_applied"))
+        revert_pct = 100 * n_revert / len(df)
+        if revert_pct > 20:
+            logger.warning(
+                "%.0f%% of countries required do-no-harm revert (%d/%d). "
+                "This suggests posterior quality issues -- check Bayesian convergence.",
+                revert_pct, n_revert, len(df),
+            )
+    else:
+        n_revert = 0
+        revert_pct = 0.0
+
     if save_csv and out is not None:
         df.to_csv(out / "robust_optimization_results.csv", index=False)
         if save_audit:
@@ -581,6 +596,8 @@ def run_all_countries(
                 "n_negative_final_reductions": int((df["reduction_mean_pct"] < 0).sum()),
                 "total_raw_absolute_reduction_kt": float(df["raw_absolute_reduction_kt"].sum()),
                 "total_final_absolute_reduction_kt": float(df["absolute_reduction_kt"].sum()),
+                "revert_pct": round(revert_pct, 1),
+                "revert_threshold_warning": revert_pct > 20,
                 "no_harm_actions": (
                     trigger_df["no_harm_action"].value_counts(dropna=False).to_dict()
                     if not trigger_df.empty

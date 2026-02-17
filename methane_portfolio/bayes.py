@@ -14,8 +14,17 @@ Likelihood:
 Linear predictor:
     mu_cts = alpha_s + u_c + beta_s * (t - 2020) + gamma_s * 1[t >= 2022]
 
-Random effects:
-    u_c ~ ZeroSumNormal(0, tau)
+Random effects (non-centered parameterization):
+    u_c_raw ~ N(0, 1)
+    u_c = tau * u_c_raw
+
+Priors:
+    alpha_s ~ N(y_bar, clip(y_sd, 0.5, 2.5))
+    beta_s  ~ N(0, 0.5)
+    gamma_s ~ N(0, 0.5)
+    sigma_s ~ HalfNormal(0.5)
+    tau     ~ HalfNormal(clip(sd(country_means), 0.15, 1.0))
+    nu      ~ Gamma(6, 1)
 """
 
 from __future__ import annotations
@@ -32,6 +41,11 @@ import pymc as pm
 from methane_portfolio import config
 
 logger = logging.getLogger(__name__)
+
+
+class ConvergenceError(RuntimeError):
+    """Raised when the Bayesian model fails to meet convergence criteria."""
+    pass
 
 
 # ---------------------------------------------------------------------------
@@ -104,7 +118,7 @@ def build_model(data: dict) -> pm.Model:
     """Construct the PyMC hierarchical model."""
     y_mean = float(np.mean(data["y"]))
     y_sd = _safe_std(data["y"], fallback=1.0)
-    alpha_sigma = float(np.clip(1.5 * max(y_sd, 0.25), 0.5, 2.5))
+    alpha_sigma = float(np.clip(y_sd, 0.5, 2.5))
     tau_sigma = _country_intercept_scale(data, y_sd=y_sd)
 
     with pm.Model() as model:
@@ -129,9 +143,10 @@ def build_model(data: dict) -> pm.Model:
         gamma_s = pm.Normal("gamma_s", mu=0, sigma=0.5, shape=data["n_species"])
         sigma_s = pm.HalfNormal("sigma_s", sigma=0.5, shape=data["n_species"])
 
-        # Non-centred zero-sum country effects reduce funnel geometry between
-        # tau and country intercepts, improving convergence stability.
-        u_c_raw = pm.ZeroSumNormal("u_c_raw", sigma=1.0, shape=data["n_countries"])
+        # Non-centered parameterization: u_c = tau * u_c_raw breaks the
+        # funnel geometry between tau and country intercepts that causes
+        # catastrophic non-convergence with centered parameterization.
+        u_c_raw = pm.Normal("u_c_raw", mu=0, sigma=1, shape=data["n_countries"])
         u_c = pm.Deterministic("u_c", tau * u_c_raw)
 
         # Linear predictor
@@ -282,7 +297,14 @@ def fit_model(
     diag = _compute_diagnostics(idata)
     with open(out / "bayes_diagnostics.json", "w", encoding="utf-8") as f:
         json.dump(diag, f, indent=2, default=_json_default)
-    if not diag.get("converged", False):
+    if not diag.get("converged_relaxed", False):
+        logger.warning(
+            "CONVERGENCE FAILURE: R-hat max=%.3f, ESS_bulk min=%.0f, ESS_tail min=%.0f. "
+            "Downstream optimization results are UNRELIABLE. "
+            "Increase --tune, --draws, or --chains.",
+            diag["max_rhat"], diag["min_ess_bulk"], diag["min_ess_tail"],
+        )
+    elif not diag.get("converged", False):
         logger.warning(
             "Bayesian diagnostics indicate weak convergence: max_rhat=%.3f, min_ess_bulk=%.1f, min_ess_tail=%.1f, divergences=%d",
             diag["max_rhat"],
@@ -306,11 +328,13 @@ def fit_model(
                 ", ".join(diag.get("ess_tail_fail_params", [])) or "none",
             )
     if fail_on_weak_convergence and not diag.get("converged_relaxed", False):
-        raise RuntimeError(
-            "Bayesian posterior failed relaxed convergence checks "
-            f"(max_rhat={diag['max_rhat']:.3f}, min_ess_bulk={diag['min_ess_bulk']:.1f}, "
-            f"min_ess_tail={diag['min_ess_tail']:.1f}, divergences={diag['divergences']}). "
-            "Refit with stronger settings or rerun with allow_weak_convergence=True if intentional."
+        raise ConvergenceError(
+            f"Model failed to converge (R-hat max={diag['max_rhat']:.3f}, "
+            f"ESS bulk min={diag['min_ess_bulk']:.0f}, "
+            f"ESS tail min={diag['min_ess_tail']:.0f}, "
+            f"divergences={diag['divergences']}). "
+            "Refusing to proceed -- downstream optimization would be unreliable. "
+            "Increase --tune, --draws, or --chains."
         )
 
     # Posterior predictive diagnostics (draw-capped for tractable runtime)

@@ -46,7 +46,7 @@ PYMC_SEED: int = 42
 CHAINS: int = 4
 DRAWS: int = 5000
 TUNE: int = 10000
-TARGET_ACCEPT: float = 0.98
+TARGET_ACCEPT: float = 0.95
 
 # ---------------------------------------------------------------------------
 # Validation tolerances

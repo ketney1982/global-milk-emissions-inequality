@@ -34,6 +34,11 @@ _TEMPLATE = r"""# Methods Appendix
 - **Aggregate Intensity** (country-year): `{agg_file}`
 {coverage_section}
 
+**Note on China deduplication:** FAO reports both "China" (m49=159, aggregate)
+and "China, mainland" (m49=156) with near-identical values.  To avoid
+double-counting in global totals, the pipeline retains only "China, mainland"
+(m49=156) and drops the aggregate entity.
+
 ---
 
 ## 2. Validation
@@ -78,7 +83,7 @@ $$\mu_{{cts}} = \alpha_s + u_c + \beta_s (t - 2020) + \gamma_s \cdot \mathbf{{1}
 | $\beta_s$ | $\mathcal{{N}}(0, 0.5)$ |
 | $\gamma_s$ | $\mathcal{{N}}(0, 0.5)$ |
 | $\sigma_s$ | $\text{{HalfNormal}}(0.5)$ |
-| $u_c$ | $\text{{ZeroSumNormal}}(0, \tau)$ (centered, sum-to-zero) |
+| $u_c$ | Non-centered: $u_{{c,raw}} \sim \mathcal{{N}}(0,1)$, $u_c = \tau \cdot u_{{c,raw}}$ |
 | $\tau$ | $\text{{HalfNormal}}(\sigma_\tau)$, $\sigma_\tau = \mathrm{{clip}}(\mathrm{{sd}}(\bar y_c), 0.15, 1.0)$ |
 | $\nu$ | $\Gamma(6, 1)$ |
 
@@ -152,8 +157,20 @@ No causal claims are made.
 def generate_appendix(
     long_df: pd.DataFrame | None = None,
     output_dir: Path | None = None,
+    *,
+    chains: int | None = None,
+    draws: int | None = None,
+    tune: int | None = None,
+    target_accept: float | None = None,
 ) -> Path:
     """Generate the Methods Appendix markdown document.
+
+    Parameters
+    ----------
+    chains, draws, tune, target_accept : optional
+        Actual sampling parameters used in the run.  When provided these
+        override the config defaults so the appendix reflects the true
+        run settings.  The CLI passes these through from command-line args.
 
     Returns the path to the generated file.
     """
@@ -293,6 +310,30 @@ def generate_appendix(
 
     from methane_portfolio import __version__
 
+    # Use actual run parameters if provided, otherwise fall back to config defaults.
+    # Also try to read from run_manifest.json if it exists and params were not passed.
+    actual_chains = chains if chains is not None else config.CHAINS
+    actual_draws = draws if draws is not None else config.DRAWS
+    actual_tune = tune if tune is not None else config.TUNE
+    actual_target_accept = target_accept if target_accept is not None else config.TARGET_ACCEPT
+
+    manifest_path = out / "run_manifest.json"
+    if manifest_path.exists() and any(v is None for v in [chains, draws, tune, target_accept]):
+        try:
+            with open(manifest_path, "r", encoding="utf-8") as f:
+                manifest = json.load(f)
+            params = manifest.get("parameters", {})
+            if chains is None and "chains" in params:
+                actual_chains = params["chains"]
+            if draws is None and "draws" in params:
+                actual_draws = params["draws"]
+            if tune is None and "tune" in params:
+                actual_tune = params["tune"]
+            if target_accept is None and "target_accept" in params:
+                actual_target_accept = params["target_accept"]
+        except Exception:
+            logger.debug("Could not read run_manifest.json for sampling parameters; using defaults.")
+
     text = _TEMPLATE.format(
         intensity_file=config.EMISSION_INTENSITY_FILE,
         structure_file=config.SPECIES_STRUCTURE_FILE,
@@ -310,10 +351,10 @@ def generate_appendix(
         global_struct=global_struct,
         global_within=global_within,
         regime_year=config.REGIME_SHIFT_YEAR,
-        chains=config.CHAINS,
-        draws=config.DRAWS,
-        tune=config.TUNE,
-        target_accept=config.TARGET_ACCEPT,
+        chains=actual_chains,
+        draws=actual_draws,
+        tune=actual_tune,
+        target_accept=actual_target_accept,
         pymc_seed=config.PYMC_SEED,
         diagnostics_section=diagnostics_section,
         ppc_diagnostics_section=ppc_diagnostics_section,
