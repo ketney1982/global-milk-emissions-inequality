@@ -19,6 +19,7 @@ Usage examples::
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 import time
@@ -43,6 +44,35 @@ def _setup_logging(verbose: bool) -> None:
         "ignore",
         message="ArviZ is undergoing a major refactor.*",
         category=FutureWarning,
+    )
+
+
+def _assert_posterior_convergence(*, allow_weak_convergence: bool) -> None:
+    """Validate saved Bayesian diagnostics before reuse downstream."""
+    diag_path = config.OUTPUT_DIR / "bayes_diagnostics.json"
+    if not diag_path.exists():
+        return
+    try:
+        diag = json.loads(diag_path.read_text(encoding="utf-8"))
+    except Exception as exc:  # pragma: no cover - defensive path
+        raise RuntimeError(f"Could not parse {diag_path}: {exc}") from exc
+
+    converged_relaxed = bool(diag.get("converged_relaxed", diag.get("converged", False)))
+    if converged_relaxed:
+        return
+
+    msg = (
+        "Saved Bayesian posterior failed relaxed convergence checks "
+        f"(max_rhat={diag.get('max_rhat', 'NA')}, "
+        f"min_ess_bulk={diag.get('min_ess_bulk', 'NA')}, "
+        f"min_ess_tail={diag.get('min_ess_tail', 'NA')}, "
+        f"divergences={diag.get('divergences', 'NA')})."
+    )
+    if allow_weak_convergence:
+        print(f"  [WARN] {msg} Continuing because --allow-weak-convergence was set.")
+        return
+    raise RuntimeError(
+        f"{msg} Rerun Bayes with stronger settings or pass --allow-weak-convergence."
     )
 
 
@@ -87,6 +117,7 @@ def cmd_bayes(args: argparse.Namespace) -> None:
         tune=args.tune,
         target_accept=args.target_accept,
         cores=args.cores,
+        fail_on_weak_convergence=not args.allow_weak_convergence,
     )
     # Also extract posterior intensity samples for downstream use
     I_samples, country_list, species_list = posterior_intensity_samples(
@@ -107,6 +138,9 @@ def cmd_optimize(args: argparse.Namespace) -> None:
     if args.allow_expansion:
         nc_path = config.OUTPUT_DIR / "bayes_posterior.nc"
         if nc_path.exists():
+            _assert_posterior_convergence(
+                allow_weak_convergence=args.allow_weak_convergence,
+            )
             idata = az.from_netcdf(str(nc_path))
             bayes_data = prepare_bayes_data(long_df)
             I_samples, country_list, species_list = posterior_intensity_samples(
@@ -140,6 +174,9 @@ def cmd_uncertainty(args: argparse.Namespace) -> None:
     I_samples, country_list, species_list = None, None, None
     nc_path = config.OUTPUT_DIR / "bayes_posterior.nc"
     if nc_path.exists():
+        _assert_posterior_convergence(
+            allow_weak_convergence=args.allow_weak_convergence,
+        )
         from methane_portfolio.bayes import prepare_bayes_data, posterior_intensity_samples
         idata = az.from_netcdf(str(nc_path))
         data = prepare_bayes_data(long_df)
@@ -158,6 +195,7 @@ def cmd_uncertainty(args: argparse.Namespace) -> None:
     grid = run_sensitivity_grid(
         long_df, I_samples=I_samples,
         country_list=country_list, species_list=species_list,
+        workers=args.sensitivity_workers,
     )
     print(f"[OK] Sensitivity grid: {len(grid)} rows saved")
 
@@ -244,10 +282,9 @@ def cmd_report(args: argparse.Namespace) -> None:
 
 def cmd_run_all(args: argparse.Namespace) -> None:
     """Run the full pipeline in order."""
-    import pandas as pd
 
     t0 = time.time()
-    n_steps = 9 if not args.skip_bayes else 7
+    n_steps = 9 if not args.skip_bayes else 8
     step = 0
 
     from methane_portfolio.io import load_all
@@ -282,6 +319,7 @@ def cmd_run_all(args: argparse.Namespace) -> None:
             chains=args.chains, draws=args.draws,
             tune=args.tune, target_accept=args.target_accept,
             cores=args.cores,
+            fail_on_weak_convergence=not args.allow_weak_convergence,
         )
         I_samples, country_list, species_list = posterior_intensity_samples(
             idata, bayes_data, n_samples=500,
@@ -289,19 +327,33 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         print(f"[OK] Step {step}/{n_steps}: Bayesian model fitted ({args.chains} chains x {args.draws} draws)")
     else:
         print("  [SKIP] Bayesian model fitting (--skip-bayes)")
-        if args.allow_expansion:
-            nc_path = config.OUTPUT_DIR / "bayes_posterior.nc"
-            if nc_path.exists():
-                import arviz as az
-                from methane_portfolio.bayes import prepare_bayes_data, posterior_intensity_samples
-                idata = az.from_netcdf(str(nc_path))
-                bayes_data = prepare_bayes_data(long_df)
-                I_samples, country_list, species_list = posterior_intensity_samples(
-                    idata, bayes_data, n_samples=500,
+        nc_path = config.OUTPUT_DIR / "bayes_posterior.nc"
+        if nc_path.exists():
+            _assert_posterior_convergence(
+                allow_weak_convergence=args.allow_weak_convergence,
+            )
+            import arviz as az
+            from methane_portfolio.bayes import prepare_bayes_data, posterior_intensity_samples
+
+            idata = az.from_netcdf(str(nc_path))
+            bayes_data = prepare_bayes_data(long_df)
+            I_samples, country_list, species_list = posterior_intensity_samples(
+                idata, bayes_data, n_samples=500,
+            )
+            print(
+                "  Loaded existing Bayesian posterior for downstream "
+                "optimisation/uncertainty/sensitivity/figures"
+            )
+        else:
+            print(
+                "  [WARN] bayes_posterior.nc is missing; downstream uncertainty and "
+                "sensitivity will use fallback scenarios, and Fig3 may be skipped"
+            )
+            if args.allow_expansion:
+                print(
+                    "  [WARN] --allow-expansion requested but posterior is unavailable; "
+                    "expansion may be disabled for some countries"
                 )
-                print("  Loaded existing Bayesian posterior for --allow-expansion")
-            else:
-                print("  [WARN] --allow-expansion requested but bayes_posterior.nc is missing")
 
     # 4. Robust optimisation (posterior-informed if Bayes ran)
     step += 1
@@ -325,22 +377,16 @@ def cmd_run_all(args: argparse.Namespace) -> None:
     )
     print(f"[OK] Step {step}/{n_steps}: Uncertainty propagation ({len(unc_df)} countries)")
 
-    # 6. Sensitivity grid (optional, depends on Bayes)
-    sensitivity_df = None
-    if not args.skip_bayes:
-        step += 1
-        from methane_portfolio.uncertainty import run_sensitivity_grid
-        sensitivity_df = run_sensitivity_grid(
-            long_df, I_samples=I_samples,
-            country_list=country_list, species_list=species_list,
-            allow_expansion=args.allow_expansion,
-        )
-        print(f"[OK] Step {step}/{n_steps}: Sensitivity grid ({len(sensitivity_df)} rows)")
-    else:
-        # Try loading existing sensitivity grid
-        sens_path = config.OUTPUT_DIR / "sensitivity_grid.csv"
-        if sens_path.exists():
-            sensitivity_df = pd.read_csv(sens_path)
+    # 6. Sensitivity grid
+    step += 1
+    from methane_portfolio.uncertainty import run_sensitivity_grid
+    sensitivity_df = run_sensitivity_grid(
+        long_df, I_samples=I_samples,
+        country_list=country_list, species_list=species_list,
+        allow_expansion=args.allow_expansion,
+        workers=args.sensitivity_workers,
+    )
+    print(f"[OK] Step {step}/{n_steps}: Sensitivity grid ({len(sensitivity_df)} rows)")
 
     # 7. Tables
     step += 1
@@ -440,6 +486,11 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--target-accept", type=float, default=config.TARGET_ACCEPT)
     b.add_argument("--cores", type=int, default=None,
                    help="CPU cores for parallel sampling (default: auto)")
+    b.add_argument(
+        "--allow-weak-convergence",
+        action="store_true",
+        help="Allow saving/using posterior even if relaxed convergence checks fail.",
+    )
 
     # optimize
     o = sub.add_parser("optimize", help="Robust portfolio optimisation")
@@ -451,9 +502,25 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Allow expansion into species with baseline share 0.",
     )
+    o.add_argument(
+        "--allow-weak-convergence",
+        action="store_true",
+        help="Allow using saved posterior even if relaxed convergence checks fail.",
+    )
 
     # uncertainty
-    sub.add_parser("uncertainty", help="Uncertainty propagation")
+    u = sub.add_parser("uncertainty", help="Uncertainty propagation")
+    u.add_argument(
+        "--sensitivity-workers",
+        type=int,
+        default=None,
+        help="Parallel workers for sensitivity grid (default: auto).",
+    )
+    u.add_argument(
+        "--allow-weak-convergence",
+        action="store_true",
+        help="Allow using saved posterior even if relaxed convergence checks fail.",
+    )
 
     # figures
     sub.add_parser("figures", help="Generate publication figures")
@@ -475,9 +542,20 @@ def build_parser() -> argparse.ArgumentParser:
     ra.add_argument("--target-accept", type=float, default=config.TARGET_ACCEPT)
     ra.add_argument("--cores", type=int, default=None,
                     help="CPU cores for parallel sampling (default: auto)")
+    ra.add_argument(
+        "--allow-weak-convergence",
+        action="store_true",
+        help="Allow using posterior even if relaxed convergence checks fail.",
+    )
     ra.add_argument("--lam", type=float, default=0.5)
     ra.add_argument("--alpha", type=float, default=0.90)
     ra.add_argument("--delta", type=float, default=0.10)
+    ra.add_argument(
+        "--sensitivity-workers",
+        type=int,
+        default=None,
+        help="Parallel workers for sensitivity grid (default: auto).",
+    )
     ra.add_argument(
         "--allow-expansion",
         action="store_true",

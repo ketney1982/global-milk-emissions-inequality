@@ -186,6 +186,7 @@ def fit_model(
     target_accept: float = config.TARGET_ACCEPT,
     seed: int = config.PYMC_SEED,
     cores: int | None = None,
+    fail_on_weak_convergence: bool = True,
     output_dir: Path | None = None,
 ) -> tuple[az.InferenceData, dict]:
     """Fit the Bayesian model and export diagnostics.
@@ -273,8 +274,6 @@ def fit_model(
 
     with model:
         idata = pm.sample(**sample_kwargs)
-        # Posterior predictive
-        idata.extend(pm.sample_posterior_predictive(idata, random_seed=seed))
 
     # Save posterior NetCDF
     idata.to_netcdf(str(out / "bayes_posterior.nc"))
@@ -306,9 +305,19 @@ def fit_model(
                 ", ".join(diag.get("ess_bulk_fail_params", [])) or "none",
                 ", ".join(diag.get("ess_tail_fail_params", [])) or "none",
             )
+    if fail_on_weak_convergence and not diag.get("converged_relaxed", False):
+        raise RuntimeError(
+            "Bayesian posterior failed relaxed convergence checks "
+            f"(max_rhat={diag['max_rhat']:.3f}, min_ess_bulk={diag['min_ess_bulk']:.1f}, "
+            f"min_ess_tail={diag['min_ess_tail']:.1f}, divergences={diag['divergences']}). "
+            "Refit with stronger settings or rerun with allow_weak_convergence=True if intentional."
+        )
 
-    # PPC summary
-    ppc_summary = _ppc_summary(idata, data)
+    # Posterior predictive diagnostics (draw-capped for tractable runtime)
+    ppc_idata = _posterior_for_ppc(idata, max_draws=config.BAYES_PPC_MAX_DRAWS)
+    with model:
+        ppc_idata = pm.sample_posterior_predictive(ppc_idata, random_seed=seed)
+    ppc_summary = _ppc_summary(ppc_idata, data)
     ppc_summary.to_csv(out / "bayes_ppc_summary.csv", index=False)
     ppc_outliers = _ppc_outliers(ppc_summary, data, top_n=25)
     ppc_outliers.to_csv(out / "bayes_ppc_outliers.csv", index=False)
@@ -325,6 +334,33 @@ def fit_model(
         )
 
     return idata, data
+
+
+def _posterior_for_ppc(
+    idata: az.InferenceData,
+    *,
+    max_draws: int,
+) -> az.InferenceData:
+    """Return posterior subset used for posterior-predictive diagnostics."""
+    n_chain = int(idata.posterior.sizes.get("chain", 1))
+    n_draw = int(idata.posterior.sizes.get("draw", 1))
+    total_draws = int(n_chain * n_draw)
+    max_draws = int(max(1, max_draws))
+    if total_draws <= max_draws:
+        return idata
+
+    draws_per_chain = max(1, max_draws // n_chain)
+    if draws_per_chain >= n_draw:
+        return idata
+
+    rng = np.random.default_rng(config.RNG_SEED)
+    draw_idx = np.sort(rng.choice(n_draw, size=draws_per_chain, replace=False))
+    logger.info(
+        "Posterior predictive sampling using %d/%d posterior draws",
+        int(draws_per_chain * n_chain),
+        total_draws,
+    )
+    return idata.sel(draw=draw_idx)
 
 
 def _compute_diagnostics(idata: az.InferenceData) -> dict:
@@ -389,10 +425,29 @@ def _ppc_summary(idata: az.InferenceData, data: dict) -> pd.DataFrame:
     """Quick posterior predictive check summary."""
     y_obs = data["y"]
     y_rep = idata.posterior_predictive["y_obs"].values  # (chain, draw, obs)
-    y_rep_mean = y_rep.mean(axis=(0, 1))
-    y_rep_median = np.median(y_rep, axis=(0, 1))
-    y_rep_p05 = np.percentile(y_rep, 5, axis=(0, 1))
-    y_rep_p95 = np.percentile(y_rep, 95, axis=(0, 1))
+    n_chain, n_draw, n_obs = y_rep.shape
+    total_draws = int(n_chain * n_draw)
+    max_draws = int(max(1, config.BAYES_PPC_MAX_DRAWS))
+
+    # Large posterior-predictive arrays can dominate runtime and memory.
+    # Use a reproducible subsample of draws for PPC diagnostics when needed.
+    y_rep_flat = y_rep.reshape(total_draws, n_obs)
+    if total_draws > max_draws:
+        rng = np.random.default_rng(config.RNG_SEED)
+        idx = rng.choice(total_draws, size=max_draws, replace=False)
+        y_rep_eval = y_rep_flat[idx, :]
+        logger.info(
+            "PPC diagnostics using %d/%d posterior predictive draws",
+            max_draws,
+            total_draws,
+        )
+    else:
+        y_rep_eval = y_rep_flat
+
+    y_rep_mean = y_rep_eval.mean(axis=0)
+    y_rep_median = np.median(y_rep_eval, axis=0)
+    y_rep_p05 = np.percentile(y_rep_eval, 5, axis=0)
+    y_rep_p95 = np.percentile(y_rep_eval, 95, axis=0)
     residuals = y_obs - y_rep_mean
 
     return pd.DataFrame({

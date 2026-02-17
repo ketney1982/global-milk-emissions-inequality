@@ -117,16 +117,20 @@ def table4_optimization(
     n: int = 20,
     output_dir: Path | None = None,
 ) -> pd.DataFrame:
-    """Table 4: Top-N countries by optimisation gain."""
+    """Table 4: Top-N countries ranked by absolute reduction (kt CO2e)."""
     out = output_dir or config.OUTPUT_DIR
     out.mkdir(parents=True, exist_ok=True)
 
+    rank_col = "absolute_reduction_kt"
+    if rank_col not in opt_df.columns:
+        rank_col = "reduction_mean_pct" if "reduction_mean_pct" in opt_df.columns else "reduction_pct"
+
     keep = [c for c in opt_df.columns if not c.startswith("w_opt_") and not c.startswith("w_base_")]
-    df = opt_df[keep].head(n).copy()
+    df = opt_df.sort_values(rank_col, ascending=False).loc[:, keep].head(n).copy()
 
     df.to_csv(out / "Table4_optimization.csv", index=False)
     _to_latex(df, out / "Table4_optimization.tex",
-              f"Top-{n} Countries by Robust Optimisation Gain (all analysed countries)")
+              f"Top-{n} Countries by Robust Optimisation Gain ranked by `{rank_col}` (all analysed countries)")
     return df
 
 

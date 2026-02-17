@@ -11,8 +11,15 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from numpy.testing import assert_allclose
 
-from methane_portfolio.bayes import _compute_diagnostics, _ppc_diagnostics
+from methane_portfolio import config
+from methane_portfolio.bayes import (
+    _compute_diagnostics,
+    _posterior_for_ppc,
+    _ppc_diagnostics,
+    _ppc_summary,
+)
 from methane_portfolio.config import BAYES_ESS_MIN, BAYES_RHAT_THRESHOLD
 
 
@@ -86,3 +93,58 @@ class TestPpcDiagnostics:
         assert diag["n_abs_residual_gt_3"] == 2
         assert diag["residual_max_abs"] == pytest.approx(4.1)
         assert diag["residual_trimmed_mean_10pct"] == pytest.approx(np.mean(ppc["residual"]))
+
+
+class TestPpcSummary:
+    """Posterior predictive summary should cap draw count for speed."""
+
+    def test_ppc_summary_subsamples_draws(self, monkeypatch):
+        monkeypatch.setattr(config, "BAYES_PPC_MAX_DRAWS", 3)
+
+        y_rep = np.arange(2 * 4 * 5, dtype=float).reshape(2, 4, 5)
+        idata = az.InferenceData(
+            posterior_predictive=xr.Dataset(
+                {"y_obs": (("chain", "draw", "obs"), y_rep)}
+            )
+        )
+        data = {"y": np.zeros(5, dtype=float)}
+
+        out = _ppc_summary(idata, data)
+
+        rng = np.random.default_rng(config.RNG_SEED)
+        idx = rng.choice(8, size=3, replace=False)
+        expected_mean = y_rep.reshape(8, 5)[idx].mean(axis=0)
+
+        assert list(out.columns) == [
+            "obs_idx",
+            "y_obs",
+            "y_rep_mean",
+            "y_rep_median",
+            "y_rep_p05",
+            "y_rep_p95",
+            "residual",
+            "residual_median_pred",
+            "within_90ci",
+        ]
+        assert len(out) == 5
+        assert_allclose(out["y_rep_mean"].to_numpy(), expected_mean)
+
+
+class TestPosteriorForPpc:
+    """Posterior subset should cap draw volume for PPC generation."""
+
+    def test_caps_draws_per_chain(self):
+        idata = az.InferenceData(
+            posterior=xr.Dataset(
+                {
+                    "alpha_s": (
+                        ("chain", "draw", "species"),
+                        np.ones((4, 10, 1), dtype=float),
+                    )
+                }
+            )
+        )
+
+        sub = _posterior_for_ppc(idata, max_draws=12)
+        assert int(sub.posterior.sizes["chain"]) == 4
+        assert int(sub.posterior.sizes["draw"]) == 3

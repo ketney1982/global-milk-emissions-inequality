@@ -11,6 +11,7 @@ import pandas as pd
 import pytest
 
 import methane_portfolio.robust_optimize as robust_optimize
+import methane_portfolio.cli as cli_module
 from methane_portfolio.cli import build_parser
 from methane_portfolio.optimize import (
     mean_intensity,
@@ -282,6 +283,40 @@ class TestRunAllCountriesLowSpecies:
         ]
         assert warn_records
 
+    def test_country_name_normalized_by_m49(self, tmp_path):
+        long_df = pd.DataFrame(
+            [
+                {
+                    "country_m49": 156,
+                    "country": "China",
+                    "year": 2023,
+                    "milk_species": "Raw milk of cattle",
+                    "species_share": 0.8,
+                    "milk_tonnes": 80.0,
+                    "kg_co2e_per_ton_milk": 9.0,
+                },
+                {
+                    "country_m49": 156,
+                    "country": "China, mainland",
+                    "year": 2023,
+                    "milk_species": "Raw milk of goat",
+                    "species_share": 0.2,
+                    "milk_tonnes": 20.0,
+                    "kg_co2e_per_ton_milk": 5.0,
+                },
+            ],
+        )
+
+        out = run_all_countries(
+            long_df,
+            year=2023,
+            output_dir=tmp_path,
+            save_csv=False,
+            do_no_harm=False,
+        )
+        assert len(out) == 1
+        assert int(out.iloc[0]["country_m49"]) == 156
+
 
 class TestRunAllCountriesGuards:
     """Regression guards for do-no-harm and output persistence."""
@@ -331,12 +366,13 @@ class TestRunAllCountriesGuards:
 
         row = out.iloc[0]
         assert np.isclose(row["baseline_intensity"], 1.0)
-        assert row["raw_optimized_mean"] > row["baseline_intensity"]
-        assert row["raw_reduction_mean_pct"] < 0
+        assert np.isclose(row["raw_optimized_mean"], row["baseline_intensity"])
+        assert np.isclose(row["raw_reduction_mean_pct"], 0.0)
         assert np.isclose(row["optimized_mean"], row["baseline_intensity"])
         assert np.isclose(row["reduction_mean_pct"], 0.0)
         assert bool(row["no_harm_applied"]) is True
         assert row["no_harm_action"] in {"baseline_revert", "constrained_solution"}
+        assert row["no_harm_excess_raw"] > 0
         assert "do-no-harm" in row["solver_message"]
 
     def test_sensitivity_grid_does_not_overwrite_main_optimization_csv(self, tmp_path):
@@ -389,6 +425,7 @@ class TestRunAllCountriesGuards:
             long_df,
             year=2023,
             n_countries_max=1,
+            workers=1,
             output_dir=tmp_path,
         )
         after = main_csv.read_bytes()
@@ -468,3 +505,143 @@ class TestCliAllowExpansion:
         parser = build_parser()
         args = parser.parse_args(["run-all", "--allow-expansion"])
         assert args.allow_expansion is True
+
+
+class TestCliRunAllSkipBayes:
+    """run-all --skip-bayes should still produce full downstream outputs."""
+
+    def test_skip_bayes_runs_sensitivity_grid(self, monkeypatch, tmp_path):
+        long_df = pd.DataFrame(
+            [
+                {
+                    "country_m49": 1,
+                    "country": "A",
+                    "year": 2023,
+                    "milk_species": "Raw milk of cattle",
+                    "species_share": 0.7,
+                    "milk_tonnes": 70.0,
+                    "kg_co2e_per_ton_milk": 10.0,
+                },
+                {
+                    "country_m49": 1,
+                    "country": "A",
+                    "year": 2023,
+                    "milk_species": "Raw milk of goat",
+                    "species_share": 0.3,
+                    "milk_tonnes": 30.0,
+                    "kg_co2e_per_ton_milk": 5.0,
+                },
+            ],
+        )
+        agg_df = pd.DataFrame(
+            [
+                {
+                    "country_m49": 1,
+                    "country": "A",
+                    "year": 2023,
+                    "milk_total_tonnes": 100.0,
+                    "kg_co2e_per_ton_milk": 8.5,
+                },
+            ],
+        )
+        species = sorted(long_df["milk_species"].unique())
+        shapley_df = pd.DataFrame(
+            [
+                {
+                    "country_m49": 1,
+                    "country": "A",
+                    "delta_struct": 0.0,
+                    "delta_within": 0.0,
+                    "delta_total": 0.0,
+                    "delta_obs": 0.0,
+                },
+            ],
+        )
+        opt_df = pd.DataFrame(
+            [
+                {
+                    "country_m49": 1,
+                    "country": "A",
+                    "reduction_mean_pct": 0.0,
+                },
+            ],
+        )
+        unc_df = pd.DataFrame([{"country_m49": 1, "country": "A"}])
+        sens_df = pd.DataFrame(
+            [
+                {
+                    "country_m49": 1,
+                    "country": "A",
+                    "baseline_intensity_kg_co2e_per_t": 8.5,
+                    "optimized_mean_kg_co2e_per_t": 8.5,
+                    "optimized_cvar_kg_co2e_per_t": 8.5,
+                    "reduction_mean_pct": 0.0,
+                    "reduction_cvar_pct": 0.0,
+                    "delta": 0.1,
+                    "lambda": 0.5,
+                    "alpha": 0.9,
+                },
+            ],
+        )
+        calls = {"sensitivity": 0}
+
+        monkeypatch.setattr(cli_module.config, "OUTPUT_DIR", tmp_path)
+        monkeypatch.setattr(cli_module.config, "FIGURE_DIR", tmp_path / "figures")
+        monkeypatch.setattr(cli_module, "write_manifest", lambda *_args, **_kwargs: None)
+
+        import methane_portfolio.figures as figures_module
+        import methane_portfolio.io as io_module
+        import methane_portfolio.report as report_module
+        import methane_portfolio.shapley as shapley_module
+        import methane_portfolio.tables as tables_module
+        import methane_portfolio.uncertainty as uncertainty_module
+        import methane_portfolio.validate as validate_module
+
+        monkeypatch.setattr(
+            io_module,
+            "load_all",
+            lambda _data_dir: (long_df.copy(), agg_df.copy(), species),
+        )
+        monkeypatch.setattr(
+            validate_module,
+            "validate_all",
+            lambda *_args, **_kwargs: pd.DataFrame({"status": ["PASS"]}),
+        )
+        monkeypatch.setattr(
+            shapley_module,
+            "shapley_decompose",
+            lambda *_args, **_kwargs: shapley_df.copy(),
+        )
+        monkeypatch.setattr(
+            robust_optimize,
+            "run_all_countries",
+            lambda *_args, **_kwargs: opt_df.copy(),
+        )
+        monkeypatch.setattr(
+            uncertainty_module,
+            "propagate_uncertainty",
+            lambda *_args, **_kwargs: unc_df.copy(),
+        )
+
+        def _fake_run_sensitivity_grid(*_args, **_kwargs):
+            calls["sensitivity"] += 1
+            return sens_df.copy()
+
+        monkeypatch.setattr(
+            uncertainty_module,
+            "run_sensitivity_grid",
+            _fake_run_sensitivity_grid,
+        )
+        monkeypatch.setattr(tables_module, "make_all_tables", lambda **_kwargs: None)
+        monkeypatch.setattr(figures_module, "make_all_figures", lambda **_kwargs: None)
+        monkeypatch.setattr(
+            report_module,
+            "generate_appendix",
+            lambda **_kwargs: tmp_path / "methods_appendix.md",
+        )
+
+        parser = build_parser()
+        args = parser.parse_args(["run-all", "--skip-bayes"])
+        cli_module.cmd_run_all(args)
+
+        assert calls["sensitivity"] == 1

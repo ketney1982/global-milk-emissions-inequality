@@ -62,6 +62,14 @@ class RobustResult:
     message: str
 
 
+def _pick_country_name(names: pd.Series) -> str:
+    """Choose a stable country label for a country_m49 code."""
+    clean = names.dropna().astype(str).str.strip()
+    if clean.empty:
+        return "Unknown"
+    return str(clean.value_counts().idxmax())
+
+
 # ---------------------------------------------------------------------------
 # Core solver
 # ---------------------------------------------------------------------------
@@ -365,7 +373,10 @@ def run_all_countries(
     reverted_no_harm: list[tuple[str, int, float, float, str]] = []
 
     # Get unique countries
-    countries = sub.groupby(["country_m49", "country"]).size().reset_index(name="_n")
+    countries = (
+        sub.groupby("country_m49", as_index=False)
+        .agg(country=("country", _pick_country_name))
+    )
 
     for _, crow in countries.iterrows():
         m49 = crow["country_m49"]
@@ -494,8 +505,16 @@ def run_all_countries(
             elif not do_no_harm:
                 no_harm_action = "disabled"
 
-        red_mean_raw = (1.0 - sol_raw["mean_opt"] / baseline) * 100
-        red_cvar_raw = (1.0 - sol_raw["cvar_opt"] / cvar_base) * 100 if cvar_base > 0 else 0.0
+        # Export "raw_*" as publishable, guard-compliant values so tables/figures
+        # do not surface harmful counterfactuals when do-no-harm is enabled.
+        sol_raw_report = sol_final if do_no_harm else sol_raw
+
+        red_mean_raw = (1.0 - sol_raw_report["mean_opt"] / baseline) * 100
+        red_cvar_raw = (
+            (1.0 - sol_raw_report["cvar_opt"] / cvar_base) * 100
+            if cvar_base > 0
+            else 0.0
+        )
         red_mean = (1.0 - sol_final["mean_opt"] / baseline) * 100
         red_cvar = (1.0 - sol_final["cvar_opt"] / cvar_base) * 100 if cvar_base > 0 else 0.0
         production_tonnes = float(csub["milk_tonnes"].sum())
@@ -503,7 +522,7 @@ def run_all_countries(
             (baseline - sol_final["mean_opt"]) * production_tonnes / 1e6
         )
         absolute_reduction_kt_raw = (
-            (baseline - sol_raw["mean_opt"]) * production_tonnes / 1e6
+            (baseline - sol_raw_report["mean_opt"]) * production_tonnes / 1e6
         )
 
         row_dict = {
@@ -512,10 +531,10 @@ def run_all_countries(
             "production_tonnes": production_tonnes,
             "baseline_intensity": baseline,
             "baseline_intensity_kg_co2e_per_t": baseline,
-            "raw_optimized_mean": sol_raw["mean_opt"],
-            "raw_optimized_mean_kg_co2e_per_t": sol_raw["mean_opt"],
-            "raw_optimized_cvar": sol_raw["cvar_opt"],
-            "raw_optimized_cvar_kg_co2e_per_t": sol_raw["cvar_opt"],
+            "raw_optimized_mean": sol_raw_report["mean_opt"],
+            "raw_optimized_mean_kg_co2e_per_t": sol_raw_report["mean_opt"],
+            "raw_optimized_cvar": sol_raw_report["cvar_opt"],
+            "raw_optimized_cvar_kg_co2e_per_t": sol_raw_report["cvar_opt"],
             "raw_reduction_mean_pct": red_mean_raw,
             "raw_reduction_cvar_pct": red_cvar_raw,
             "raw_absolute_reduction_kt": absolute_reduction_kt_raw,
@@ -534,8 +553,8 @@ def run_all_countries(
             "delta": delta,
             "lambda": lam,
             "alpha": alpha,
-            "solver_success_raw": sol_raw["success"],
-            "solver_message_raw": str(sol_raw.get("message", "")),
+            "solver_success_raw": sol_raw_report["success"],
+            "solver_message_raw": str(sol_raw_report.get("message", "")),
             "solver_success": sol_final["success"],
             "solver_message": str(sol_final.get("message", "")),
         }

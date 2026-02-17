@@ -73,6 +73,7 @@ BAYES_ESS_MIN: int = 400
 BAYES_ESS_MIN_RELAXED: int = 100
 BAYES_DIAG_MAX_REPORT_PARAMS: int = 20
 BAYES_PPC_MEAN_BIAS_WARN: float = 0.05
+BAYES_PPC_MAX_DRAWS: int = 4000
 
 # ---------------------------------------------------------------------------
 # Optimization

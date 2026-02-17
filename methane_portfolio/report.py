@@ -262,7 +262,7 @@ def generate_appendix(
 
     optimisation_scope_section = (
         "- `Table4_optimization.csv` is ranked from `robust_optimization_results.csv` "
-        "over all analysed countries.\n"
+        "by `absolute_reduction_kt` (descending) over all analysed countries.\n"
         f"- `sensitivity_grid.csv` is computed on the top {n_sensitivity_countries} producers only "
         "(runtime-control subset used for parameter grid sweeps)."
     )
@@ -272,7 +272,8 @@ def generate_appendix(
             with open(opt_audit_path, "r", encoding="utf-8") as f:
                 opt_audit = json.load(f)
             optimisation_transparency_section = (
-                "- `robust_optimization_results.csv` preserves both raw (`raw_*`) and final (`optimized_*`) outputs.\n"
+                "- `robust_optimization_results.csv` preserves both export-safe raw (`raw_*`) and final (`optimized_*`) outputs.\n"
+                "- `no_harm_excess_raw` records unconstrained overshoot relative to baseline before guard enforcement.\n"
                 f"- Do-no-harm applied to {opt_audit.get('n_no_harm_applied', 'N/A')} / {opt_audit.get('n_countries', 'N/A')} countries.\n"
                 f"- Negative reductions: raw={opt_audit.get('n_negative_raw_reductions', 'N/A')}, "
                 f"final={opt_audit.get('n_negative_final_reductions', 'N/A')}.\n"

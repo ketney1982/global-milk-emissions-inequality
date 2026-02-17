@@ -14,8 +14,10 @@ Also provides a sensitivity grid over (delta, kappa, lambda, alpha).
 
 from __future__ import annotations
 
+import multiprocessing
 import itertools
 import logging
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import numpy as np
@@ -25,6 +27,14 @@ from methane_portfolio import config
 from methane_portfolio.robust_optimize import run_all_countries
 
 logger = logging.getLogger(__name__)
+
+
+def _pick_country_name(names: pd.Series) -> str:
+    """Choose a stable country label for a country_m49 code."""
+    clean = names.dropna().astype(str).str.strip()
+    if clean.empty:
+        return "Unknown"
+    return str(clean.value_counts().idxmax())
 
 
 # ---------------------------------------------------------------------------
@@ -91,7 +101,10 @@ def propagate_uncertainty(
     rng = np.random.default_rng(config.RNG_SEED)
     rows = []
 
-    countries = sub.groupby(["country_m49", "country"]).size().reset_index(name="_n")
+    countries = (
+        sub.groupby("country_m49", as_index=False)
+        .agg(country=("country", _pick_country_name))
+    )
     for _, crow in countries.iterrows():
         m49 = crow["country_m49"]
         cname = crow["country"]
@@ -151,6 +164,47 @@ def propagate_uncertainty(
 # Sensitivity grid
 # ---------------------------------------------------------------------------
 
+_SENSITIVITY_KEEP_COLS = [
+    "country_m49", "country",
+    "baseline_intensity_kg_co2e_per_t",
+    "optimized_mean_kg_co2e_per_t",
+    "optimized_cvar_kg_co2e_per_t",
+    "reduction_mean_pct", "reduction_cvar_pct",
+    "delta", "lambda", "alpha",
+]
+
+
+def _run_sensitivity_combo(
+    sub_df: pd.DataFrame,
+    I_samples: np.ndarray | None,
+    country_list: list[int] | None,
+    species_list: list[str] | None,
+    year: int,
+    allow_expansion: bool,
+    delta: float,
+    lam: float,
+    alpha: float,
+) -> pd.DataFrame:
+    """Execute one (delta, lambda, alpha) sensitivity run."""
+    res = run_all_countries(
+        sub_df,
+        I_samples=I_samples,
+        country_list=country_list,
+        species_list=species_list,
+        year=year,
+        lam=lam,
+        alpha=alpha,
+        delta=delta,
+        allow_expansion=allow_expansion,
+        log_skips=False,
+        save_csv=False,
+    )
+    res["delta"] = delta
+    res["lambda"] = lam
+    res["alpha"] = alpha
+    return res[[c for c in _SENSITIVITY_KEEP_COLS if c in res.columns]]
+
+
 def run_sensitivity_grid(
     long_df: pd.DataFrame,
     I_samples: np.ndarray | None = None,
@@ -164,6 +218,7 @@ def run_sensitivity_grid(
     year: int = config.END_YEAR,
     n_countries_max: int = 20,
     allow_expansion: bool = False,
+    workers: int | None = None,
     output_dir: Path | None = None,
 ) -> pd.DataFrame:
     """Run the optimisation over a grid of hyper-parameters.
@@ -187,36 +242,66 @@ def run_sensitivity_grid(
     sub_df = long_df[long_df["country_m49"].isin(prod)]
 
     all_rows = []
-    total = len(deltas) * len(lambdas) * len(alphas)
-    logger.info("Sensitivity grid: %d parameter combinations", total)
+    combos = list(itertools.product(deltas, lambdas, alphas))
+    total = len(combos)
 
-    for d, l, a in itertools.product(deltas, lambdas, alphas):
-        res = run_all_countries(
-            sub_df,
-            I_samples=I_samples,
-            country_list=country_list,
-            species_list=species_list,
-            year=year,
-            lam=l, alpha=a, delta=d,
-            allow_expansion=allow_expansion,
-            log_skips=False,
-            save_csv=False,
+    if workers is None:
+        workers = min(max(multiprocessing.cpu_count() - 1, 1), total)
+    workers = max(int(workers), 1) if total > 0 else 1
+    logger.info(
+        "Sensitivity grid: %d parameter combinations (workers=%d)",
+        total,
+        workers,
+    )
+
+    if workers == 1:
+        for d, l, a in combos:
+            all_rows.append(
+                _run_sensitivity_combo(
+                    sub_df,
+                    I_samples,
+                    country_list,
+                    species_list,
+                    year,
+                    allow_expansion,
+                    d,
+                    l,
+                    a,
+                ),
+            )
+    else:
+        with ProcessPoolExecutor(max_workers=workers) as pool:
+            futures = [
+                pool.submit(
+                    _run_sensitivity_combo,
+                    sub_df,
+                    I_samples,
+                    country_list,
+                    species_list,
+                    year,
+                    allow_expansion,
+                    d,
+                    l,
+                    a,
+                )
+                for d, l, a in combos
+            ]
+            for idx, fut in enumerate(as_completed(futures), start=1):
+                all_rows.append(fut.result())
+                if idx == total or idx % 6 == 0:
+                    logger.info("Sensitivity grid progress: %d/%d combinations", idx, total)
+
+    if all_rows:
+        grid_df = pd.concat(all_rows, ignore_index=True)
+    else:
+        grid_df = pd.DataFrame(columns=_SENSITIVITY_KEEP_COLS)
+    if not grid_df.empty:
+        grid_df.sort_values(
+            ["delta", "lambda", "alpha", "country_m49"],
+            inplace=True,
+            kind="mergesort",
         )
-        res["delta"] = d
-        res["lambda"] = l
-        res["alpha"] = a
-        # Keep only summary columns
-        keep_cols = [
-            "country_m49", "country",
-            "baseline_intensity_kg_co2e_per_t",
-            "optimized_mean_kg_co2e_per_t",
-            "optimized_cvar_kg_co2e_per_t",
-            "reduction_mean_pct", "reduction_cvar_pct",
-            "delta", "lambda", "alpha",
-        ]
-        all_rows.append(res[[c for c in keep_cols if c in res.columns]])
-
-    grid_df = pd.concat(all_rows, ignore_index=True)
+        grid_df.reset_index(drop=True, inplace=True)
     grid_df.to_csv(out / "sensitivity_grid.csv", index=False)
     return grid_df
 

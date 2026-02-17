@@ -10,7 +10,7 @@ import json
 
 import pandas as pd
 
-from methane_portfolio.tables import table3_bayes_summary
+from methane_portfolio.tables import table3_bayes_summary, table4_optimization
 
 
 class TestTable3BayesSummary:
@@ -40,3 +40,19 @@ class TestTable3BayesSummary:
 
         tex = (tmp_path / "Table3_bayes_summary.tex").read_text(encoding="utf-8")
         assert "parameter" in tex
+
+
+class TestTable4Optimization:
+    """Table 4 should rank by absolute reduction when available."""
+
+    def test_ranks_by_absolute_reduction(self, tmp_path):
+        opt_df = pd.DataFrame(
+            [
+                {"country_m49": 1, "country": "A", "absolute_reduction_kt": 1.0, "reduction_mean_pct": 10.0},
+                {"country_m49": 2, "country": "B", "absolute_reduction_kt": 5.0, "reduction_mean_pct": 4.0},
+                {"country_m49": 3, "country": "C", "absolute_reduction_kt": 3.0, "reduction_mean_pct": 6.0},
+            ]
+        )
+
+        out = table4_optimization(opt_df, n=3, output_dir=tmp_path)
+        assert out["country"].tolist() == ["B", "C", "A"]
