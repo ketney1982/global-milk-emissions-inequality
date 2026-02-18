@@ -1,0 +1,25 @@
+20:33:17 | arviz.preview                  | INFO  | arviz_base not installed
+20:33:17 | arviz.preview                  | INFO  | arviz_stats not installed
+20:33:17 | arviz.preview                  | INFO  | arviz_plots not installed
+20:33:19 | pytensor.configdefaults        | WARNING | g++ not available, if using conda: `conda install gxx`
+20:33:19 | pytensor.configdefaults        | WARNING | g++ not detected!  PyTensor will be unable to compile C-implementations and will default to Python. Performance may be severely degraded. To remove this warning, set PyTensor flags cxx to an empty string.
+20:33:20 | methane_portfolio.bayes        | INFO  | nutpie sampler detected Ś using Rust-based NUTS (fast)
+20:33:20 | methane_portfolio.bayes        | INFO  | Sampling 2 chains Î 10 draws (tune=10, target_accept=0.90, cores=2, sampler=nutpie)
+20:33:20 | methane_portfolio.bayes        | INFO  | TIP: You have 16 CPUs but are only running 2 chains. Increase --chains to 16 to speed up sampling.
+20:33:20 | pymc.sampling.mcmc             | WARNING | Only 10 samples per chain. Reliable r-hat and ESS diagnostics require longer chains for accurate estimate.
+C:\Users\OK\AppData\Roaming\Python\Python313\site-packages\pymc\sampling\mcmc.py:360: UserWarning: `idata_kwargs` are currently ignored by the nutpie sampler
+  warnings.warn(
+20:33:30 | pymc.sampling.forward          | INFO  | Sampling: [y_obs]
+Sampling ... ---------------------------------------- 100% 0:00:00 / 0:00:00
+20:33:32 | root                           | ERROR | Pipeline error: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>
+Traceback (most recent call last):
+  File "C:\Code\global-milk-emissions-inequality\methane_portfolio\cli.py", line 435, in main
+    dispatch[args.command](args)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Code\global-milk-emissions-inequality\methane_portfolio\cli.py", line 77, in cmd_bayes
+    print(f"\u2713 Bayesian model fitted ({args.chains} chains Î {args.draws} draws)")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\encodings\cp1250.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>
