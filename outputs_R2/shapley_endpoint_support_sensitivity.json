@@ -1,0 +1,24 @@
+{
+  "full_panel": {
+    "n_countries": 181,
+    "global_struct_g_ch4_per_kg": -4.281279064877723,
+    "global_within_g_ch4_per_kg": 1.850106393124408,
+    "global_net_g_ch4_per_kg": -2.4311726717533144
+  },
+  "excluding_species_support_changes": {
+    "n_countries": 176,
+    "excluded": [
+      "Cyprus",
+      "Germany",
+      "Greece",
+      "Luxembourg",
+      "Netherlands (Kingdom of the)"
+    ],
+    "excluded_share_of_production_weight_pct": 5.4933,
+    "global_struct_g_ch4_per_kg": -4.5216,
+    "global_within_g_ch4_per_kg": 2.021,
+    "global_net_g_ch4_per_kg": -2.5006
+  },
+  "unit": "g CH4 per kg raw milk",
+  "note": "Values are the production-weighted global Shapley components, 2020-2023."
+}

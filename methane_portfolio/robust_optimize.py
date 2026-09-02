@@ -1,6 +1,6 @@
 # Autor: Ketney Otto
 # Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
-# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+# Contact: ketney.otto@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
 
 """Robust portfolio optimisation with CVaR risk measure.
 
@@ -14,6 +14,31 @@ For each country we solve:
 CVaR is handled via the Rockafellarâ€“Uryasev linear relaxation:
     CVaR_Î± â‰ min_t  { t  +  (1/(K(1â’Î±))) Â· ÎŁ_k max(0, I'_k â’ t) }
 which is folded into the objective.
+
+TWO CORRECTIONS RELATIVE TO THE R1 RELEASE
+------------------------------------------
+1. Reference estimand (`posterior_baseline=True`, the default).
+   R1 computed the reference intensity from the *observed* species intensities,
+   `baseline = w_ref @ i_obs`, while evaluating the optimum on Bayesian
+   posterior scenarios. The two sides of every reported percentage therefore
+   came from different estimands, and hierarchical shrinkage entered the result
+   as apparent mitigation. The reference is now
+   `baseline = mean_k(I_scen[k] @ w_ref)`, from the same scenarios that
+   evaluate the optimum.
+
+2. Solver (`use_lp=True`, the default).
+   With the Rockafellar-Uryasev representation the problem is an exact linear
+   program once the L1 budget is expressed through auxiliary deviation
+   variables (see `lp_optimize`). R1 solved it with SLSQP initialised at
+   `x0 = (w_ref, 0)`, which is precisely the non-differentiable kink of the L1
+   constraint; that search failed to certify optimality for 9 of the 181
+   countries and returned a strictly suboptimal mix for a further 22. HiGHS
+   certifies every country.
+
+Reported CVaR, for both the reference and the optimum, is the empirical CVaR at
+the respective alpha-quantile, so the two are computed the same way. The R1
+behaviour remains reachable with `use_lp=False, posterior_baseline=False` for
+traceability against the preprint.
 
 NOTE: all results are labelled as **accounting counterfactuals** per the
 causal guardrails.
@@ -32,6 +57,7 @@ import pandas as pd
 from scipy.optimize import minimize
 
 from methane_portfolio import config
+from methane_portfolio.lp_optimize import empirical_cvar, solve_lp
 from methane_portfolio.optimize import (
     mean_intensity,
     tv_distance_constraint,
@@ -333,6 +359,8 @@ def run_all_countries(
     output_dir: Path | None = None,
     save_csv: bool = True,
     save_audit: bool = True,
+    use_lp: bool = True,
+    posterior_baseline: bool = True,
 ) -> pd.DataFrame:
     """Run robust optimisation for all countries with data in ``year``.
 
@@ -427,16 +455,20 @@ def run_all_countries(
         if allow_expansion and not has_country_posterior:
             expansion_disabled_no_posterior.append((str(cname), int(m49)))
 
-        baseline = float(w_ref @ i_obs) if i_obs.sum() > 0 else 0.0
-        if baseline <= 0 or w_ref.sum() < 1e-12:
+        baseline_observed = float(w_ref @ i_obs) if i_obs.sum() > 0 else 0.0
+        if baseline_observed <= 0 or w_ref.sum() < 1e-12:
             continue
 
-        # Baseline CVaR
+        # Reference intensity and reference CVaR, both from the scenario set that
+        # also evaluates the optimum (see the module docstring, correction 1).
         port_base = I_scen @ w_ref
-        t_base = np.percentile(port_base, alpha * 100)
-        cvar_base = t_base + np.maximum(0.0, port_base - t_base).sum() / (
-            len(port_base) * (1 - alpha)
-        )
+        if posterior_baseline:
+            baseline = float(port_base.mean())
+        else:
+            baseline = baseline_observed          # R1 behaviour, retained for tracing
+        if baseline <= 0:
+            continue
+        cvar_base = empirical_cvar(port_base, alpha)
 
         if active_species < 2 and not effective_allow_expansion:
             # No decision freedom: keep baseline mix and include country in outputs.
@@ -452,32 +484,38 @@ def run_all_countries(
             no_harm_applied = False
             no_harm_action = "not_applicable_fixed_baseline"
         else:
-            sol_raw = solve_robust(
-                w_ref, I_scen,
-                lam=lam, alpha=alpha, delta=delta,
-                allow_expansion=effective_allow_expansion,
-                baseline_ceiling=None,
-                no_harm_tol=no_harm_tol,
-                method=solver_method,
-                maxiter=solver_maxiter,
-                ftol=solver_ftol,
-            )
+            def _solve(ceiling):
+                """Dispatch to the exact LP or to the legacy nonlinear solver."""
+                if use_lp:
+                    sol = solve_lp(
+                        w_ref, I_scen,
+                        lam=lam, alpha=alpha, delta=delta,
+                        allow_expansion=effective_allow_expansion,
+                        ceiling=ceiling,
+                    )
+                else:
+                    sol = solve_robust(
+                        w_ref, I_scen,
+                        lam=lam, alpha=alpha, delta=delta,
+                        allow_expansion=effective_allow_expansion,
+                        baseline_ceiling=ceiling,
+                        no_harm_tol=no_harm_tol,
+                        method=solver_method,
+                        maxiter=solver_maxiter,
+                        ftol=solver_ftol,
+                    )
+                    # report CVaR the same way on both sides of the ratio
+                    sol["cvar_opt"] = empirical_cvar(I_scen @ sol["w_opt"], alpha)
+                return sol
+
+            sol_raw = _solve(None)
             sol_final = sol_raw
             no_harm_applied = False
             no_harm_action = "not_needed"
 
             if do_no_harm and sol_raw["mean_opt"] > baseline + no_harm_tol:
                 no_harm_applied = True
-                sol_constrained = solve_robust(
-                    w_ref, I_scen,
-                    lam=lam, alpha=alpha, delta=delta,
-                    allow_expansion=effective_allow_expansion,
-                    baseline_ceiling=baseline,
-                    no_harm_tol=no_harm_tol,
-                    method=solver_method,
-                    maxiter=solver_maxiter,
-                    ftol=solver_ftol,
-                )
+                sol_constrained = _solve(baseline)
                 if sol_constrained["mean_opt"] <= baseline + no_harm_tol:
                     sol_final = sol_constrained
                     no_harm_action = "constrained_solution"
@@ -505,9 +543,13 @@ def run_all_countries(
             elif not do_no_harm:
                 no_harm_action = "disabled"
 
-        # Export "raw_*" as publishable, guard-compliant values so tables/figures
-        # do not surface harmful counterfactuals when do-no-harm is enabled.
-        sol_raw_report = sol_final if do_no_harm else sol_raw
+        # The "raw_*" columns are the UNGUARDED solver output, always. R1 exported
+        # `sol_final` here whenever do_no_harm was enabled, which made the raw_* columns
+        # byte-identical to the guarded ones in every row while the README described them
+        # as unmodified solver output. Consumers that need guard-compliant values should
+        # read the unprefixed columns; `no_harm_applied` / `no_harm_action` say which
+        # rows differ.
+        sol_raw_report = sol_raw
 
         red_mean_raw = (1.0 - sol_raw_report["mean_opt"] / baseline) * 100
         red_cvar_raw = (
@@ -529,8 +571,21 @@ def run_all_countries(
             "country_m49": m49,
             "country": cname,
             "production_tonnes": production_tonnes,
+            # NOTE ON UNITS: the intensity columns below are in kg CH4 per kg raw milk
+            # (equivalently t CH4 / t milk). The historical "_kg_co2e_per_t" suffix is a
+            # misnomer kept for column-name compatibility with the R1 artefacts: the
+            # quantity is methane mass and no GWP conversion is applied anywhere. The
+            # manuscript reports g CH4 / kg raw milk, i.e. these values x 1000.
             "baseline_intensity": baseline,
             "baseline_intensity_kg_co2e_per_t": baseline,
+            # the observed aggregate ratio, kept alongside the posterior reference so the
+            # divergence introduced by hierarchical shrinkage stays auditable
+            "baseline_intensity_observed": baseline_observed,
+            "baseline_cvar": float(cvar_base),
+            "reference_is_posterior": bool(posterior_baseline),
+            "solver": "highs-lp" if use_lp else "scipy-nonlinear",
+            "lp_certified": bool(use_lp and sol_final.get("success", False)),
+            "tv_distance": float(0.5 * np.abs(sol_final["w_opt"] - w_ref).sum()),
             "raw_optimized_mean": sol_raw_report["mean_opt"],
             "raw_optimized_mean_kg_co2e_per_t": sol_raw_report["mean_opt"],
             "raw_optimized_cvar": sol_raw_report["cvar_opt"],

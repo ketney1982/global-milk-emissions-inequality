@@ -4,7 +4,7 @@
 
 **Author:** Ketney Otto
 **Affiliation:** „Lucian Blaga" University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Rațiu Street, no. 7-9, 550012 Sibiu, Romania
-**Contact:** otto.ketney@ulbsibiu.ro | [ORCID 0000-0003-1638-1154](https://orcid.org/0000-0003-1638-1154)
+**Contact:** ketney.otto@ulbsibiu.ro | [ORCID 0000-0003-1638-1154](https://orcid.org/0000-0003-1638-1154)
 
 ## Overview
 
@@ -212,40 +212,63 @@ The robust portfolio optimizer includes a **do-no-harm constraint**: no country'
 ### Raw vs. Final Traceability
 
 `robust_optimization_results.csv` retains **both** values:
-- `raw_optimized_mean` / `raw_reduction_mean_pct` — direct solver output, unmodified
-- `optimized_mean` / `reduction_mean_pct` — after do-no-harm guard
+- `raw_optimized_mean` / `raw_reduction_mean_pct` — the unguarded solver output
+- `optimized_mean` / `reduction_mean_pct` — after the do-no-harm guard
 - `no_harm_applied` — boolean flag marking which countries were adjusted
 - `no_harm_action` — human-readable description of the adjustment
+
+> **Corrected in R2.** Up to and including the R1 commit, the exporter assigned
+> `sol_raw_report = sol_final if do_no_harm else sol_raw`, so whenever the guard was
+> enabled — the default — the `raw_*` columns were written from the **guarded** solution.
+> In the published R1 output they were byte-identical to the unprefixed columns in all
+> 181 rows while 31 rows had in fact been guard-adjusted, which contradicted the
+> description above. `raw_*` now always carries the unguarded solution.
 
 `robust_optimization_audit.json` provides aggregate statistics: how many countries were affected, and to what extent.
 
 ### Observed Do-No-Harm Behavior
 
-In the reference pipeline run (16 chains × 8,000 draws):
+With the R2 defaults (posterior-consistent reference, exact LP solve):
 
-| Metric | Value |
-|--------|-------|
-| Total countries optimized | 181 |
-| Countries with do-no-harm applied | 31 (17.1%) |
-| Negative raw reductions | 0 |
-| Negative final reductions | 0 |
-| `revert_threshold_warning` | false |
+| Metric | R1 | R2 |
+|--------|----|----|
+| Total countries optimized | 181 | 181 |
+| Countries attaining a certified optimum | 178 | **181** |
+| Countries with do-no-harm applied | 31 (17.1%) | **0** |
+| Negative raw reductions | 0 | 0 |
+| Negative final reductions | 0 | 0 |
 
-**Why 31 countries trigger the guard:**
+**Why the guard no longer fires.** R1 attributed the 31 triggers to "near-boundary
+numerical artifacts". That diagnosis was wrong. The reference intensity was computed
+from the *observed* species intensities, `w_ref @ i_obs`, while the optimum was
+evaluated on Bayesian *posterior* scenarios. For 47% of countries the posterior mean of
+the reference mix exceeds the observed ratio — hierarchical shrinkage pulls sparse-data
+countries toward the species means — so the optimum could appear to exceed the reference
+even when it was optimal. With both sides measured on the same scenarios, the reference
+mix is always feasible under the budget constraint, so a certified optimum can never
+return a worse mean, and the guard is redundant. It is retained as an explicit
+safeguard.
 
-Two distinct mechanisms cause the raw solver to produce intensities marginally above baseline:
+Single-species countries (74 of 181) still have no decision freedom: with only one
+active species the mix is not a decision variable. They are fixed at the reference and
+report a reduction of exactly zero. They do not enter the do-no-harm count.
 
-1. **Single-species countries** (74 of 181 countries, e.g., Argentina, Australia, Belgium): These countries produce milk from only one species (typically cattle).  The optimizer has no room to shift species shares because there is no alternative species to shift *toward*.  These are automatically fixed to baseline and do not enter into the do-no-harm count.
+### Sensitivity Grid
 
-2. **Near-boundary numerical artifacts** (the 31 do-no-harm countries): In countries with 2+ species but where the optimal portfolio is very close to the current portfolio, the SLSQP solver may produce intensities that exceed baseline by tiny amounts (typically < 0.5 kg CO₂e/t, often < 0.01).  The guard reverts these to baseline.  Example countries: Estonia (excess: 0.0006), Netherlands (excess: 0.0004), Ukraine (excess: 0.0006).
+The pipeline evaluates 36 parameter combinations over `delta` (TV-distance budget),
+`lambda` (mean vs CVaR weight) and `alpha` (CVaR confidence). Because the LP solves each
+country in milliseconds, R2 runs the grid on the full 181-country panel rather than on a
+20-country subset. The R1 warning `"30% of countries required do-no-harm revert (6/20)"`
+no longer occurs, for the reason given above.
 
-The do-no-harm guard is a **conservative safety mechanism**, not a sign of model failure.  The raw solver outputs are fully preserved in `raw_*` columns for independent verification.
-
-### Sensitivity Grid Warning: "30% of countries required do-no-harm revert"
-
-During the sensitivity analysis (Step 6), the pipeline evaluates 36 parameter combinations spanning a grid of `delta` (TV-distance budget), `lambda` (mean vs CVaR weight), `kappa` (Dirichlet concentration), and `alpha` (CVaR confidence).  Some extreme parameter combinations — particularly small `delta` values (tight portfolio change budgets) — produce a higher proportion of do-no-harm reverts.
-
-The warning message `"30% of countries required do-no-harm revert (6/20)"` refers to **specific subsets within individual sensitivity grid cells** (typically 20 representative countries), not the full 181-country optimization.  This is expected and informative: it reveals which parameter regions are too tight for meaningful portfolio adjustments.  The sensitivity grid output (`outputs/sensitivity_grid.csv`) documents these patterns for all 36 combinations.
+Two properties of the grid are worth noting, both reported in the manuscript:
+- `delta` is the only parameter that changes the result. The mean reduction rises
+  2.44% → 8.08% → 11.91% → 15.92% for `delta` = 0.01/0.05/0.10/0.20 and does **not**
+  saturate on the full panel; the median saturates at `delta` = 0.05.
+- The optimal composition is invariant to `lambda` and `alpha` to within 1e-16 in every
+  weight, because the species ordering by posterior mean intensity coincides with the
+  ordering by upper-tail intensity. The risk term therefore acts as a robustness check
+  rather than as a distinct decision rule in this panel.
 
 ### Verification
 

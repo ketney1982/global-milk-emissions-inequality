@@ -1,6 +1,6 @@
 # Autor: Ketney Otto
 # Affiliation: „Lucian Blaga” University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Ratiu Street, no. 7-9, 550012 Sibiu, Romania
-# Contact: otto.ketney@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
+# Contact: ketney.otto@ulbsibiu.ro, orcid.org/0000-0003-1638-1154
 
 """Tests for robust portfolio optimisation."""
 
@@ -362,12 +362,20 @@ class TestRunAllCountriesGuards:
             output_dir=tmp_path,
             save_csv=False,
             do_no_harm=True,
+            # The fixture puts the posterior scenarios far above the observed ratio, so a
+            # guard trigger is only possible when the reference is taken from the observed
+            # intensities. That is the R1 configuration; see test_no_harm_cannot_fire_*
+            # for the R2 default.
+            posterior_baseline=False,
         )
 
         row = out.iloc[0]
         assert np.isclose(row["baseline_intensity"], 1.0)
-        assert np.isclose(row["raw_optimized_mean"], row["baseline_intensity"])
-        assert np.isclose(row["raw_reduction_mean_pct"], 0.0)
+        # raw_* is the UNGUARDED solver output. R1 overwrote it with the guarded value
+        # whenever the guard was enabled, which made this pair compare equal and hid the
+        # very excess the guard exists to catch. It must now exceed the reference.
+        assert row["raw_optimized_mean"] > row["baseline_intensity"]
+        assert row["raw_reduction_mean_pct"] < 0.0
         assert np.isclose(row["optimized_mean"], row["baseline_intensity"])
         assert np.isclose(row["reduction_mean_pct"], 0.0)
         assert bool(row["no_harm_applied"]) is True
@@ -473,6 +481,7 @@ class TestRunAllCountriesGuards:
             save_csv=True,
             save_audit=True,
             do_no_harm=True,
+            posterior_baseline=False,   # see the note in the test above
         )
 
         audit_path = tmp_path / "robust_optimization_audit.json"
