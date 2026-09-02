@@ -155,7 +155,7 @@ Content equivalence between the GitHub `data/` copies and the archived `evidence
 | Item | Value |
 | --- | --- |
 | Repository | https://github.com/ketney1982/global-milk-emissions-inequality |
-| Commit | `57d1c4cd3b5110df6f1c511fb338d50bb6d50f90` (tag R1, 18 February 2026) |
+| Release | `v2.0.0-R2` (2 September 2026) — the version that produces the reported results. A file inside a commit cannot carry that commit's own hash, so this record identifies the release by tag; resolve it with `git rev-parse v2.0.0-R2`. The preceding release is commit `57d1c4cd3b5110df6f1c511fb338d50bb6d50f90` (message "R1", 18 February 2026), which accompanied the preprint and differs in the two respects listed in `CHANGELOG.md`. |
 | Pipeline | `methane_portfolio` v0.1.0, entry point `run_all` |
 | Python | 3.13.5 (MSC v.1943, 64-bit), Windows 11 |
 | Pipeline RNG seed | 20230101 |
