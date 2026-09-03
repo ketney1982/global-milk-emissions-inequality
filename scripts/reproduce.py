@@ -60,10 +60,15 @@ def _collect_outputs() -> dict[str, str]:
     files: list[Path] = []
     patterns = [
         "robust_optimization_results.csv",
+        "robust_optimization_audit.json",
         "shapley_country.csv",
         "shapley_global.json",
         "uncertainty_summary.csv",
         "sensitivity_grid.csv",
+        "sensitivity_summary_all181.csv",
+        "sensitivity_summary_top20.csv",
+        "bayes_diagnostics.json",
+        "posterior_intensity_draws.npz",
         "methods_appendix.md",
     ]
     for name in patterns:
@@ -79,6 +84,86 @@ def _collect_outputs() -> dict[str, str]:
         rel = str(p.relative_to(ROOT)).replace("\\", "/")
         checksums[rel] = _sha256(p)
     return checksums
+
+
+def _collect_inputs() -> dict[str, str]:
+    """Checksum the frozen analytical inputs, so a run is pinned to its data."""
+    data_dir = ROOT / "data"
+    checksums: dict[str, str] = {}
+    if data_dir.exists():
+        for p in sorted(data_dir.glob("*.csv")):
+            rel = str(p.relative_to(ROOT)).replace("\\", "/")
+            checksums[rel] = _sha256(p)
+    return checksums
+
+
+def _verify_manuscript_scope() -> dict[str, object]:
+    """Check that the run produced the analysis the manuscript reports.
+
+    Two scope regressions were shipped in R1/R2 and neither was caught by anything
+    that ran automatically:
+
+    * the sensitivity grid silently covered 20 countries instead of the panel, and
+    * the optimiser exported one ambiguous absolute-reduction column.
+
+    This returns a verdict per check and never raises, so the manifest records the
+    state of the run rather than aborting it.
+    """
+    import csv
+
+    checks: dict[str, object] = {}
+
+    opt = OUT_DIR / "robust_optimization_results.csv"
+    if opt.exists():
+        with opt.open(encoding="utf-8", newline="") as f:
+            header = next(csv.reader(f))
+        required = {
+            "observed_ch4_t",
+            "abs_reduction_mt_ch4",
+            "abs_reduction_mt_ch4_posterior",
+        }
+        checks["optimisation_columns"] = {
+            "required": sorted(required),
+            "missing": sorted(required - set(header)),
+            "ambiguous_column_removed": "absolute_reduction_kt" not in header,
+            "pass": not (required - set(header)) and "absolute_reduction_kt" not in header,
+        }
+
+    grid = OUT_DIR / "sensitivity_grid.csv"
+    if grid.exists():
+        countries: set[str] = set()
+        configs: set[tuple[str, str, str]] = set()
+        n_rows = 0
+        with grid.open(encoding="utf-8", newline="") as f:
+            for row in csv.DictReader(f):
+                n_rows += 1
+                countries.add(row["country_m49"])
+                configs.add((row["delta"], row["lambda"], row["alpha"]))
+        expected = len(countries) * len(configs)
+        checks["sensitivity_grid_scope"] = {
+            "n_rows": n_rows,
+            "n_countries": len(countries),
+            "n_configurations": len(configs),
+            "expected_rows": expected,
+            "pass": n_rows == expected and len(configs) == 36,
+        }
+
+    checks["all_pass"] = all(
+        v.get("pass", True) for v in checks.values() if isinstance(v, dict)
+    )
+    return checks
+
+
+def _redact_home(text: str) -> str:
+    """Replace the running user's home directory with ``~``.
+
+    The manifest is deposited publicly, and an absolute interpreter path leaks the
+    local account name for no reproducibility benefit: what matters is the
+    interpreter version and the package set, both of which are recorded separately.
+    """
+    home = str(Path.home())
+    out = text.replace(home, "~")
+    return out.replace(home.replace("\\", "/"), "~")
 
 
 def _git_info() -> dict[str, str | bool]:
@@ -130,7 +215,7 @@ def main() -> None:
 
     manifest = {
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-        "python_executable": sys.executable,
+        "python_executable": _redact_home(sys.executable),
         "python_version": sys.version,
         "platform": platform.platform(),
         "git": _git_info(),
@@ -141,12 +226,32 @@ def main() -> None:
             "no_run": args.no_run,
         },
         "pip_freeze": _capture([sys.executable, "-m", "pip", "freeze"]).splitlines(),
+        "input_sha256": _collect_inputs(),
         "output_sha256": _collect_outputs(),
+        "manuscript_scope_checks": _verify_manuscript_scope(),
     }
 
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     rel = manifest_path.relative_to(ROOT) if manifest_path.is_relative_to(ROOT) else manifest_path
     print(f"[OK] Reproducibility manifest written to {rel}")
+
+    scope = manifest["manuscript_scope_checks"]
+    grid = scope.get("sensitivity_grid_scope")
+    if grid:
+        verdict = "OK" if grid["pass"] else "FAIL"
+        print(
+            f"[{verdict}] Sensitivity grid: {grid['n_rows']} rows = "
+            f"{grid['n_countries']} countries x {grid['n_configurations']} configurations"
+        )
+    cols = scope.get("optimisation_columns")
+    if cols:
+        verdict = "OK" if cols["pass"] else "FAIL"
+        print(f"[{verdict}] Optimisation export carries both absolute-reduction quantities")
+    if not scope.get("all_pass", True):
+        print(
+            "[WARN] This run does NOT match the scope reported in the manuscript. "
+            "See manuscript_scope_checks in the manifest."
+        )
 
 
 if __name__ == "__main__":

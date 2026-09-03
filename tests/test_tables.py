@@ -45,12 +45,12 @@ class TestTable3BayesSummary:
 class TestTable4Optimization:
     """Table 4 should rank by absolute reduction when available."""
 
-    def test_ranks_by_absolute_reduction(self, tmp_path):
+    def test_ranks_by_inventory_scaled_reduction(self, tmp_path):
         opt_df = pd.DataFrame(
             [
-                {"country_m49": 1, "country": "A", "absolute_reduction_kt": 1.0, "reduction_mean_pct": 10.0},
-                {"country_m49": 2, "country": "B", "absolute_reduction_kt": 5.0, "reduction_mean_pct": 4.0},
-                {"country_m49": 3, "country": "C", "absolute_reduction_kt": 3.0, "reduction_mean_pct": 6.0},
+                {"country_m49": 1, "country": "A", "abs_reduction_mt_ch4": 1.0, "reduction_mean_pct": 10.0},
+                {"country_m49": 2, "country": "B", "abs_reduction_mt_ch4": 5.0, "reduction_mean_pct": 4.0},
+                {"country_m49": 3, "country": "C", "abs_reduction_mt_ch4": 3.0, "reduction_mean_pct": 6.0},
             ]
         )
 

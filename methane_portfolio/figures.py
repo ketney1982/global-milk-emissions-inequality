@@ -10,6 +10,8 @@ No seaborn is used. Colors are drawn from a curated palette.
 
 from __future__ import annotations
 
+import inspect
+
 import json
 import logging
 from pathlib import Path
@@ -646,11 +648,19 @@ def fig6_elasticity(
     fig, ax = plt.subplots(figsize=(7.4, 4.8), constrained_layout=True)
     _setup_ax(ax)
 
+    # Matplotlib renamed boxplot's `labels` to `tick_labels` in 3.9 and removed the
+    # old spelling in 3.10, so `run-all` crashed here on any current install.
+    # Resolve the spelling from the running version rather than pinning matplotlib.
+    tick_label_kw = (
+        "tick_labels"
+        if "tick_labels" in inspect.signature(mpl.axes.Axes.boxplot).parameters
+        else "labels"
+    )
     bp = ax.boxplot(
         data,
         vert=False,
-        labels=species_short,
         patch_artist=True,
+        **{tick_label_kw: species_short},
         showfliers=False,
         widths=0.62,
         medianprops={"color": "#1f1f1f", "linewidth": 1.0},

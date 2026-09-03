@@ -166,12 +166,45 @@ def propagate_uncertainty(
 
 _SENSITIVITY_KEEP_COLS = [
     "country_m49", "country",
-    "baseline_intensity_kg_co2e_per_t",
-    "optimized_mean_kg_co2e_per_t",
-    "optimized_cvar_kg_co2e_per_t",
+    "production_tonnes", "observed_ch4_t",
+    "baseline_intensity_observed",
+    "baseline_intensity", "optimized_mean",
+    "baseline_cvar", "optimized_cvar",
     "reduction_mean_pct", "reduction_cvar_pct",
+    "abs_reduction_mt_ch4", "abs_reduction_mt_ch4_posterior",
+    "tv_distance", "active_species",
+    "no_harm_applied", "no_harm_action", "lp_certified",
     "delta", "lambda", "alpha",
 ]
+
+# Summary columns for the per-configuration digest written alongside the grid.
+_SENSITIVITY_SUMMARY_COLS = [
+    "delta", "lambda", "alpha",
+    "mean", "median", "q25", "q75", "cvar", "certified",
+]
+
+
+def _summarise_grid(grid_df: pd.DataFrame) -> pd.DataFrame:
+    """Per-(delta, lambda, alpha) digest of a sensitivity grid.
+
+    Reproduces Table 8 of the manuscript: mean, median and quartiles of the
+    percentage reduction in posterior mean intensity, the mean CVaR reduction,
+    and the number of certified solves.
+    """
+    if grid_df.empty:
+        return pd.DataFrame(columns=_SENSITIVITY_SUMMARY_COLS)
+    rows = []
+    for (d, lam, a), g in grid_df.groupby(["delta", "lambda", "alpha"], sort=True):
+        rows.append({
+            "delta": d, "lambda": lam, "alpha": a,
+            "mean": float(g["reduction_mean_pct"].mean()),
+            "median": float(g["reduction_mean_pct"].median()),
+            "q25": float(g["reduction_mean_pct"].quantile(0.25)),
+            "q75": float(g["reduction_mean_pct"].quantile(0.75)),
+            "cvar": float(g["reduction_cvar_pct"].mean()),
+            "certified": int(g["lp_certified"].sum()) if "lp_certified" in g else int(len(g)),
+        })
+    return pd.DataFrame(rows, columns=_SENSITIVITY_SUMMARY_COLS)
 
 
 def _run_sensitivity_combo(
@@ -216,30 +249,49 @@ def run_sensitivity_grid(
     lambdas: tuple[float, ...] = config.LAMBDA_GRID,
     alphas: tuple[float, ...] = config.ALPHA_GRID,
     year: int = config.END_YEAR,
-    n_countries_max: int = 20,
+    n_countries_max: int | None = None,
     allow_expansion: bool = False,
     workers: int | None = None,
     output_dir: Path | None = None,
 ) -> pd.DataFrame:
     """Run the optimisation over a grid of hyper-parameters.
 
-    To keep runtime tractable, only the top ``n_countries_max`` producers
-    are included.
+    Scope
+    -----
+    ``n_countries_max=None`` (the default since R3) evaluates the grid on the
+    **whole analysed panel**, which is what the manuscript reports: 181 countries
+    x 36 configurations = 6,516 country-configuration solves. R1 and R2 defaulted
+    to ``n_countries_max=20`` for runtime reasons, so the public entry point did
+    not regenerate the reported grid. That constraint no longer applies: under the
+    exact LP formulation one full-panel solve takes ~1.5 s, so the entire grid runs
+    in under a minute on one core.
 
-    Returns a tidy DataFrame saved to ``outputs/sensitivity_grid.csv``.
+    Passing an integer still restricts the grid to that many largest producers;
+    the top-20 restriction is retained as a *derived summary*, not as the scope of
+    the grid itself, for comparability with the R1 release.
+
+    Outputs
+    -------
+    ``sensitivity_grid.csv``            tidy per-country, per-configuration results
+    ``sensitivity_summary_all181.csv``  Table 8, full panel
+    ``sensitivity_summary_top20.csv``   Table 8, restricted to the 20 largest producers
     """
     out = output_dir or config.OUTPUT_DIR
     out.mkdir(parents=True, exist_ok=True)
 
-    # Select top-producing countries
     sub = long_df[long_df["year"] == year]
-    prod = (
-        sub.groupby("country_m49")["milk_tonnes"]
-        .sum()
-        .nlargest(n_countries_max)
-        .index.tolist()
-    )
-    sub_df = long_df[long_df["country_m49"].isin(prod)]
+    prod_rank = sub.groupby("country_m49")["milk_tonnes"].sum().sort_values(ascending=False)
+    if n_countries_max is None:
+        sub_df = long_df
+        logger.info(
+            "Sensitivity grid scope: full panel (%d countries in %d)",
+            int(prod_rank.size), year,
+        )
+    else:
+        keep = prod_rank.nlargest(int(n_countries_max)).index.tolist()
+        sub_df = long_df[long_df["country_m49"].isin(keep)]
+        logger.info("Sensitivity grid scope: top %d producers", int(n_countries_max))
+    top20 = prod_rank.nlargest(20).index.tolist()
 
     all_rows = []
     combos = list(itertools.product(deltas, lambdas, alphas))
@@ -303,6 +355,20 @@ def run_sensitivity_grid(
         )
         grid_df.reset_index(drop=True, inplace=True)
     grid_df.to_csv(out / "sensitivity_grid.csv", index=False)
+
+    summary_all = _summarise_grid(grid_df)
+    summary_all.to_csv(out / "sensitivity_summary_all181.csv", index=False)
+    if not grid_df.empty:
+        summary_top = _summarise_grid(grid_df[grid_df["country_m49"].isin(top20)])
+    else:
+        summary_top = _summarise_grid(grid_df)
+    summary_top.to_csv(out / "sensitivity_summary_top20.csv", index=False)
+
+    n_countries = int(grid_df["country_m49"].nunique()) if not grid_df.empty else 0
+    logger.info(
+        "Sensitivity grid: %d rows = %d countries x %d configurations",
+        len(grid_df), n_countries, len(combos),
+    )
     return grid_df
 
 

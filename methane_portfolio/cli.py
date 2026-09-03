@@ -76,6 +76,57 @@ def _assert_posterior_convergence(*, allow_weak_convergence: bool) -> None:
     )
 
 
+def _load_posterior_samples(args, long_df, *, quiet: bool = False):
+    """Obtain the posterior intensity scenarios that every downstream stage uses.
+
+    Two sources, in order of preference:
+
+    1. ``--posterior-draws`` (or the default ``outputs/posterior_intensity_draws.npz``)
+       -- the frozen (n_draws, n_countries, n_species) array actually consumed by the
+       optimisation. ~3.6 MB, so it can be deposited alongside the code and makes
+       every downstream result exactly reproducible without the 1.6 GB archive.
+    2. ``outputs/bayes_posterior.nc`` -- the full posterior archive, from which the
+       same draws are re-derived under the recorded seed.
+
+    Returns ``(I_samples, country_list, species_list)``, or a triple of ``None`` when
+    neither source is present, in which case the callers fall back to the lognormal
+    scenarios and say so.
+    """
+    from methane_portfolio.bayes import (
+        load_intensity_draws,
+        posterior_intensity_samples,
+        prepare_bayes_data,
+    )
+
+    draws_path = Path(
+        getattr(args, "posterior_draws", None)
+        or config.OUTPUT_DIR / "posterior_intensity_draws.npz"
+    )
+    if draws_path.exists():
+        I_samples, country_list, species_list = load_intensity_draws(draws_path)
+        if not quiet:
+            print(f"  Using frozen posterior intensity draws: {draws_path}")
+        return I_samples, country_list, species_list
+
+    nc_path = config.OUTPUT_DIR / "bayes_posterior.nc"
+    if nc_path.exists():
+        import arviz as az
+
+        _assert_posterior_convergence(
+            allow_weak_convergence=getattr(args, "allow_weak_convergence", False),
+        )
+        idata = az.from_netcdf(str(nc_path))
+        bayes_data = prepare_bayes_data(long_df)
+        I_samples, country_list, species_list = posterior_intensity_samples(
+            idata, bayes_data, n_samples=500,
+        )
+        if not quiet:
+            print(f"  Using Bayesian posterior archive: {nc_path}")
+        return I_samples, country_list, species_list
+
+    return None, None, None
+
+
 # ---------------------------------------------------------------------------
 # Sub-command handlers
 # ---------------------------------------------------------------------------
@@ -134,21 +185,19 @@ def cmd_optimize(args: argparse.Namespace) -> None:
     from methane_portfolio.robust_optimize import run_all_countries
 
     long_df, agg_df, species = load_all(args.data_dir)
-    I_samples, country_list, species_list = None, None, None
-    if args.allow_expansion:
-        nc_path = config.OUTPUT_DIR / "bayes_posterior.nc"
-        if nc_path.exists():
-            _assert_posterior_convergence(
-                allow_weak_convergence=args.allow_weak_convergence,
-            )
-            idata = az.from_netcdf(str(nc_path))
-            bayes_data = prepare_bayes_data(long_df)
-            I_samples, country_list, species_list = posterior_intensity_samples(
-                idata, bayes_data, n_samples=500,
-            )
-            print("  Loaded existing Bayesian posterior for expansion-enabled optimisation")
-        else:
-            print("  [WARN] --allow-expansion requested but bayes_posterior.nc is missing; expansion may be disabled")
+
+    # R3: the posterior is loaded whenever it is available, not only when
+    # --allow-expansion is set. R1/R2 wired it in only under that flag, so a bare
+    # `optimize` silently fell back to the lognormal scenarios and did not
+    # reproduce the reported optimisation.
+    I_samples, country_list, species_list = _load_posterior_samples(args, long_df)
+    if I_samples is None:
+        print(
+            "  [WARN] no posterior draws or archive found; falling back to "
+            "lognormal scenarios. This does NOT reproduce the reported results."
+        )
+        if args.allow_expansion:
+            print("  [WARN] --allow-expansion requires a posterior; expansion may be disabled")
 
     result = run_all_countries(
         long_df,
@@ -170,20 +219,12 @@ def cmd_uncertainty(args: argparse.Namespace) -> None:
 
     long_df, agg_df, species = load_all(args.data_dir)
 
-    # Try to load Bayesian posterior for posterior-informed uncertainty
-    I_samples, country_list, species_list = None, None, None
-    nc_path = config.OUTPUT_DIR / "bayes_posterior.nc"
-    if nc_path.exists():
-        _assert_posterior_convergence(
-            allow_weak_convergence=args.allow_weak_convergence,
+    I_samples, country_list, species_list = _load_posterior_samples(args, long_df)
+    if I_samples is None:
+        print(
+            "  [WARN] no posterior draws or archive found; falling back to "
+            "lognormal scenarios. This does NOT reproduce the reported results."
         )
-        from methane_portfolio.bayes import prepare_bayes_data, posterior_intensity_samples
-        idata = az.from_netcdf(str(nc_path))
-        data = prepare_bayes_data(long_df)
-        I_samples, country_list, species_list = posterior_intensity_samples(
-            idata, data, n_samples=500,
-        )
-        print("  Using Bayesian posterior for uncertainty propagation")
 
     result = propagate_uncertainty(
         long_df, I_samples=I_samples,
@@ -196,8 +237,12 @@ def cmd_uncertainty(args: argparse.Namespace) -> None:
         long_df, I_samples=I_samples,
         country_list=country_list, species_list=species_list,
         workers=args.sensitivity_workers,
+        n_countries_max=args.sensitivity_countries,
     )
-    print(f"[OK] Sensitivity grid: {len(grid)} rows saved")
+    print(
+        f"[OK] Sensitivity grid: {len(grid)} rows "
+        f"({grid['country_m49'].nunique() if len(grid) else 0} countries x 36 configurations) saved"
+    )
 
 
 def cmd_figures(args: argparse.Namespace) -> None:
@@ -324,30 +369,23 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         I_samples, country_list, species_list = posterior_intensity_samples(
             idata, bayes_data, n_samples=500,
         )
+        # Freeze the draws that every downstream stage consumes, so the rest of the
+        # pipeline can be re-run exactly without the 1.6 GB posterior archive.
+        from methane_portfolio.bayes import INTENSITY_DRAWS_FILE, save_intensity_draws
+        save_intensity_draws(
+            I_samples, country_list, species_list,
+            config.OUTPUT_DIR / INTENSITY_DRAWS_FILE,
+        )
         print(f"[OK] Step {step}/{n_steps}: Bayesian model fitted ({args.chains} chains x {args.draws} draws)")
     else:
         print("  [SKIP] Bayesian model fitting (--skip-bayes)")
-        nc_path = config.OUTPUT_DIR / "bayes_posterior.nc"
-        if nc_path.exists():
-            _assert_posterior_convergence(
-                allow_weak_convergence=args.allow_weak_convergence,
-            )
-            import arviz as az
-            from methane_portfolio.bayes import prepare_bayes_data, posterior_intensity_samples
-
-            idata = az.from_netcdf(str(nc_path))
-            bayes_data = prepare_bayes_data(long_df)
-            I_samples, country_list, species_list = posterior_intensity_samples(
-                idata, bayes_data, n_samples=500,
-            )
+        I_samples, country_list, species_list = _load_posterior_samples(args, long_df)
+        if I_samples is None:
             print(
-                "  Loaded existing Bayesian posterior for downstream "
-                "optimisation/uncertainty/sensitivity/figures"
-            )
-        else:
-            print(
-                "  [WARN] bayes_posterior.nc is missing; downstream uncertainty and "
-                "sensitivity will use fallback scenarios, and Fig3 may be skipped"
+                "  [WARN] neither posterior_intensity_draws.npz nor bayes_posterior.nc "
+                "was found; downstream uncertainty and sensitivity will use fallback "
+                "scenarios, Fig3 may be skipped, and the reported results will NOT be "
+                "reproduced"
             )
             if args.allow_expansion:
                 print(
@@ -385,8 +423,15 @@ def cmd_run_all(args: argparse.Namespace) -> None:
         country_list=country_list, species_list=species_list,
         allow_expansion=args.allow_expansion,
         workers=args.sensitivity_workers,
+        n_countries_max=args.sensitivity_countries,
     )
-    print(f"[OK] Step {step}/{n_steps}: Sensitivity grid ({len(sensitivity_df)} rows)")
+    n_sens_countries = (
+        int(sensitivity_df["country_m49"].nunique()) if len(sensitivity_df) else 0
+    )
+    print(
+        f"[OK] Step {step}/{n_steps}: Sensitivity grid "
+        f"({len(sensitivity_df)} rows = {n_sens_countries} countries x 36 configurations)"
+    )
 
     # 7. Tables
     step += 1
@@ -505,6 +550,16 @@ def build_parser() -> argparse.ArgumentParser:
 
     # optimize
     o = sub.add_parser("optimize", help="Robust portfolio optimisation")
+    o.add_argument(
+        "--posterior-draws",
+        type=Path,
+        default=None,
+        help=(
+            "Path to frozen posterior intensity draws (.npz) as written by the "
+            "bayes stage. Defaults to outputs/posterior_intensity_draws.npz, and "
+            "falls back to outputs/bayes_posterior.nc when neither is given."
+        ),
+    )
     o.add_argument("--lam", type=float, default=0.5)
     o.add_argument("--alpha", type=float, default=0.90)
     o.add_argument("--delta", type=float, default=0.10)
@@ -522,10 +577,30 @@ def build_parser() -> argparse.ArgumentParser:
     # uncertainty
     u = sub.add_parser("uncertainty", help="Uncertainty propagation")
     u.add_argument(
+        "--posterior-draws",
+        type=Path,
+        default=None,
+        help=(
+            "Path to frozen posterior intensity draws (.npz) as written by the "
+            "bayes stage. Defaults to outputs/posterior_intensity_draws.npz, and "
+            "falls back to outputs/bayes_posterior.nc when neither is given."
+        ),
+    )
+    u.add_argument(
         "--sensitivity-workers",
         type=int,
         default=None,
         help="Parallel workers for sensitivity grid (default: auto).",
+    )
+    u.add_argument(
+        "--sensitivity-countries",
+        type=int,
+        default=None,
+        help=(
+            "Restrict the sensitivity grid to the N largest producers. "
+            "Default: the full analysed panel (181 countries x 36 configurations "
+            "= 6,516 solves), which is the scope reported in the manuscript."
+        ),
     )
     u.add_argument(
         "--allow-weak-convergence",
@@ -544,6 +619,16 @@ def build_parser() -> argparse.ArgumentParser:
 
     # run-all
     ra = sub.add_parser("run-all", help="Run full pipeline")
+    ra.add_argument(
+        "--posterior-draws",
+        type=Path,
+        default=None,
+        help=(
+            "Path to frozen posterior intensity draws (.npz) as written by the "
+            "bayes stage. Defaults to outputs/posterior_intensity_draws.npz, and "
+            "falls back to outputs/bayes_posterior.nc when neither is given."
+        ),
+    )
     ra.add_argument("--no-fail", action="store_true")
     ra.add_argument("--skip-bayes", action="store_true",
                     help="Skip Bayesian model fitting (faster)")
@@ -566,6 +651,16 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=None,
         help="Parallel workers for sensitivity grid (default: auto).",
+    )
+    ra.add_argument(
+        "--sensitivity-countries",
+        type=int,
+        default=None,
+        help=(
+            "Restrict the sensitivity grid to the N largest producers. "
+            "Default: the full analysed panel (181 countries x 36 configurations "
+            "= 6,516 solves), which is the scope reported in the manuscript."
+        ),
     )
     ra.add_argument(
         "--allow-expansion",

@@ -269,14 +269,14 @@ def build_phase_space(
     if "baseline_intensity" not in opt.columns and "baseline_intensity_kg_co2e_per_t" in opt.columns:
         opt["baseline_intensity"] = opt["baseline_intensity_kg_co2e_per_t"]
 
-    required_opt = {"country_m49", "reduction_pct", "absolute_reduction_kt", "baseline_intensity"}
+    required_opt = {"country_m49", "reduction_pct", "abs_reduction_mt_ch4", "baseline_intensity"}
     missing_opt = required_opt - set(opt.columns)
     if missing_opt:
         raise ValueError(f"Missing required optimization columns: {sorted(missing_opt)}")
 
     shapley_cols = ["country_m49", "delta_struct", "delta_within", "delta_total"]
     optional_shapley = [c for c in ["country", weights_col, "region"] if c in df_shapley.columns]
-    opt_cols = ["country_m49", "reduction_pct", "absolute_reduction_kt", "baseline_intensity"]
+    opt_cols = ["country_m49", "reduction_pct", "abs_reduction_mt_ch4", "baseline_intensity"]
     optional_opt = [c for c in ["country", "region"] if c in opt.columns]
 
     merged = df_shapley[shapley_cols + optional_shapley].merge(
@@ -310,7 +310,7 @@ def build_phase_space(
         "delta_within",
         "delta_total",
         "reduction_pct",
-        "absolute_reduction_kt",
+        "abs_reduction_mt_ch4",
         "baseline_intensity",
         weights_col,
         "region",

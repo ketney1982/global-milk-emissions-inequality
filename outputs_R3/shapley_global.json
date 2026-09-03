@@ -1,0 +1,13 @@
+{
+  "base_year": 2020,
+  "end_year": 2023,
+  "weight_method": "avg",
+  "n_countries": 181,
+  "global_struct": -0.004281279064877723,
+  "global_within": 0.001850106393124408,
+  "global_total": -0.0024311726717533145,
+  "net": -0.0024311726717533145,
+  "total_interval_weight": 935403097.9749999,
+  "max_reconstruction_error": 1.509903313490213e-14,
+  "max_consistency_gap": 0.0
+}

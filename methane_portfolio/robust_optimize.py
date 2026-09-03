@@ -15,8 +15,8 @@ CVaR is handled via the Rockafellarâ€“Uryasev linear relaxation:
     CVaR_Î± â‰ min_t  { t  +  (1/(K(1â’Î±))) Â· ÎŁ_k max(0, I'_k â’ t) }
 which is folded into the objective.
 
-TWO CORRECTIONS RELATIVE TO THE R1 RELEASE
-------------------------------------------
+CORRECTIONS RELATIVE TO THE R1 RELEASE
+--------------------------------------
 1. Reference estimand (`posterior_baseline=True`, the default).
    R1 computed the reference intensity from the *observed* species intensities,
    `baseline = w_ref @ i_obs`, while evaluating the optimum on Bayesian
@@ -34,6 +34,19 @@ TWO CORRECTIONS RELATIVE TO THE R1 RELEASE
    constraint; that search failed to certify optimality for 9 of the 181
    countries and returned a strictly suboptimal mix for a further 22. HiGHS
    certifies every country.
+
+3. Absolute reduction (R3).
+   R1 and R2 exported a single column, `absolute_reduction_kt`, computed as
+   `(baseline - optimised_mean) * production`. Two things were wrong with it.
+   The `/1e6` divisor makes the quantity megatonnes of CH4, not kilotonnes; and
+   the quantity itself is the *posterior-scaled* difference, whereas the
+   manuscript reports the *inventory-scaled* accounting reduction, the posterior
+   percentage applied to the observed inventory, `E_obs * R / 100`. The two
+   differ because the posterior reference is not the observed aggregate ratio:
+   the panel totals are 8.45 and 10.73 Mt CH4. Both are now exported under
+   explicit names, `abs_reduction_mt_ch4` (inventory-scaled, the reported one)
+   and `abs_reduction_mt_ch4_posterior`, together with the `observed_ch4_t`
+   inventory they are built from. The ambiguous column is gone.
 
 Reported CVaR, for both the reference and the optimum, is the empirical CVaR at
 the respective alpha-quantile, so the two are computed the same way. The R1
@@ -560,10 +573,38 @@ def run_all_countries(
         red_mean = (1.0 - sol_final["mean_opt"] / baseline) * 100
         red_cvar = (1.0 - sol_final["cvar_opt"] / cvar_base) * 100 if cvar_base > 0 else 0.0
         production_tonnes = float(csub["milk_tonnes"].sum())
-        absolute_reduction_kt = (
+
+        # Observed methane charged to milk in the reference year, in tonnes of CH4.
+        # intensity [kg CH4 / kg milk] x production [t milk] = [t CH4]; this equals
+        # the reported FAOSTAT kilotonnes to machine precision (DATA_PROVENANCE.md)
+        # and is the denominator against which the panel share is quoted.
+        observed_ch4_t = float(
+            (csub["milk_tonnes"] * csub["kg_co2e_per_ton_milk"].fillna(0.0)).sum()
+        )
+
+        # TWO DISTINCT QUANTITIES; they are not interchangeable.
+        #
+        # (a) INVENTORY-SCALED accounting reduction -- the posterior percentage
+        #     reduction applied to the observed inventory,
+        #         A_c = E_obs_c * R_c / 100.
+        #     This is what the manuscript reports (Table 7, Figure 5) and the only
+        #     one that aggregates coherently against the reported panel inventory.
+        #
+        # (b) POSTERIOR-SCALED reduction -- the posterior intensity difference times
+        #     production, (I_ref_c - I_opt_c) * M_c.
+        #     Because the posterior reference differs from the observed aggregate
+        #     ratio by hierarchical shrinkage, (a) != (b): the panel totals are
+        #     8.45 and 10.73 Mt CH4 respectively.
+        #
+        # Both are in MEGATONNES of CH4. The R1 name `absolute_reduction_kt` was a
+        # misnomer -- the /1e6 divisor returns Mt, not kt -- and it carried (b) while
+        # the manuscript reported (a). Both are now exported under explicit names.
+        abs_reduction_mt_ch4 = observed_ch4_t * red_mean / 100.0 / 1e6
+        abs_reduction_mt_ch4_raw = observed_ch4_t * red_mean_raw / 100.0 / 1e6
+        abs_reduction_mt_ch4_posterior = (
             (baseline - sol_final["mean_opt"]) * production_tonnes / 1e6
         )
-        absolute_reduction_kt_raw = (
+        abs_reduction_mt_ch4_posterior_raw = (
             (baseline - sol_raw_report["mean_opt"]) * production_tonnes / 1e6
         )
 
@@ -571,6 +612,8 @@ def run_all_countries(
             "country_m49": m49,
             "country": cname,
             "production_tonnes": production_tonnes,
+            "observed_ch4_t": observed_ch4_t,
+            "active_species": active_species,
             # NOTE ON UNITS: the intensity columns below are in kg CH4 per kg raw milk
             # (equivalently t CH4 / t milk). The historical "_kg_co2e_per_t" suffix is a
             # misnomer kept for column-name compatibility with the R1 artefacts: the
@@ -592,7 +635,8 @@ def run_all_countries(
             "raw_optimized_cvar_kg_co2e_per_t": sol_raw_report["cvar_opt"],
             "raw_reduction_mean_pct": red_mean_raw,
             "raw_reduction_cvar_pct": red_cvar_raw,
-            "raw_absolute_reduction_kt": absolute_reduction_kt_raw,
+            "raw_abs_reduction_mt_ch4": abs_reduction_mt_ch4_raw,
+            "raw_abs_reduction_mt_ch4_posterior": abs_reduction_mt_ch4_posterior_raw,
             "optimized_mean": sol_final["mean_opt"],
             "optimized_mean_kg_co2e_per_t": sol_final["mean_opt"],
             "optimized_cvar": sol_final["cvar_opt"],
@@ -600,7 +644,8 @@ def run_all_countries(
             "reduction_pct": red_mean,
             "reduction_mean_pct": red_mean,
             "reduction_cvar_pct": red_cvar,
-            "absolute_reduction_kt": absolute_reduction_kt,
+            "abs_reduction_mt_ch4": abs_reduction_mt_ch4,
+            "abs_reduction_mt_ch4_posterior": abs_reduction_mt_ch4_posterior,
             "no_harm_enabled": bool(do_no_harm),
             "no_harm_applied": bool(no_harm_applied),
             "no_harm_action": no_harm_action,
@@ -649,8 +694,12 @@ def run_all_countries(
                 "n_no_harm_applied": int(len(trigger_df)),
                 "n_negative_raw_reductions": int((df["raw_reduction_mean_pct"] < 0).sum()),
                 "n_negative_final_reductions": int((df["reduction_mean_pct"] < 0).sum()),
-                "total_raw_absolute_reduction_kt": float(df["raw_absolute_reduction_kt"].sum()),
-                "total_final_absolute_reduction_kt": float(df["absolute_reduction_kt"].sum()),
+                "total_raw_abs_reduction_mt_ch4": float(df["raw_abs_reduction_mt_ch4"].sum()),
+                "total_final_abs_reduction_mt_ch4": float(df["abs_reduction_mt_ch4"].sum()),
+                "total_final_abs_reduction_mt_ch4_posterior": float(
+                    df["abs_reduction_mt_ch4_posterior"].sum()
+                ),
+                "total_observed_ch4_mt": float(df["observed_ch4_t"].sum() / 1e6),
                 "revert_pct": round(revert_pct, 1),
                 "revert_threshold_warning": revert_pct > 20,
                 "no_harm_actions": (

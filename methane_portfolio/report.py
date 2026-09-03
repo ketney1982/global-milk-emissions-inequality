@@ -263,7 +263,7 @@ def generate_appendix(
         n_species = long_df["milk_species"].nunique()
     n_countries_analysis = n_countries_shapley or n_countries_input
     n_excluded_analysis = max(0, int(n_countries_input - n_countries_analysis))
-    n_sensitivity_countries = 20
+    n_sensitivity_countries = 0
     sens_path = out / "sensitivity_grid.csv"
     if sens_path.exists():
         try:
@@ -282,9 +282,11 @@ def generate_appendix(
 
     optimisation_scope_section = (
         "- `Table4_optimization.csv` is ranked from `robust_optimization_results.csv` "
-        "by `absolute_reduction_kt` (descending) over all analysed countries.\n"
-        f"- `sensitivity_grid.csv` is computed on the top {n_sensitivity_countries} producers only "
-        "(runtime-control subset used for parameter grid sweeps)."
+        "by `abs_reduction_mt_ch4` (inventory-scaled, descending) over all analysed countries.\n"
+        f"- `sensitivity_grid.csv` is computed on all {n_sensitivity_countries} analysed countries "
+        f"({n_sensitivity_countries * 36} country-configuration solves over the 4x3x3 grid); "
+        "`sensitivity_summary_top20.csv` additionally restricts the same grid to the 20 "
+        "largest producers, for comparability with the R1 release."
     )
     opt_audit_path = out / "robust_optimization_audit.json"
     if opt_audit_path.exists():

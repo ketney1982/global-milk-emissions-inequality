@@ -1,0 +1,16 @@
+{
+  "do_no_harm_enabled": true,
+  "n_countries": 181,
+  "n_no_harm_applied": 0,
+  "n_negative_raw_reductions": 0,
+  "n_negative_final_reductions": 0,
+  "total_raw_abs_reduction_mt_ch4": 8.454550898810846,
+  "total_final_abs_reduction_mt_ch4": 8.454550898810846,
+  "total_final_abs_reduction_mt_ch4_posterior": 10.731123530477534,
+  "total_observed_ch4_mt": 44.46849329999996,
+  "revert_pct": 0.0,
+  "revert_threshold_warning": false,
+  "no_harm_actions": {},
+  "countries_no_harm_applied": [],
+  "note": "Raw optimisation outputs are preserved in raw_* columns. Final outputs may apply do-no-harm guard but never alter source input data."
+}

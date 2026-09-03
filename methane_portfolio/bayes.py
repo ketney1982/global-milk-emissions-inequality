@@ -300,16 +300,38 @@ def fit_model(
     with open(out / "bayes_diagnostics.json", "w", encoding="utf-8") as f:
         json.dump(diag, f, indent=2, default=_json_default)
 
-    # Tau hyperparameter convergence (reported as warning, not failure)
-    if not diag.get("tau_converged", True):
+    # Non-centred pair (tau, u_c_raw): reported as warning, not failure.
+    uc_raw = diag.get("u_c_raw", {})
+    uc = diag.get("u_c", {})
+    if not diag.get("tau_converged", True) or not uc_raw.get("converged_relaxed", True):
         logger.warning(
-            "Hyperparameter tau has slow mixing (R-hat=%.3f, ESS_bulk=%.0f, "
-            "ESS_tail=%.0f). This is a known pathology in hierarchical models "
-            "with many groups and sparse data.  Relative country effects are "
-            "well-identified via ZeroSumNormal constraint; downstream results "
-            "are robust to the modest tau uncertainty.",
+            "Slow mixing in the non-centred pair: tau (R-hat=%.3f, ESS_bulk=%.0f, "
+            "ESS_tail=%.0f) and u_c_raw (max R-hat=%s, min ESS_bulk=%s, min "
+            "ESS_tail=%s). These two are only jointly identified, so this is a "
+            "scale/offset trade-off rather than a failure of the country effects "
+            "themselves; see the u_c block below.",
             diag["tau_rhat"], diag["tau_ess_bulk"], diag["tau_ess_tail"],
+            _fmt(uc_raw.get("max_rhat")), _fmt(uc_raw.get("min_ess_bulk"), 0),
+            _fmt(uc_raw.get("min_ess_tail"), 0),
         )
+    if uc.get("available"):
+        if uc.get("converged_strict"):
+            logger.info(
+                "Identified country effects u_c = tau * u_c_raw meet the strict "
+                "criteria over all %d levels (max R-hat=%.4f, min ESS_bulk=%.0f, "
+                "min ESS_tail=%.0f).",
+                uc["n_components"], uc["max_rhat"],
+                uc["min_ess_bulk"], uc["min_ess_tail"],
+            )
+        else:
+            logger.warning(
+                "Identified country effects u_c FAIL the strict criteria "
+                "(max R-hat=%.4f, min ESS_bulk=%.0f, min ESS_tail=%.0f over %d "
+                "levels). Country-level posterior intensities, and therefore the "
+                "optimisation scenarios built from them, are unreliable.",
+                uc["max_rhat"], uc["min_ess_bulk"], uc["min_ess_tail"],
+                uc["n_components"],
+            )
 
     # Direct parameter convergence (hard failure if violated)
     if not diag.get("converged_relaxed", False):
@@ -402,6 +424,58 @@ def _posterior_for_ppc(
     return idata.sel(draw=draw_idx)
 
 
+def _fmt(v, nd: int = 3) -> str:
+    """Format an optional numeric diagnostic for logging."""
+    return "n/a" if v is None else f"{float(v):.{nd}f}"
+
+
+def _summary_or_none(idata: az.InferenceData, var: str) -> pd.DataFrame | None:
+    """``az.summary`` for one variable, or None when the variable is absent."""
+    try:
+        if var not in idata.posterior:
+            return None
+        return az.summary(idata, var_names=[var], round_to="none")
+    except Exception:  # pragma: no cover - defensive, older/partial idata
+        logger.warning("Could not summarise %s for diagnostics.", var)
+        return None
+
+
+def _block_diagnostics(
+    summary: pd.DataFrame | None,
+    strict_rhat: float,
+    strict_ess: int,
+    relaxed_rhat: float,
+    relaxed_ess: int,
+) -> dict:
+    """Worst-case R-hat / ESS over all components of a vector-valued variable."""
+    if summary is None or summary.empty:
+        return {"available": False}
+    max_rhat = float(summary["r_hat"].max())
+    min_ess_bulk = float(summary["ess_bulk"].min())
+    min_ess_tail = float(summary["ess_tail"].min())
+    return {
+        "available": True,
+        "n_components": int(len(summary)),
+        "max_rhat": max_rhat,
+        "min_ess_bulk": min_ess_bulk,
+        "min_ess_tail": min_ess_tail,
+        "worst_rhat_component": str(summary["r_hat"].idxmax()),
+        "n_rhat_fail_strict": int((summary["r_hat"] >= strict_rhat).sum()),
+        "n_ess_bulk_fail_strict": int((summary["ess_bulk"] < strict_ess).sum()),
+        "n_ess_tail_fail_strict": int((summary["ess_tail"] < strict_ess).sum()),
+        "converged_strict": bool(
+            max_rhat < strict_rhat
+            and min_ess_bulk >= strict_ess
+            and min_ess_tail >= strict_ess
+        ),
+        "converged_relaxed": bool(
+            max_rhat < relaxed_rhat
+            and min_ess_bulk >= relaxed_ess
+            and min_ess_tail >= relaxed_ess
+        ),
+    }
+
+
 def _compute_diagnostics(idata: az.InferenceData) -> dict:
     """R-hat, ESS, divergences.
 
@@ -412,24 +486,40 @@ def _compute_diagnostics(idata: az.InferenceData) -> dict:
       estimates.  Both ``converged`` and ``converged_relaxed`` require all
       direct parameters to meet their respective thresholds.
 
-    * **Hyperparameter** (tau) -- the random-effect scale.  Slow mixing of
-      tau is a well-known pathology in hierarchical models with many groups
-      and sparse data.  Because the ZeroSumNormal constraint on the country
-      raw effects and the non-centered parameterization ensure that *relative*
-      country effects are well-identified, a modest R-hat / ESS violation on
-      tau alone does **not** invalidate downstream results.  Tau diagnostics
-      are reported separately and trigger a WARNING, but do not block the
-      pipeline.
+    * **Non-centred pair** (tau, u_c_raw) -- the random-effect scale and the
+      raw country offsets.  Under a non-centred parameterisation these two are
+      only *jointly* identified: the likelihood constrains their product, not
+      either factor, so the sampler is free to trade scale against raw offsets
+      and both mix slowly.  Reporting tau alone was incomplete -- ``u_c_raw`` is
+      also a directly sampled variable, and it fails by exactly the same margin.
+      Both are now assessed, and both are reported separately from, and do not
+      block, the direct parameters.
+
+    * **Identified country effects** (u_c = tau * u_c_raw) -- the quantity that
+      actually enters the linear predictor and therefore every country-level
+      posterior intensity.  This is the diagnostic that matters downstream, and
+      it is checked against the strict thresholds.  In the deposited run it
+      passes comfortably (max R-hat 1.007, min ESS_bulk 2,551, min ESS_tail 994
+      over all 182 country levels) while tau and u_c_raw both sit at R-hat 1.19
+      with ESS_bulk 65 -- the signature of a weakly identified factorisation
+      rather than of unreliable country effects.
     """
     # Direct (observation-level) parameters
     direct_vars = ["alpha_s", "beta_s", "gamma_s", "sigma_s", "nu"]
-    summary_direct = az.summary(idata, var_names=direct_vars)
+    summary_direct = az.summary(idata, var_names=direct_vars, round_to="none")
 
-    # Hyperparameter (random-effect scale)
-    summary_hyper = az.summary(idata, var_names=["tau"])
+    # Hyperparameter (random-effect scale) and the raw offsets it multiplies.
+    # These are only jointly identified, so they are assessed together.
+    summary_hyper = az.summary(idata, var_names=["tau"], round_to="none")
+    summary_raw = _summary_or_none(idata, "u_c_raw")
+
+    # The identified combination u_c = tau * u_c_raw, which is what enters the
+    # linear predictor and hence every downstream country-level quantity.
+    summary_uc = _summary_or_none(idata, "u_c")
 
     # Full summary for reporting
-    summary = pd.concat([summary_direct, summary_hyper])
+    parts = [summary_direct, summary_hyper]
+    summary = pd.concat(parts)
 
     max_rhat = float(summary_direct["r_hat"].max())
     min_ess_bulk = float(summary_direct["ess_bulk"].min())
@@ -470,6 +560,15 @@ def _compute_diagnostics(idata: az.InferenceData) -> dict:
         and tau_ess_tail >= relaxed_ess
     )
 
+    # Non-centred raw offsets: directly sampled, weakly identified with tau.
+    raw_block = _block_diagnostics(
+        summary_raw, strict_rhat, strict_ess, relaxed_rhat, relaxed_ess,
+    )
+    # Identified country effects u_c = tau * u_c_raw: the downstream-relevant one.
+    uc_block = _block_diagnostics(
+        summary_uc, strict_rhat, strict_ess, relaxed_rhat, relaxed_ess,
+    )
+
     return {
         "max_rhat": max_rhat,
         "min_ess_bulk": min_ess_bulk,
@@ -487,6 +586,9 @@ def _compute_diagnostics(idata: az.InferenceData) -> dict:
         "tau_ess_bulk": tau_ess_bulk,
         "tau_ess_tail": tau_ess_tail,
         "tau_converged": tau_converged,
+        "u_c_raw": raw_block,
+        "u_c": uc_block,
+        "country_effects_converged": uc_block.get("converged_strict"),
         "n_rhat_fail": int(len(rhat_fail)),
         "n_ess_bulk_fail": int(len(ess_bulk_fail)),
         "n_ess_tail_fail": int(len(ess_tail_fail)),
@@ -611,6 +713,58 @@ def _ppc_diagnostics(ppc_summary: pd.DataFrame) -> dict:
 # ---------------------------------------------------------------------------
 # Posterior sample extraction
 # ---------------------------------------------------------------------------
+
+INTENSITY_DRAWS_FILE = "posterior_intensity_draws.npz"
+
+
+def save_intensity_draws(
+    I_samples: np.ndarray,
+    country_list: list[int],
+    species_list: list[str],
+    path: Path,
+    *,
+    year: int = config.END_YEAR,
+    n_samples_seed: int = config.RNG_SEED,
+) -> Path:
+    """Freeze the posterior intensity draws that the downstream analyses consume.
+
+    The full posterior archive is ~1.6 GB, which is an awkward thing to deposit
+    and an awkward thing to re-run. Everything downstream of the MCMC -- the
+    portfolio optimisation, the sensitivity grid, the uncertainty propagation and
+    every figure and table built on them -- depends on the posterior only through
+    this (n_draws, n_countries, n_species) array. At 500 draws it is ~3.6 MB, so
+    depositing it makes the whole downstream pipeline exactly reproducible without
+    the archive and without re-sampling.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(
+        path,
+        I_samples=np.asarray(I_samples, dtype=np.float64),
+        country_list=np.asarray(country_list, dtype=np.int64),
+        species_list=np.asarray(species_list, dtype=object),
+        year=np.int64(year),
+        seed=np.int64(n_samples_seed),
+    )
+    logger.info(
+        "Wrote %d x %d x %d posterior intensity draws to %s",
+        *np.shape(I_samples), path,
+    )
+    return path
+
+
+def load_intensity_draws(path: Path) -> tuple[np.ndarray, list[int], list[str]]:
+    """Read draws written by :func:`save_intensity_draws`.
+
+    Returns the same triple as :func:`posterior_intensity_samples`, so the two are
+    interchangeable at every call site.
+    """
+    with np.load(Path(path), allow_pickle=True) as z:
+        I_samples = z["I_samples"]
+        country_list = [int(c) for c in z["country_list"]]
+        species_list = [str(sp) for sp in z["species_list"]]
+    return I_samples, country_list, species_list
+
 
 def posterior_intensity_samples(
     idata: az.InferenceData,

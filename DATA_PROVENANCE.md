@@ -155,13 +155,31 @@ Content equivalence between the GitHub `data/` copies and the archived `evidence
 | Item | Value |
 | --- | --- |
 | Repository | https://github.com/ketney1982/global-milk-emissions-inequality |
-| Release | `v2.0.0-R2` (2 September 2026) — the version that produces the reported results. A file inside a commit cannot carry that commit's own hash, so this record identifies the release by tag; resolve it with `git rev-parse v2.0.0-R2`. The preceding release is commit `57d1c4cd3b5110df6f1c511fb338d50bb6d50f90` (message "R1", 18 February 2026), which accompanied the preprint and differs in the two respects listed in `CHANGELOG.md`. |
+| Release | `v3.0.0-R3` (3 September 2026) — the version that produces **and regenerates** the reported results. A file inside a commit cannot carry that commit's own hash, so this record identifies the release by tag; resolve it with `git rev-parse v3.0.0-R3`. The preceding releases are tag `v2.0.0-R2` (2 September 2026), which produced the same numbers but whose public entry point did not regenerate the full sensitivity grid or export the reported absolute-reduction quantity, and commit `57d1c4cd3b5110df6f1c511fb338d50bb6d50f90` (message "R1", 18 February 2026), which accompanied the preprint. `CHANGELOG.md` lists what changed at each step. Both `v2.0.0-R2` and `v3.0.0-R3` are annotated Git tags in the repository, not GitHub Release objects. |
 | Pipeline | `methane_portfolio` v0.1.0, entry point `run_all` |
 | Python | 3.13.5 (MSC v.1943, 64-bit), Windows 11 |
 | Pipeline RNG seed | 20230101 |
 | PyMC / NUTS seed | 42 |
 | Sampler | 16 chains x (15,000 tune + 8,000 draws), target_accept 0.95 |
 | Posterior artefact | `bayes_posterior.nc`, 1,629,605,755 bytes, retained by the author |
+| Deposited posterior draws | `outputs_R3/posterior_intensity_draws.npz`, SHA-256 `545754fc77dada9acb2944886e5913d0cfadd3455d187893a30738f5273cbc44`, 3,459,376 bytes — the 500 x 182 x 5 latent-intensity draws that every downstream stage consumes |
+
+**Reproducing the reported results.** Everything downstream of the MCMC depends on the
+posterior only through the 500 x 182 x 5 array of latent species-intensity draws. That array is
+deposited, so the full analysis can be regenerated from the repository alone:
+
+```bash
+cp outputs_R3/posterior_intensity_draws.npz outputs/
+python -m methane_portfolio.cli run-all --skip-bayes
+python scripts/reproduce.py --no-run
+```
+
+This reproduces the per-country optimisation, the 6,516-row sensitivity grid, the uncertainty
+propagation and every figure and table, and writes `reproducibility_manifest.json` recording the
+environment, the input and output checksums, and an explicit check that the run has the scope the
+manuscript reports. Regenerating the posterior draws themselves requires re-running the MCMC, or
+the retained `bayes_posterior.nc`; with the recorded seeds and the software environment listed in
+the manifest, the sampler reproduces them.
 
 **BigQuery.** Extraction and harmonisation were carried out in Google BigQuery (project `cercetare-485010`, dataset `faostat_clean`). The extraction SQL is **not** part of the public repository. The public reproducibility entry point is the three frozen CSVs listed in Section 7 together with the pipeline code; every downstream result can be regenerated from them. Section 2 of this document specifies the extraction semantics completely enough for an independent analyst to rebuild the same inputs directly from FAOSTAT.
 
@@ -174,3 +192,5 @@ Content equivalence between the GitHub `data/` copies and the archived `evidence
 3. The reallocation budget delta is a **mathematical scenario bound on the production mix**, not a demonstrated feasible intervention. It does not represent feed resources, land suitability, breed availability, processing infrastructure, demand, product functionality, cultural role or transition cost.
 4. Posterior species intensities are draws of a **latent central intensity**, exp(mu), with no residual noise added. They are not posterior predictive draws of realised country-species intensities.
 5. Because the functional unit is raw milk tonnage, no comparison in this study is corrected for fat, protein or total solids.
+6. Two distinct absolute quantities are exported and must not be conflated. `abs_reduction_mt_ch4` is the **inventory-scaled accounting reduction**, the posterior percentage applied to the observed methane inventory; it is the quantity reported in the manuscript and the only one comparable with a reported inventory. `abs_reduction_mt_ch4_posterior` is the posterior intensity difference multiplied by production; it is internally consistent with the optimisation but is not an inventory quantity. The panel totals are 8.45 and 10.73 Mt CH4 respectively. Neither is a projection of methane that a reallocation would remove from the atmosphere.
+7. Country-level posterior quantities depend on the country effects through `u_c = tau * u_c_raw`, which meets the strict convergence criteria at every one of the 182 country levels. The two factors `tau` and `u_c_raw` are only jointly identified and both mix slowly; consequently the **magnitude of between-country dispersion** is not well determined and is not interpreted as a substantive result anywhere in this study.

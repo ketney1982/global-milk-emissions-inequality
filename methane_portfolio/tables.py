@@ -121,7 +121,7 @@ def table4_optimization(
     out = output_dir or config.OUTPUT_DIR
     out.mkdir(parents=True, exist_ok=True)
 
-    rank_col = "absolute_reduction_kt"
+    rank_col = "abs_reduction_mt_ch4"
     if rank_col not in opt_df.columns:
         rank_col = "reduction_mean_pct" if "reduction_mean_pct" in opt_df.columns else "reduction_pct"
 
@@ -157,7 +157,7 @@ def table5_sensitivity(
 
     agg.to_csv(out / "Table5_sensitivity.csv", index=False)
     _to_latex(agg, out / "Table5_sensitivity.tex",
-              "Sensitivity Analysis Summary (top producers subset)")
+              "Sensitivity Analysis Summary (full analysed panel)")
     return agg
 
 

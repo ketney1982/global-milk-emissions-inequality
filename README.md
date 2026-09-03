@@ -29,8 +29,11 @@ python -m venv .venv
 # Install
 pip install -e ".[dev]"
 
-# Run the full pipeline without Bayesian model fitting (fast path)
+# Reproduce the manuscript, without re-running the MCMC.
+# The deposited draws are the only thing the downstream stages need from the posterior.
+cp outputs_R3/posterior_intensity_draws.npz outputs/
 methane-portfolio run-all --skip-bayes
+
 # Optional: allow expansion into species with baseline zero share
 methane-portfolio run-all --allow-expansion
 
@@ -138,16 +141,27 @@ Parameters that directly enter the linear predictor and affect downstream intens
 
 If direct parameters fail even the relaxed thresholds, the pipeline raises `ConvergenceError` and refuses to produce downstream results.
 
-### Tier 2 — Hyperparameter `tau` (Warning Only)
+### Tier 2 — The non-centred pair `tau` and `u_c_raw` (Warning Only)
 
-The random-effect scale `tau` controls the magnitude of country-level intercepts (`u_c = tau × u_c_raw`).  Slow mixing of `tau` is a **well-documented pathology** in hierarchical models with many groups (181 countries) and sparse data (4 years).
+Country intercepts are parameterised as `u_c = tau × u_c_raw`. Under a non-centred
+parameterisation the likelihood constrains the **product**, not either factor, so
+`tau` and `u_c_raw` are only jointly identified and the sampler is free to trade
+scale against raw offsets. Both therefore mix slowly, by the same margin. Slow
+mixing of a random-effect scale is a well-documented pathology in hierarchical
+models with many groups (181 countries) and sparse data (4 years).
 
-**Why it does not invalidate results:**
-- The `ZeroSumNormal` constraint on `u_c_raw` ensures `Σ u_c = 0`, breaking the `tau ↔ alpha_s` ridge
-- The non-centered parameterization `u_c = tau × u_c_raw` breaks the funnel geometry
-- Relative country effects are well-identified regardless of `tau` mixing quality
+Up to R2 only `tau` was reported here, which was incomplete: `u_c_raw` is a
+directly sampled variable too, and it fails the same thresholds. Both are now
+assessed and reported (`u_c_raw` block in `bayes_diagnostics.json`).
 
-**Policy:** Tau diagnostics are logged as `WARNING` but **do not block the pipeline**.
+**Policy:** both are logged as `WARNING` and **do not block the pipeline**.
+
+### Tier 3 — The identified country effects `u_c` (Checked)
+
+What actually enters the linear predictor, and therefore every country-level
+posterior intensity and every optimisation scenario, is the product `u_c`. That is
+the diagnostic that matters downstream, and it is checked against the strict
+thresholds and reported as `country_effects_converged`.
 
 ### Diagnostics Output Files
 
@@ -171,10 +185,14 @@ With the reference sampling configuration (16 chains × 8,000 draws, 15,000 tuni
 | `sigma_s` (5 species) | 1.00 | 36,153 | 67,695 | ✅ Converged (strict) |
 | `nu`                  | 1.00 | 51,176 | 81,742 | ✅ Converged (strict) |
 | `tau` *(hyperparameter)* | 1.19 | 65 | 189 | ⚠️ Slow mixing (expected) |
+| `u_c_raw` (182 levels, max/min) | 1.19 | 65 | 189 | ⚠️ Slow mixing (expected) |
+| `u_c = tau × u_c_raw` (182 levels, max/min) | 1.007 | 2,551 | 994 | ✅ Converged (strict) |
 
 - **Zero divergences** across all 16 chains.
-- All direct parameters pass **strict** convergence thresholds (R-hat < 1.01, ESS ≥ 400) by wide margins.
-- The `tau` hyperparameter exhibits the expected slow mixing (R-hat = 1.19, ESS bulk = 65), as discussed in Tier 2 above.  This does not affect downstream results.
+- All species-level parameters pass **strict** convergence thresholds (R-hat < 1.01, ESS ≥ 400) by wide margins.
+- `tau` and `u_c_raw` both exhibit the expected slow mixing (R-hat = 1.19, ESS bulk = 65). They are the two factors of one product and are only jointly identified, so this is a weakly identified factorisation, not unreliable country effects.
+- The identified combination `u_c` passes the strict thresholds at **every one of the 182 country levels** (max R-hat 1.007, min ESS bulk 2,551, min ESS tail 994). Since `u_c` is what enters the linear predictor, the country-level posterior intensities used as optimisation scenarios are well mixed.
+- What remains genuinely uncertain is `tau` itself, i.e. the **magnitude of between-country dispersion**. That quantity is not interpreted as a substantive result anywhere in the analysis. The earlier claim in this file — that slow `tau` mixing "does not affect downstream results" — was asserted rather than demonstrated; the `u_c` row above is the demonstration.
 
 ### Posterior Predictive Check (PPC) Interpretation
 
@@ -226,6 +244,30 @@ The robust portfolio optimizer includes a **do-no-harm constraint**: no country'
 
 `robust_optimization_audit.json` provides aggregate statistics: how many countries were affected, and to what extent.
 
+### Absolute reduction: two quantities, two columns
+
+> **Corrected in R3.** R1 and R2 exported a single column, `absolute_reduction_kt`,
+> computed as `(baseline − optimised_mean) × production / 1e6`. Two things were wrong
+> with it. The `/1e6` divisor makes the result **megatonnes** of CH₄, not kilotonnes; and
+> the quantity itself is the *posterior-scaled* difference, whereas the manuscript
+> reports the *inventory-scaled* accounting reduction. Because the posterior reference is
+> not the observed aggregate ratio, the two are not equal — the panel totals are 8.45 and
+> 10.73 Mt CH₄. The ambiguous column is gone; both quantities are now exported under
+> explicit names.
+
+| Column | Definition | Units |
+|--------|------------|-------|
+| `observed_ch4_t` | Reported methane charged to milk in the reference year | t CH₄ |
+| `abs_reduction_mt_ch4` | **Inventory-scaled**: `observed_ch4_t × reduction_mean_pct / 100`. The quantity reported in the manuscript (Table 7, Figure 5) and the one that aggregates against the reported panel inventory. | Mt CH₄ |
+| `abs_reduction_mt_ch4_posterior` | **Posterior-scaled**: `(baseline_intensity − optimized_mean) × production_tonnes`. Internally consistent with the optimisation, but not comparable with a reported inventory. | Mt CH₄ |
+
+Both have `raw_*` counterparts carrying the unguarded solution. Country rankings
+(`Table4_optimization.csv`, Figure 5) use `abs_reduction_mt_ch4`.
+
+Neither is a projected emission saving. Both apply a modelled compositional reduction
+rate to production or to an inventory, under the allocation boundary described in
+`DATA_PROVENANCE.md`, in which the four non-bovine species carry whole-herd methane.
+
 ### Observed Do-No-Harm Behavior
 
 With the R2 defaults (posterior-consistent reference, exact LP solve):
@@ -256,19 +298,34 @@ report a reduction of exactly zero. They do not enter the do-no-harm count.
 ### Sensitivity Grid
 
 The pipeline evaluates 36 parameter combinations over `delta` (TV-distance budget),
-`lambda` (mean vs CVaR weight) and `alpha` (CVaR confidence). Because the LP solves each
-country in milliseconds, R2 runs the grid on the full 181-country panel rather than on a
-20-country subset. The R1 warning `"30% of countries required do-no-harm revert (6/20)"`
-no longer occurs, for the reason given above.
+`lambda` (mean vs CVaR weight) and `alpha` (CVaR confidence), on the **full analysed
+panel**: 181 countries × 36 configurations = **6,516 country-configuration solves**. The
+R1 warning `"30% of countries required do-no-harm revert (6/20)"` no longer occurs, for
+the reason given above.
+
+> **Corrected in R3.** R2 described the full-panel grid in the manuscript and deposited a
+> full-panel result, but `run_sensitivity_grid` still defaulted to `n_countries_max=20`
+> and `run-all` did not override it, so the public entry point regenerated a 720-row grid
+> rather than the reported 6,516-row one. The default is now the whole panel; the top-20
+> restriction survives as a *derived summary* (`sensitivity_summary_top20.csv`) for
+> comparability with R1, and as the explicit `--sensitivity-countries N` flag. On current
+> hardware the full grid takes ~12 s, so there is no longer a runtime reason to subset.
 
 Two properties of the grid are worth noting, both reported in the manuscript:
-- `delta` is the only parameter that changes the result. The mean reduction rises
-  2.44% → 8.08% → 11.91% → 15.92% for `delta` = 0.01/0.05/0.10/0.20 and does **not**
-  saturate on the full panel; the median saturates at `delta` = 0.05.
-- The optimal composition is invariant to `lambda` and `alpha` to within 1e-16 in every
-  weight, because the species ordering by posterior mean intensity coincides with the
-  ordering by upper-tail intensity. The risk term therefore acts as a robustness check
-  rather than as a distinct decision rule in this panel.
+- `delta` is the only parameter that changes the result materially. The mean reduction
+  rises 2.44% → 8.08% → 11.91% → 15.92% for `delta` = 0.01/0.05/0.10/0.20 and does
+  **not** saturate on the full panel; the median saturates at `delta` = 0.05.
+- The optimal composition is invariant to `lambda` and `alpha` for **180 of the 181
+  countries at every budget**, to within 1e-15, because the species ordering by posterior
+  mean intensity coincides with the ordering by upper-tail intensity. There is exactly
+  one exception in the whole grid: Indonesia at `delta` = 0.20 under
+  `lambda` = 0.20, `alpha` = 0.95, where the LP selects a different vertex of the budget
+  face (it retains 2.24 pp of buffalo instead of moving it to goats). The alternative is
+  genuinely optimal for that objective, not a numerical tie — it improves that objective
+  by 2.4e-05 and is worse under the other eight — and it moves the panel mean by 0.0025
+  percentage points, from 15.9230% to 15.9205%. The risk term therefore acts as a
+  robustness check rather than as a distinct decision rule almost everywhere in this
+  panel, with that single documented exception.
 
 ### Verification
 
@@ -322,16 +379,44 @@ All warnings are documented in detail in their respective sections above.  If a 
 
 ## Reproducibility for Manuscript
 
-### Full Pipeline Execution
+### The short route: everything except the MCMC
+
+Every stage downstream of the sampler depends on the posterior only through a
+`(500, 182, 5)` array of latent species intensities. That array is deposited, at 3.5 MB
+against 1.6 GB for the full posterior archive, so the reported analysis regenerates from
+the repository alone:
 
 ```bash
-# Full pipeline (Bayesian + all downstream)
-methane-portfolio run-all --chains 16 --draws 8000 --tune 15000
-methane-portfolio run-all --chains 16 --draws 8000 --tune 15000 --target-accept 0.95
-
-# Fast path (skip Bayesian, uses cached posterior if available)
-methane-portfolio run-all --skip-bayes
+cp outputs_R3/posterior_intensity_draws.npz outputs/
+methane-portfolio run-all --skip-bayes     # ~20 s
+python scripts/reproduce.py --no-run       # manifest + scope verification
 ```
+
+This produces the per-country optimisation, the **6,516-row** sensitivity grid
+(181 countries × 36 configurations), the uncertainty propagation, and every figure and
+table. `reproduce.py` then prints:
+
+```
+[OK] Sensitivity grid: 6516 rows = 181 countries x 36 configurations
+[OK] Optimisation export carries both absolute-reduction quantities
+```
+
+and fails loudly if either scope check does not hold. Compare `outputs/` against
+`outputs_R3/` — the deposited artefacts of this release, with `SHA256SUMS.txt`.
+
+### The long route: from the sampler
+
+```bash
+methane-portfolio run-all --chains 16 --draws 8000 --tune 15000 --target-accept 0.95
+```
+
+This re-runs the MCMC (16 chains × 8,000 draws after 15,000 tuning steps, seed 42) and
+writes both `bayes_posterior.nc` and a fresh `posterior_intensity_draws.npz`. Exact
+reproduction of the draws requires the recorded software environment as well as the
+seeds; `reproducibility_manifest.json` records the environment of any given run. The
+reference run used the `nutpie` sampler, which the pipeline auto-detects and prefers over
+the PyMC NUTS implementation when it is installed — a detail that matters, since the two
+do not produce identical chains from the same seed.
 
 ### Reproducibility Manifest
 
@@ -343,7 +428,8 @@ python scripts/reproduce.py --skip-bayes
 - Run parameters (chains, draws, tune, seeds)
 - Git commit hash + dirty state
 - Full package versions (`pip freeze`)
-- SHA-256 checksums for all key output files
+- SHA-256 checksums for the frozen **inputs** and for all key output files
+- `manuscript_scope_checks`: whether this run has the scope the manuscript reports
 
 ### Fixed Seeds
 

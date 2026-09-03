@@ -20,8 +20,13 @@ With the Rockafellar-Uryasev representation of CVaR, the whole problem is linear
 The original implementation solved this with SLSQP started at x0 = (w_ref, 0),
 which is exactly the non-differentiable kink of |w - w_ref|; that is the source of
 the reported convergence failures. HiGHS solves the LP form exactly, so every
-country attains a certified optimum and no "best feasible solution" fallback,
-weight renormalisation or TV re-projection is needed.
+country attains a certified optimum: there is no "best feasible solution" fallback
+and no TV re-projection.
+
+On the returned vector the only post-processing is a clip at zero and a division by
+the sum -- housekeeping against floating-point noise in the simplex constraint, of
+order 1e-16, not a feasibility repair. Calling that "no renormalisation" would be
+inaccurate, so it is stated as what it is.
 
 Variable layout:  x = [ w (S) | t (1) | u (K) | z (S) ]
 """
@@ -130,6 +135,9 @@ def solve_lp(w_ref, I_scen, *, lam=0.5, alpha=0.90, delta=0.10,
                 "message": str(res.message)}
 
     w = np.asarray(res.x[iw], dtype=float)
+    # Numerical housekeeping only. The LP already enforces w >= 0 and sum(w) == 1;
+    # what survives here is float noise at the 1e-16 level, so the clip and the
+    # division are cosmetic, not a repair of an infeasible solution.
     w = np.clip(w, 0.0, None)
     if not allow_expansion:
         w[w_ref == 0.0] = 0.0
