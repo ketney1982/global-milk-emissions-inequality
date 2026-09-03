@@ -1,5 +1,41 @@
 # Changelog
 
+## R3.1 - 3 September 2026
+
+Audit-trail release. No change to code, inputs, outputs or any reported value. The tag
+exists so that the deposited verification manifest and the release it certifies agree.
+
+### Corrected: the verification manifest was written from a dirty pre-release tree
+
+`outputs_R3/reproducibility_manifest_verification.json` recorded
+`commit = ec2fbb88ffc9165e709d0cb0f9473c9ca91395cd` with `dirty = true`, because it was
+generated while R3 was being prepared rather than after the R3 commit. Every checksum in
+it was correct and every scope check passed, but nothing in the file told a reader that:
+its own provenance was a modified working tree at an earlier commit, which is exactly the
+thing a verification manifest is supposed to rule out.
+
+The manifest was regenerated with the verification-only entry point,
+`python scripts/reproduce.py --no-run`, on a clean checkout of `v3.0.0-R3`. It now records
+`commit = 0059918d0c64fa32fc1cf0f886537e85ea1fdbea`, `dirty = false`. The regenerated file
+is byte-identical to its predecessor apart from `timestamp_utc` and the `git` block: the
+four input checksums, the sixteen output checksums, `pip_freeze`, the interpreter and the
+platform are all unchanged, and `manuscript_scope_checks.all_pass` remains `true`
+(6,516 grid rows = 181 countries x 36 configurations; both absolute-reduction columns
+present, the ambiguous one absent).
+
+Because a file committed into a tree cannot carry that tree's own hash, the manifest inside
+`v3.0.1-R3` names the `v3.0.0-R3` commit - the commit that produced the deposited outputs.
+That is the intended reading, and `DATA_PROVENANCE.md` now says so.
+
+### Corrected: `git rev-parse v3.0.0-R3` does not return the release commit
+
+`DATA_PROVENANCE.md` told the reader to resolve the release with
+`git rev-parse v3.0.0-R3`. Both release tags are *annotated*, so that command returns the
+tag object - `90a53a997fcccc7a91a40568e2ed1a21984d4cdc` for R3 - and not the commit
+`0059918d0c64fa32fc1cf0f886537e85ea1fdbea` cited in the manuscript. A reader following the
+instruction literally saw two unrelated hashes and no explanation for the difference. The
+instruction is now `git rev-list -n 1 <tag>`, which dereferences the tag to its commit.
+
 ## R3 - 3 September 2026
 
 Reproducibility release. R2 corrected the science; R3 makes the **public entry point
