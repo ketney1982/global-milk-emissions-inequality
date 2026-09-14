@@ -335,7 +335,9 @@ def fig2_country_quadrants(
 
 
 # ===================================================================
-# Figure 3: Regime shift posteriors
+# Figure 3: posteriors of the post-2022 level term (gamma_s). With four annual
+# observations this term is weakly separable from the linear trend and is a
+# flexible temporal adjustment, NOT an identified regime shift.
 # ===================================================================
 
 def fig3_regime_shift(
@@ -360,7 +362,7 @@ def fig3_regime_shift(
     species_idx = [index_by_species[sp] for sp in species_order]
 
     fig, ax = plt.subplots(figsize=(7, 4), constrained_layout=True)
-    _setup_ax(ax, "Posterior Regime-Shift Parameters (\u03b3\u209b, t \u2265 2022)")
+    _setup_ax(ax, "Posterior Post-2022 Level Term (\u03b3\u209b, t \u2265 2022)")
 
     parts = ax.violinplot(
         [gamma_flat[:, src_idx] for src_idx in species_idx],

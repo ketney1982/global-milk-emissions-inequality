@@ -66,7 +66,11 @@ DEFAULT_WEIGHT_METHOD: str = "avg"
 # ---------------------------------------------------------------------------
 # Bayesian model
 # ---------------------------------------------------------------------------
-REGIME_SHIFT_YEAR: int = 2022  # 1[t >= 2022]
+REGIME_SHIFT_YEAR: int = 2022  # 1[t >= 2022]; the identifier is historical. The
+# term it switches on is a post-2022 LEVEL ADJUSTMENT, not an identified regime
+# shift: with four annual observations it is weakly separable from the linear
+# trend, its posterior is centred on zero for all five species, and it is not
+# interpreted as evidence of a structural break anywhere in the manuscript.
 BAYES_RHAT_THRESHOLD: float = 1.01
 BAYES_RHAT_THRESHOLD_RELAXED: float = 1.10
 BAYES_ESS_MIN: int = 400

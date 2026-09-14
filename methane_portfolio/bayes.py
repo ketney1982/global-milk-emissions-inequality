@@ -307,8 +307,10 @@ def fit_model(
         logger.warning(
             "Slow mixing in the non-centred pair: tau (R-hat=%.3f, ESS_bulk=%.0f, "
             "ESS_tail=%.0f) and u_c_raw (max R-hat=%s, min ESS_bulk=%s, min "
-            "ESS_tail=%s). These two are only jointly identified, so this is a "
-            "scale/offset trade-off rather than a failure of the country effects "
+            "ESS_tail=%s). The likelihood constrains their product far more tightly "
+            "than either factor, so this is a weakly identified scale/offset "
+            "trade-off with poor posterior geometry, not a structural "
+            "non-identifiability and not a failure of the country effects "
             "themselves; see the u_c block below.",
             diag["tau_rhat"], diag["tau_ess_bulk"], diag["tau_ess_tail"],
             _fmt(uc_raw.get("max_rhat")), _fmt(uc_raw.get("min_ess_bulk"), 0),
@@ -508,8 +510,10 @@ def _compute_diagnostics(idata: az.InferenceData) -> dict:
     direct_vars = ["alpha_s", "beta_s", "gamma_s", "sigma_s", "nu"]
     summary_direct = az.summary(idata, var_names=direct_vars, round_to="none")
 
-    # Hyperparameter (random-effect scale) and the raw offsets it multiplies.
-    # These are only jointly identified, so they are assessed together.
+    # Hyperparameter (random-effect scale) and the raw offsets it multiplies. The
+    # likelihood constrains only their product, so the factorisation is weakly
+    # identified and the two are assessed together. The zero-sum prior fixes the
+    # scale of the raw offsets, so tau is formally identified.
     summary_hyper = az.summary(idata, var_names=["tau"], round_to="none")
     summary_raw = _summary_or_none(idata, "u_c_raw")
 

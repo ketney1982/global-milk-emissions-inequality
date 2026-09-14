@@ -161,7 +161,7 @@ Parameters that directly enter the linear predictor and affect downstream intens
 |-----------|-------------|
 | `alpha_s` | Species intercepts |
 | `beta_s`  | Species time slopes |
-| `gamma_s` | Species regime-shift effects (post-2022) |
+| `gamma_s` | Species post-2022 level term (not an identified regime shift) |
 | `sigma_s` | Species-level observation noise |
 | `nu`      | Student-t degrees of freedom |
 
@@ -174,8 +174,11 @@ If direct parameters fail even the relaxed thresholds, the pipeline raises `Conv
 
 Country intercepts are parameterised as `u_c = tau × u_c_raw`. Under a non-centred
 parameterisation the likelihood constrains the **product**, not either factor, so
-`tau` and `u_c_raw` are only jointly identified and the sampler is free to trade
-scale against raw offsets. Both therefore mix slowly, by the same margin. Slow
+`tau` and `u_c_raw` are weakly identified **from the likelihood**, which constrains only
+their product, so the sampler is free to trade scale against raw offsets. The zero-sum
+prior does fix the scale of the raw offsets, so `tau` is **formally identified**; what the
+diagnostics show is weak identification and poor posterior geometry, not structural
+non-identifiability. Both factors therefore mix slowly, by the same margin. Slow
 mixing of a random-effect scale is a well-documented pathology in hierarchical
 models with many groups (181 countries) and sparse data (4 years).
 
@@ -219,7 +222,7 @@ With the reference sampling configuration (16 chains × 8,000 draws, 15,000 tuni
 
 - **Zero divergences** across all 16 chains.
 - All species-level parameters pass **strict** convergence thresholds (R-hat < 1.01, ESS ≥ 400) by wide margins.
-- `tau` and `u_c_raw` both exhibit the expected slow mixing (R-hat = 1.19, ESS bulk = 65). They are the two factors of one product and are only jointly identified, so this is a weakly identified factorisation, not unreliable country effects.
+- `tau` and `u_c_raw` both exhibit the expected slow mixing (R-hat = 1.19, ESS bulk = 65). They are the two factors of one product, which the likelihood constrains far more tightly than either factor; the zero-sum prior leaves `tau` formally identified, so this is a weakly identified factorisation with poor posterior geometry, not unreliable country effects and not structural non-identifiability.
 - The identified combination `u_c` passes the strict thresholds at **every one of the 182 country levels** (max R-hat 1.007, min ESS bulk 2,551, min ESS tail 994). Since `u_c` is what enters the linear predictor, the country-level posterior intensities used as optimisation scenarios are well mixed.
 - What remains genuinely uncertain is `tau` itself, i.e. the **magnitude of between-country dispersion**. That quantity is not interpreted as a substantive result anywhere in the analysis. The earlier claim in this file — that slow `tau` mixing "does not affect downstream results" — was asserted rather than demonstrated; the `u_c` row above is the demonstration.
 
@@ -230,21 +233,21 @@ The pipeline automatically performs posterior predictive checks on a subsample o
 | PPC Metric | Value | Interpretation |
 |-----------|-------|----------------|
 | Residual mean | 0.106 | Slight positive bias — model marginally underestimates |
-| Residual **median** | 0.001 | Effectively zero — bias is driven by outliers |
+| Residual **median** | 0.001 | Effectively zero — the bias sits in the tail, not the bulk |
 | Trimmed mean (10%) | 0.027 | Near-zero after trimming tail observations |
-| 90% CI coverage | 93.6% | Well-calibrated (expected: ~90%) |
+| 90% CI coverage | 93.6% | Consistent with slightly conservative intervals (nominal 90%); coverage alone cannot establish that the dispersion is correct |
 | \|residual\| > 2 | 124 / 1,615 (7.7%) | Consistent with heavy-tailed Student-t likelihood |
-| \|residual\| > 3 | 50 / 1,615 (3.1%) | Genuine outliers in the data |
+| \|residual\| > 3 | 50 / 1,615 (3.1%) | Extreme reported ratios, all non-bovine; source verification warranted |
 
 **Why the residual mean exceeds the 0.05 warning threshold:**
 
-The bias is driven entirely by a small number of **genuine data outliers** — not model misspecification.  The top outliers are:
+The bias is concentrated in a small number of **extreme reported ratios**. These are extreme values of the reported accounting ratio that warrant source verification; they are not demonstrated data errors, and their presence does not by itself establish that the model is correctly specified. Every one of the fifty observations with an absolute residual above three is non-bovine. The largest are:
 
-1. **Kuwait — sheep milk** (all 4 years): Species share ~0.5% but emission intensity ~13 kg CO₂e/t — among the highest globally for sheep milk.  The model's partial pooling pulls the prediction toward the global sheep mean, producing large positive residuals (|r| ≈ 4.8).
-2. **Russia — sheep milk** (all 4 years): Species share ~0.015% with anomalously high intensity (~28–34 kg CO₂e/t).  Same mechanism as Kuwait.
-3. **Czechia — sheep milk** (2022): Share effectively zero (0.003%) with elevated intensity.
+1. **Kuwait — sheep milk** (all 4 years): species share ~0.5%, reported ratio ~12,700–13,200 g CH4 per kg raw milk — among the highest reported for sheep milk. Partial pooling pulls the prediction toward the global sheep mean, producing large positive residuals (|r| ≈ 4.8).
+2. **Russian Federation — sheep milk** (all 4 years): species share ~0.017%, reported ratio ~27,000–34,000 g CH4 per kg raw milk. Same mechanism as Kuwait.
+3. **Czechia — sheep milk** (2022): share effectively zero (0.003%), reported ratio ~14,300 g CH4 per kg raw milk.
 
-These outliers share a pattern: **extremely low species shares combined with anomalously high intensities**.  The Student-t likelihood accommodates these heavy tails without distorting the bulk of estimates.  The median residual of 0.001 and the 93.6% coverage confirm that the model is well-calibrated for the vast majority of observations.
+These cases share a pattern: **very low species shares combined with very high reported ratios**, which is what the whole-herd numerator produces when milk output is small relative to herd size. The Student-t likelihood accommodates such heavy tails without distorting the bulk of the estimates. The median residual of 0.001 and the 93.6% pooled coverage are consistent with adequate calibration over most of the panel, but coverage alone cannot establish that the dispersion is correctly specified, and the pooled figure conceals a systematic difference between species: coverage is 91.7% for cattle against 95.4% for camels and 96.4% for goats, and the mean log residual is essentially zero for cattle but positive for all four non-bovine species (`evidence/06_boundary_sensitivity/panelG_ppc_by_species.csv`).
 
 Full outlier details are in `outputs/bayes_ppc_outliers.csv`.
 
@@ -398,7 +401,7 @@ These warnings are **purely cosmetic** — they reflect MinGW linker configurati
 | Warning | Severity | Explanation |
 |---------|----------|-------------|
 | `tau` R-hat > 1.01 / low ESS | ⚠️ Expected | Hierarchical hyperparameter slow mixing — see [Bayesian Model Convergence Protocol](#bayesian-model-convergence-protocol) |
-| PPC residual mean > 0.05 | ⚠️ Expected | Driven by outliers (Kuwait, Russia sheep milk) — see [PPC Interpretation](#posterior-predictive-check-ppc-interpretation) |
+| PPC residual mean > 0.05 | ⚠️ Expected | Concentrated in extreme reported ratios (Kuwait, Russian Federation sheep milk) — see [PPC Interpretation](#posterior-predictive-check-ppc-interpretation) |
 | "Do-no-harm guard triggered" | ℹ️ By design | Conservative safety constraint — see [Optimization Transparency](#optimization-transparency) |
 | "30% of countries required do-no-harm revert" | ℹ️ By design | Specific to tight sensitivity grid cells — see [Sensitivity Grid Warning](#sensitivity-grid-warning-30-of-countries-required-do-no-harm-revert) |
 
