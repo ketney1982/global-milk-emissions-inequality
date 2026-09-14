@@ -30,7 +30,7 @@ Panels A–H back Tables 2 and S4–S5 of the submission.
 
 ## `07_supporting_analyses/`
 
-Robustness checks reported in Supplementary Sections S4.2–S4.8 and S4.12.
+Robustness checks reported in Supplementary Sections S4.2 to S4.9.
 
 | File | Supplementary section | Content |
 | --- | --- | --- |
@@ -40,9 +40,19 @@ Robustness checks reported in Supplementary Sections S4.2–S4.8 and S4.12.
 | `influence_summary_both_estimands.csv` | S4.4 | decompositions recomputed with the largest 1, 5 and 10 contributors removed, on both estimands |
 | `finite_draw_stability.csv`, `finite_draw_stability_repeats.csv` | S4.5 | the linear program re-solved on subsamples of the deposited draws (100, 250, 500; 15 repeats at the first two) |
 | `dirichlet_concentration_sensitivity.csv` | S4.6 | the reference mix perturbed as a Dirichlet draw at concentrations 50, 200, 1,000, 20,000 and infinity, 10 repeats at each finite concentration |
+| `implied_dirichlet_concentration.csv`, `implied_dirichlet_concentration.py` | S4.6 | the concentration implied by the observed 2020–2023 variability of national species shares (method of moments; median 23,244, tenth percentile 700 over the 112 countries where it is identifiable) |
 | `trend_step_separability.csv` | S4.7 | separability of the species trend from the post-2022 step |
 | `zero_methane_cells.csv` | S4.8 | cells carrying positive milk output and a reported methane value of zero |
-| `absent_reporting_entities.csv` | S4.12 | FAOSTAT reporting entities absent from the frozen analytical extraction |
+| `absent_reporting_entities.csv` | S4.9 | FAOSTAT reporting entities absent from the frozen analytical extraction |
+
+### One result corrected here
+
+The direction of the optimal reallocation is preserved in all 107 multi-species systems
+under Dirichlet perturbations at concentrations of 20,000 and above — the region the
+observed share variability implies — but not universally under weaker perturbations:
+106–107 systems at 1,000, 104–107 at 200 and 99–103 at 50. An earlier draft stated the
+direction was unchanged at every concentration examined. That was too strong, and the
+manuscript, the Supplementary Materials and this repository now report the range.
 
 ### Two things these files are not
 

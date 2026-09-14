@@ -1,7 +1,7 @@
 """Supporting analyses for the Supplementary Materials (Section S4).
 
 Regenerates, from the deposited frozen inputs and the deposited posterior draw
-array, the robustness checks reported in Supplementary Sections S4.2 to S4.8:
+array, the robustness checks reported in Supplementary Sections S4.2 to S4.9:
 
   S4.2  robust species summaries (median, IQR, 20% trimmed mean, raw mean, and the
         raw mean recomputed without denominator-collapse cells)
@@ -11,7 +11,7 @@ array, the robustness checks reported in Supplementary Sections S4.2 to S4.8:
   S4.6  Dirichlet concentration sensitivity of the reference mix
   S4.7  trend / post-2022 step separability (copied from the deposited output)
   S4.8  cells carrying positive milk output and a reported methane value of zero
-  S4.12 FAOSTAT reporting entities absent from the frozen analytical extraction
+  S4.9  FAOSTAT reporting entities absent from the frozen analytical extraction
 
 The mean-CVaR linear program is imported from boundary_sensitivity.py, so the same
 implementation that reproduces the deposited country-level reductions to 1.3e-13
@@ -38,7 +38,7 @@ COLLAPSE_M = 0.25          # and milk below this fraction of the cell's own maxi
 
 # FAOSTAT reporting entities that carry milk and emissions records upstream but are
 # absent from the three frozen analytical tables. The criterion that removed them is
-# not recoverable from the archived artefacts; see S4.12.
+# not recoverable from the archived artefacts; see S4.9.
 ABSENT = [
     (682, "Saudi Arabia", "cattle, camels, goats, sheep"),
     (760, "Syrian Arab Republic", "cattle, goats, sheep, camels"),
@@ -244,7 +244,7 @@ def main():
     dc.to_csv(OUT + "dirichlet_concentration_sensitivity.csv", index=False)
     print(dc.to_string(index=False))
 
-    print("\nS4.12 entities absent from the frozen extraction")
+    print("\nS4.9 entities absent from the frozen extraction")
     present = set(ei.country_m49.unique())
     rows = []
     for m49, name, spp in ABSENT:
