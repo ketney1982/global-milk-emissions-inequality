@@ -1,0 +1,6 @@
+sp,n,coverage_90ci_pct,mean_log_residual,median_log_residual,n_abs_resid_gt_2,n_abs_resid_gt_3
+cattle,723,91.7,0.0016,0.0004,0,0
+buffalo,74,91.89,0.3078,0.0456,6,5
+sheep,291,93.81,0.1888,0.1563,38,18
+camel,108,95.37,0.112,0.0613,21,11
+goats,419,96.42,0.1909,0.0103,59,16

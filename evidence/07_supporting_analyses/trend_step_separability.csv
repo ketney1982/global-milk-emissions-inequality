@@ -1,0 +1,6 @@
+species,beta_mean,beta_sd,gamma_mean,gamma_sd,beta_z,gamma_z,opposite_sign,sd_ratio_gamma_over_beta,gamma_abs_z_below_1,gamma_credible_interval_excludes_zero
+buffalo,-0.0513,0.1444,0.0239,0.3034,-0.3556,0.0788,True,2.1013,True,False
+camel,0.0485,0.1955,-0.0134,0.3885,0.2482,-0.0344,True,1.9866,True,False
+cattle,-0.006,0.0021,0.0045,0.0044,-2.8512,1.0228,True,2.0821,False,False
+goats,0.0037,0.1214,0.0045,0.262,0.0304,0.0173,False,2.1589,True,False
+sheep,0.0188,0.1289,-0.0003,0.276,0.1461,-0.0012,True,2.141,True,False

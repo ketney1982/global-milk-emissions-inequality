@@ -1,0 +1,9 @@
+{
+  "seed": 20230101,
+  "trim": 0.2,
+  "collapse_quantile": 0.99,
+  "collapse_milk_fraction": 0.25,
+  "delta": 0.1,
+  "lambda": 0.5,
+  "alpha": 0.9
+}

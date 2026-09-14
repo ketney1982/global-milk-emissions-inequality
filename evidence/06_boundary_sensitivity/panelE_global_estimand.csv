@@ -1,0 +1,13 @@
+quantity,value_g_ch4_per_kg
+world_ratio_2020,47.41747074765995
+world_ratio_2023,46.27283731059594
+world_ratio_change,-1.1446334370640088
+shapley3_geography,1.531148391059638
+shapley3_within_country_species_mix,-4.393465089456303
+shapley3_country_species_intensity,1.717683261332656
+shapley3_sum,-1.1446334370640088
+shapley3_identity_error,0.0
+fixed_country_weight_struct,-4.28127906487773
+fixed_country_weight_within,1.850106393124398
+fixed_country_weight_net,-2.431172671753332
+n_countries,181.0

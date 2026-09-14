@@ -1,5 +1,54 @@
 # Changelog
 
+## v3.1.0-R4
+
+Revision accompanying the submission to *Animals* (Section: Animal System and Management).
+No value produced by the R3 pipeline changed; this release adds the analyses the revised
+manuscript reports and corrects two statements about the repository itself.
+
+### Added
+
+- `evidence/06_boundary_sensitivity/` — allocation-boundary and functional-unit
+  sensitivity, the exact three-factor decomposition of the world aggregate ratio, the
+  eligible-subgroup reductions, species-stratified posterior predictive coverage and the
+  zero-methane cells (panels A–H), with the script that produces them. The script
+  contains an independent re-implementation of the mean–CVaR linear program and
+  reproduces the deposited country-level reductions to 1.279e-13 percentage points and
+  the deposited global Shapley components exactly.
+- `evidence/07_supporting_analyses/` — the robustness checks reported in Supplementary
+  Sections S4.2–S4.8 and S4.12: robust species summaries and the denominator-collapse
+  rule, country–species reporting coverage, finite-draw subsampling stability, Dirichlet
+  concentration sensitivity, and the FAOSTAT reporting entities absent from the frozen
+  extraction.
+- `evidence/README.md` — what each output file backs, and what these files are not.
+- `outputs_R3/` now also carries the posterior predictive and validation diagnostics and
+  the influence and trend-step summaries that the two scripts read.
+
+### Changed
+
+- README reframed to match the manuscript: the pipeline produces accounting quantities,
+  not a mitigation potential; "portfolio optimization" is described as a bounded
+  species-mix reallocation scenario; the post-2022 term is no longer called a regime
+  shift; the non-convergence of the country-dispersion hyperparameter is stated up front.
+- Both revision scripts resolve their input paths automatically, so they run unchanged
+  from a clean clone and from the manuscript's evidence tree.
+
+### Corrected
+
+- **Dirichlet concentration sensitivity.** The previous draft stated that perturbing the
+  reference mix left the direction of the optimal move toward cattle unchanged in all 107
+  multi-species systems at every concentration examined. The regenerated analysis shows
+  this holds at concentrations of 20,000 and above, but not at weaker concentrations: the
+  direction is preserved in 106–107 systems at 1,000, 104–107 at 200 and 99–103 at 50.
+  The manuscript and Supplementary Materials have been corrected accordingly.
+- **Pre-specified protocol.** Earlier drafts described a written protocol "deposited
+  before any of those analyses was run", with a fingerprint in the release manifest. No
+  such document was deposited. The rules were fixed before the corresponding analyses were
+  run and are specified in full in the Supplementary Materials and in
+  `evidence/07_supporting_analyses/supporting_analyses_config.json`; the claim of a
+  deposited protocol has been withdrawn from the manuscript, the Supplementary Materials
+  and this repository.
+
 ## R3.1 - 3 September 2026
 
 Audit-trail release. No change to code, inputs, outputs or any reported value. The tag

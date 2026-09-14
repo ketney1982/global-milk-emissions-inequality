@@ -1,0 +1,11 @@
+{
+  "residual_mean": 0.10586301704228851,
+  "residual_median": 0.0008910380655002825,
+  "residual_trimmed_mean_10pct": 0.02736913048773224,
+  "residual_max_abs": 4.88816477283939,
+  "residual_q95_abs": 2.3345807781238728,
+  "coverage_90ci": 0.9356037151702786,
+  "n_abs_residual_gt_2": 124,
+  "n_abs_residual_gt_3": 50,
+  "n_obs": 1615
+}

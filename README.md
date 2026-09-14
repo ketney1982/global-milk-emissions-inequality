@@ -1,6 +1,21 @@
-# Decoupling Methane from Milk
+# Species Composition and Reported Methane Intensity in Multispecies Dairy Systems
 
-**Bayesian Species Portfolio Optimization under Structural Constraints (2020–2023)**
+**Exact decomposition, uncertainty-aware bounded species-mix reallocation, and accounting-boundary sensitivity across 181 countries (2020–2023)**
+
+> **Scope note.** Every quantity produced by this pipeline is an *accounting* quantity.
+> The reallocation scenario measures how far a reported methane-intensity metric responds
+> to a bounded change in the species composition of milk output; it is **not** a mitigation
+> potential, **not** a feasibility assessment and **not** a recommendation to substitute one
+> milking species for another. For the four non-bovine species the numerator is whole-herd
+> methane charged against milk alone, so the species ordering is a property of the
+> accounting boundary and not a measure of biological efficiency.
+
+> **Panel coverage.** The analytical panel is global in geographical coverage but is not an
+> exhaustive census of FAOSTAT reporting entities: five entities that carry milk and
+> emissions records upstream are absent from the frozen extraction for reasons not
+> recoverable from the archived artefacts. They are listed in
+> `evidence/07_supporting_analyses/absent_reporting_entities.csv`. No reconstruction or
+> imputation was performed.
 
 **Author:** Ketney Otto
 **Affiliation:** „Lucian Blaga" University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Rațiu Street, no. 7-9, 550012 Sibiu, Romania
@@ -12,11 +27,25 @@ This repository implements a reproducible research pipeline to:
 
 1. **Validate** the accounting identity $ I_{ct} = \sum_s w_{cts} \cdot I_{cts} $
 2. **Decompose** changes in emission intensity via exact two-factor Shapley values
-3. **Fit** a Bayesian hierarchical model with species-level partial pooling and regime shift
-4. **Optimize** species portfolios via robust (CVaR) optimization with feasibility constraints
+3. **Fit** a Bayesian hierarchical model with species-level partial pooling, used as a descriptive smoother of the reported country–species intensities (the post-2022 level term is not an identified regime shift and is not interpreted as one)
+4. **Solve** a bounded species-mix reallocation scenario, formulated as an exact mean–CVaR linear program under explicit composition constraints
 5. **Propagate** uncertainty using posterior draws + Dirichlet share perturbation
 6. **Generate** publication-quality figures and tables
 7. **Auto-write** a Methods Appendix
+
+## Reproducing the revised (R4) analyses
+
+Neither script re-runs the sampler; both read the deposited posterior draw array.
+
+```bash
+python evidence/06_boundary_sensitivity/boundary_sensitivity.py   # boundary + functional unit
+python evidence/07_supporting_analyses/supporting_analyses.py     # S4 robustness checks
+```
+
+`boundary_sensitivity.py` prints two reproduction checks on startup: the deposited
+country-level reductions to `1.279e-13` percentage points (panel mean 11.9065%, median
+2.3785%) and the deposited global Shapley components exactly (`-4.2813` / `+1.8501`).
+See [`evidence/README.md`](evidence/README.md) for what each output file backs.
 
 ## Quick Start
 
@@ -92,8 +121,8 @@ python scripts/reproduce.py --skip-bayes
 ## Key Scientific Features
 
 - **Structural-consistent inference**: National intensity modelled as mixture $I_{ct} = \sum w_{cts} I_{cts}$
-- **Bayesian partial pooling + regime shift**: Student-t likelihood with $\gamma_s \cdot \mathbf{1}[t \geq 2022]$
-- **Robust portfolio optimization**: Minimizes $\lambda E[I] + (1-\lambda) \text{CVaR}_\alpha(I)$ via Rockafellar-Uryasev
+- **Bayesian partial pooling**: Student-t likelihood with a post-2022 level term $\gamma_s \cdot \mathbf{1}[t \geq 2022]$. Four annual observations cannot separate that term from the linear trend, so it is a flexible temporal adjustment and **not** a detected structural break. The country-dispersion hyperparameter $\tau$ does not converge and is never interpreted; the identified product $u_c = \tau u_{c,\mathrm{raw}}$ does converge and is what enters the linear predictor.
+- **Bounded species-mix reallocation**: Minimizes $\lambda E[I] + (1-\lambda) \text{CVaR}_\alpha(I)$ via Rockafellar-Uryasev, solved as an exact linear program under explicit composition constraints. In this panel the risk term is empirically inert and functions as a stability diagnostic on the species ordering rather than as a distinct decision rule.
 - **Editorial traceability**: `robust_optimization_results.csv` keeps both raw (`raw_*`) and guarded outputs, with `robust_optimization_audit.json` documenting every do-no-harm intervention
 - **Causal guardrails**: All results are labelled as accounting counterfactuals; causal language triggers errors
 
@@ -343,7 +372,7 @@ This script validates that:
 
 ## Causal Guardrails
 
-All results are **accounting counterfactuals / scenario-based analyses**.  They quantify "what if country X shifted its species portfolio" under the structural model — they do **not** imply causal effects.  No covariates supporting causal identification (e.g., policy instruments, farm-level interventions) are present in the data.
+All results are **accounting counterfactuals / scenario-based analyses**.  They quantify "what if country X shifted its milk-species production mix" under the structural model — they do **not** imply causal effects.  No covariates supporting causal identification (e.g., policy instruments, farm-level interventions) are present in the data.
 
 The `CAUSAL_DISCLAIMER` is embedded in all generated reports and appendices.
 

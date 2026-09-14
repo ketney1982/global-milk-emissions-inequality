@@ -1,0 +1,10 @@
+scenario,delta_struct_g_per_kg,delta_within_g_per_kg,delta_net_g_per_kg,max_identity_error,n_countries
+"Whole-herd numerator, raw milk (reported)",-4.2813,1.8501,-2.4312,4.55e-13,181
+Uniform allocation ratio r = 0.75,-3.1491,1.1403,-2.0088,1.82e-12,181
+Uniform allocation ratio r = 0.50,-2.0169,0.4305,-1.5864,4.55e-13,181
+Uniform allocation ratio r = 0.25,-0.8848,-0.2793,-1.1641,5.68e-13,181
+Uniform allocation ratio r = 0.10,-0.2055,-0.7052,-0.9106,2.27e-13,181
+Illustrative species-differentiated allocation,-1.2256,-0.5446,-1.7702,3.41e-13,181
+Per kg FPCM,-2.9664,0.9539,-2.0125,9.09e-13,181
+Per kg total-solids equivalent,-3.0672,0.9512,-2.116,3.18e-12,181
+FPCM + illustrative differentiated allocation,-0.8173,-0.6804,-1.4978,4.55e-13,181

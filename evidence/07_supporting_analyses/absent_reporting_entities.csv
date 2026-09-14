@@ -1,0 +1,6 @@
+country,m49,species_potentially_affected,present_in_frozen_inputs,status,reason
+Saudi Arabia,682,"cattle, camels, goats, sheep",False,absent from the frozen analytical extraction,not recoverable from the archived artefacts; no post hoc reconstruction or imputation performed
+Syrian Arab Republic,760,"cattle, goats, sheep, camels",False,absent from the frozen analytical extraction,not recoverable from the archived artefacts; no post hoc reconstruction or imputation performed
+United Arab Emirates,784,"cattle, camels, goats",False,absent from the frozen analytical extraction,not recoverable from the archived artefacts; no post hoc reconstruction or imputation performed
+Central African Republic,140,"cattle, goats",False,absent from the frozen analytical extraction,not recoverable from the archived artefacts; no post hoc reconstruction or imputation performed
+South Africa,710,"cattle, goats, sheep",False,absent from the frozen analytical extraction,not recoverable from the archived artefacts; no post hoc reconstruction or imputation performed
