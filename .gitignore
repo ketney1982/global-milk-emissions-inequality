@@ -207,3 +207,7 @@ private/
 # Local run verification artifacts
 verify_output*.txt
 *outputs - Copie
+CHANGELOG.md
+verify_output_16.txt
+verify_output.txt
+verify_quiet.txt
