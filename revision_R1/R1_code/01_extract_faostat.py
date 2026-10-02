@@ -92,7 +92,8 @@ def main():
     df = df[df.milk_t.notna() & (df.milk_t > 0)]
     cols = ["country", "area_code", "m49", "year", "species", "milk_t", "milk_animals", "stock_gle", "stock_qcl",
             "ch4_enteric_kt", "ch4_manure_kt", "ch4_whole_kt", "flag_milk_t", "flag_milk_animals", "flag_stock_gle",
-            "flag_ch4_enteric_kt", "flag_ch4_manure_kt", "note_milk_t", "note_milk_animals", "note_stock_gle"]
+            "flag_ch4_enteric_kt", "flag_ch4_manure_kt", "note_milk_t", "note_milk_animals", "note_stock_gle",
+            "flag_stock_qcl", "note_stock_qcl", "note_ch4_enteric_kt", "note_ch4_manure_kt"]
     df = df[cols].sort_values(["country", "species", "year"])
     os.makedirs(OUT, exist_ok=True)
     df.to_csv(os.path.join(OUT, "faostat_panel_2020_2023_long.csv"), index=False)

@@ -14,8 +14,8 @@ out = p.rename(columns={
     "delta": "milk_allocation_factor_delta", "I_whole": "ch4_g_per_kg_raw_milk_whole_herd", "I_milk": "ch4_g_per_kg_raw_milk_milk_allocated"})
 cols = ["country", "country_m49", "year", "species", "raw_milk_t", "milk_animals_head_PAS", "total_stock_head_QCL", "total_stock_head_GLE",
         "ch4_enteric_kt", "ch4_manure_kt", "ch4_whole_herd_kt", "milk_allocation_factor_delta", "ch4_g_per_kg_raw_milk_whole_herd",
-        "ch4_g_per_kg_raw_milk_milk_allocated", "flag_milk_t", "flag_milk_animals", "flag_stock_gle", "flag_ch4_enteric_kt", "flag_ch4_manure_kt",
-        "note_milk_t", "note_milk_animals", "note_stock_gle"]
+        "ch4_g_per_kg_raw_milk_milk_allocated", "flag_milk_t", "flag_milk_animals", "flag_stock_gle", "flag_stock_qcl", "flag_ch4_enteric_kt", "flag_ch4_manure_kt",
+        "note_milk_t", "note_milk_animals", "note_stock_qcl", "note_stock_gle", "note_ch4_enteric_kt", "note_ch4_manure_kt"]
 out[cols].to_csv(os.path.join(D, "analytical_panel_2020_2023.csv"), index=False)
 dd = """# Data dictionary - analytical_panel_2020_2023.csv
 
@@ -35,7 +35,8 @@ One row per country x species x year (complete-case series only, see Methods 2.3
 | milk_allocation_factor_delta | PAS / total_stock_head_QCL for non-bovine species; 1 for cattle | fraction |
 | ch4_g_per_kg_raw_milk_whole_herd | 10^6 * ch4_whole_herd_kt / raw_milk_t | g CH4 per kg raw milk |
 | ch4_g_per_kg_raw_milk_milk_allocated | whole-herd intensity * delta | g CH4 per kg raw milk |
-| flag_*, note_* | FAOSTAT flags (A official, E estimated, I imputed, X external) and notes of each component | - |
+| flag_milk_t, flag_milk_animals, flag_stock_qcl, flag_stock_gle, flag_ch4_enteric_kt, flag_ch4_manure_kt | FAOSTAT flag of each component (A official, E estimated, I imputed, X external) | - |
+| note_milk_t, note_milk_animals, note_stock_qcl, note_stock_gle, note_ch4_enteric_kt, note_ch4_manure_kt | FAOSTAT note of each component (empty when FAOSTAT publishes no note; FAOSTAT publishes none for the methane elements in 2020-2023) | - |
 
 No global-warming-potential conversion is applied. The former column name 'kg_co2e_per_ton_milk' of the original files was a misnomer for a CH4 mass ratio and is not used.
 """

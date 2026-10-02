@@ -1,7 +1,7 @@
 {
- "R1_data/DATA_DICTIONARY.md": "958b0e3efb3a2ac9869bcd4a26d53cf6c4f6258dc9bd2897e964397aaf28a3c4",
- "R1_data/analytical_panel_2020_2023.csv": "219ca2a571c0d8d938c849e7dd6ba2004066fc6761c6687b8f2124adf17a7013",
- "R1_data/faostat_panel_2020_2023_long.csv": "db98cdabdb6a25543af08be726eae8af85503271af40700e4381142d67503baf",
+ "R1_data/DATA_DICTIONARY.md": "0d85f2f32eb7290e6f6a49a8c96a5ab66b6175ee6237d91abdf840d41090fb1d",
+ "R1_data/analytical_panel_2020_2023.csv": "7ee9e8b31fb7ac7737914577cbeb197b0f2df0d28e0a29628fe33a31aafb54ab",
+ "R1_data/faostat_panel_2020_2023_long.csv": "c1230953ada68a5530a12b1eb14ae0289eb420d142c899e8b6a09216c27ded49",
  "R1_results/S_balanced_panel_species_trend.csv": "5eb2b9cef602f9cfc33e8bf78a94c017f39c3ff5ed06c3ce6864fc16dccea02e",
  "R1_results/S_buffalo_unbalanced_vs_balanced.csv": "d77308a5b0d42ef1bb2fbe2f8a3dec1e13383d2c3f8ad7b899bcfbee9a7bf040",
  "R1_results/S_counterfactual_country_milk.csv": "71c067bb201883a6da849244dc8a4b33ec9837282bf1c996000ab2300f613331",
@@ -24,10 +24,10 @@
  "R1_results/T3_tier1_diagnostic.csv": "c81c80a71e6011f8e11e4ddb69f34e2bd45574a4642995a1ce7bfb54f512dc1d",
  "R1_results/T4_shapley_cases.csv": "9b392d7cac4b4210f4a7af5fd90f0e08b9a84c5871848f06db940246a4a39856",
  "R1_results/T5_counterfactual_summary.csv": "be7f676a16668c816fbe67d90e4e16d065e7b0f352c660c924f25f1a07f9d160",
- "R1_results/analytical_panel_complete_case.csv": "361eeec77965ae970d024989d3711ec6bf091bea68cae575ae84e98ad0199afc",
+ "R1_results/analytical_panel_complete_case.csv": "30b31ae254e092b8de7652d03f8bd3ac8de25a5342e584650213d2b9c80a4b68",
  "R1_results/results_summary.json": "f7cd11c43f642f1e135fc1e36c636081e455c6bef6259dc098e6bcfa26dba127",
- "R1_code/01_extract_faostat.py": "960eadec6c041c823ccfbffc2e8f17bb95e5b93c4d1d7b654d7ecbb9d00b454a",
+ "R1_code/01_extract_faostat.py": "dc7546867ddd3c1c37ead19f567225f33b3ce8b25af33b6a977ae26aba93b7df",
  "R1_code/02_analysis.py": "49ceed346911ef15be81653e5f7d65b460a5c046179b2073d1b82252698b3554",
  "R1_code/04_legacy_smoother_summary.py": "f20613de36d9fedae5c56818c90d7cf04e10798783059b1e7c64c206edd21a2b",
- "R1_code/06_export_deposit.py": "9d01213867264ff910fc8578bc6491edcd4039b4b74d49abb6ea6280af7a9f94"
+ "R1_code/06_export_deposit.py": "7856499c1c2dcbfc538d63e381647152b05610916c1d2d51d01db654e37591d9"
 }
