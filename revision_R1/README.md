@@ -21,7 +21,7 @@ python 02_analysis.py
 python 04_legacy_smoother_summary.py
 python 06_export_deposit.py
 ```
-Starting from the deposited `R1_data/faostat_panel_2020_2023_long.csv`, step 02 reproduces every file of `R1_results/` byte for byte.
+Starting from the deposited `R1_data/faostat_panel_2020_2023_long.csv`, step 02 reproduces every file of `R1_results/` (differences below 1e-12 in the bootstrap intervals of `T3_tier1_diagnostic.csv` are possible between linear-algebra libraries).
 
 ## Headline numbers (186 countries, 405 country–species series, 1,620 cells, 99.91 % of 2023 reported milk)
 - Milk-allocated world ratio 2020–2023: −0.64 g CH4 kg⁻¹ = country shares +0.57, species mix −1.43, intensity +0.21 (three-factor); without the Mongolian sheep-milk series +0.48, −0.10, −1.02.

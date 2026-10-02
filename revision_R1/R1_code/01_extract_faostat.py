@@ -12,8 +12,8 @@ Columns
   country, area_code, m49, year, species,
   milk_t            QCL element 5510 Production, raw milk item (t)
   milk_animals      QCL element 5318 Milk Animals (head)  = PAS
-  stock_gle         GLE element 5111 Stocks (head)         = TS used for the allocation factor
-  stock_qcl         QCL element 5111 Stocks (head), species-level stock (cross-check only)
+  stock_qcl         QCL element 5111 Stocks (head)         = TS used for the primary allocation factor (FAO Emissions intensities)
+  stock_gle         GLE element 5111 Stocks (head)         = used for the Tier 1 diagnostic and the boundary sensitivity (delta with GLE stock)
   ch4_enteric_kt    GLE 72254, ch4_manure_kt GLE 72256, ch4_whole_kt = sum (kt CH4)
   flag_*            FAOSTAT flags of each component
   note_*            FAOSTAT notes of each component

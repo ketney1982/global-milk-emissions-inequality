@@ -65,8 +65,8 @@ def coverage_tables(d):
             reasons.append("zero methane against positive milk")
         if g.milk_animals.isna().any() and s != "cattle":
             reasons.append("no milk-animal count")
-        if g.stock_gle.isna().any() and s != "cattle":
-            reasons.append("no stock count")
+        if g.stock_qcl.isna().any() and s != "cattle":
+            reasons.append("no QCL total-stock count")
         rows.append(dict(country=g.country.iloc[0], m49=m, species=s, years_with_milk=len(g),
                          milk_2023_t=g[g.year == Y1].milk_t.sum(), reason="; ".join(sorted(set(reasons)))))
     ex = pd.DataFrame(rows).sort_values(["country", "species"])
@@ -458,17 +458,17 @@ def main():
             ch = (g.ch4_whole_kt * (g.delta if b == "milk" else 1)).sum()
             summary[f"world_ratio_{b}_{y}"] = float(ch / g.milk_t.sum() * G_PER_KG)
 
-    # ---- accounting identity checks on the analytical panel (3 checks x country-years)
+    # ---- accounting identity checks on the analytical panel (2 identities x 2 boundaries x country-years: shares sum to one; mixture identity)
     chk = []
     for b, col in [("whole", "I_whole"), ("milk", "I_milk")]:
         for (m, y), g in cc.groupby(["m49", "year"]):
             w = g.milk_t / g.milk_t.sum()
             nat_direct = (g.ch4_whole_kt * (g.delta if b == "milk" else 1)).sum() / g.milk_t.sum() * G_PER_KG
-            chk.append(dict(boundary=b, m49=m, year=y, share_sum_err=abs(w.sum() - 1), milk_sum_err=abs(g.milk_t.sum() - g.milk_t.sum()) / g.milk_t.sum(),
+            chk.append(dict(boundary=b, m49=m, year=y, share_sum_err=abs(w.sum() - 1),
                             mixture_err=abs((w * g[col]).sum() - nat_direct)))
     chk = pd.DataFrame(chk)
     summary["accounting_checks_country_years"] = int(chk[chk.boundary == "whole"].shape[0])
-    summary["accounting_checks_total"] = int(3 * chk.shape[0])
+    summary["accounting_checks_total"] = int(2 * chk.shape[0])
     summary["accounting_checks_max_share_err"] = float(chk.share_sum_err.max())
     summary["accounting_checks_max_mixture_err_g_per_kg"] = float(chk.mixture_err.max())
     json.dump(summary, open(os.path.join(OUT, "results_summary.json"), "w"), indent=2, default=str)
