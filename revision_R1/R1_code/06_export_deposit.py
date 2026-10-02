@@ -43,11 +43,11 @@ open(os.path.join(D, "DATA_DICTIONARY.md"), "w", encoding="utf-8").write(dd)
 
 
 def sha(path):
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for ch in iter(lambda: f.read(1 << 20), b""):
-            h.update(ch)
-    return h.hexdigest()
+    """SHA-256 of the file; line endings of text files are normalised to LF so that the hash is the same on every platform."""
+    b = open(path, "rb").read()
+    if path.endswith((".py", ".md", ".json", ".csv")):
+        b = b.replace(b"\r\n", b"\n")
+    return hashlib.sha256(b).hexdigest()
 
 
 DEPOSITED_SCRIPTS = ("01_extract_faostat.py", "02_analysis.py", "04_legacy_smoother_summary.py", "06_export_deposit.py")   # data-generating scripts only
