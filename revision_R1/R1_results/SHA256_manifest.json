@@ -22,12 +22,12 @@
  "R1_results/T1_descriptive_by_species_year.csv": "b46a4631de0aef2d8e41bd9a6745548d8e2db8840953ceb55e2d913e34ed9e32",
  "R1_results/T2_regional_summary_2023.csv": "5e3d8eae7b77594c8eb7a93aa1ff222c9beaaeb6417ea82cdf06c62d362536e0",
  "R1_results/T3_tier1_diagnostic.csv": "c81c80a71e6011f8e11e4ddb69f34e2bd45574a4642995a1ce7bfb54f512dc1d",
- "R1_results/T4_shapley_cases.csv": "439096c4edee906b8dba3bdce1586bb10281cff356891a24fa48b7f40ed95381",
+ "R1_results/T4_shapley_cases.csv": "9b392d7cac4b4210f4a7af5fd90f0e08b9a84c5871848f06db940246a4a39856",
  "R1_results/T5_counterfactual_summary.csv": "be7f676a16668c816fbe67d90e4e16d065e7b0f352c660c924f25f1a07f9d160",
- "R1_results/analytical_panel_complete_case.csv": "2bb481f6e857242da191a5eaa01e750ed60b4d3ab23573871bbd5474d03bc59c",
- "R1_results/results_summary.json": "b2044b80ed9626af5cc75269340573d91df3a1b552b9929e6e157fecef4b528f",
+ "R1_results/analytical_panel_complete_case.csv": "361eeec77965ae970d024989d3711ec6bf091bea68cae575ae84e98ad0199afc",
+ "R1_results/results_summary.json": "f7cd11c43f642f1e135fc1e36c636081e455c6bef6259dc098e6bcfa26dba127",
  "R1_code/01_extract_faostat.py": "960eadec6c041c823ccfbffc2e8f17bb95e5b93c4d1d7b654d7ecbb9d00b454a",
- "R1_code/02_analysis.py": "a6c7ee754cfce3611e69cfff4a8be4d89c559673c4a9372a37b623b0d6c85542",
+ "R1_code/02_analysis.py": "49ceed346911ef15be81653e5f7d65b460a5c046179b2073d1b82252698b3554",
  "R1_code/04_legacy_smoother_summary.py": "f20613de36d9fedae5c56818c90d7cf04e10798783059b1e7c64c206edd21a2b",
  "R1_code/06_export_deposit.py": "9d01213867264ff910fc8578bc6491edcd4039b4b74d49abb6ea6280af7a9f94"
 }

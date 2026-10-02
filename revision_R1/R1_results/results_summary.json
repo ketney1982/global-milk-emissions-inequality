@@ -45,5 +45,8 @@
   "accounting_checks_country_years": 744,
   "accounting_checks_total": 2976,
   "accounting_checks_max_share_err": 3.3306690738754696e-16,
-  "accounting_checks_max_mixture_err_g_per_kg": 4.547473508864641e-13
+  "accounting_checks_max_mixture_err_g_per_kg": 4.547473508864641e-13,
+  "cattle_pas_vs_gle_dairy_stock_countries": 185,
+  "cattle_pas_vs_gle_dairy_stock_within5pct_countries_pct": 78.91891891891892,
+  "cattle_pas_vs_gle_dairy_stock_within5pct_milk_share_pct": 92.0877181320263
 }

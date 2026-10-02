@@ -41,6 +41,9 @@ def build_panel():
     d["I_whole"] = d.ch4_whole_kt / d.milk_t * G_PER_KG
     d["I_milk"] = d.I_whole * d.delta
     d["I_milk_gle"] = d.I_whole * d.delta_gle
+    # sensitivity: cattle also scaled by milk animals / GLE dairy stock (capped at 1) instead of delta = 1
+    d["delta_cat"] = np.where(d.species == "cattle", (d.milk_animals / d.stock_gle).clip(upper=1.0).fillna(1.0), d.delta)
+    d["I_milk_cat"] = d.I_whole * d.delta_cat
     ok_cell = (d.milk_t > 0) & (d.ch4_whole_kt > 0) & d.delta.notna() & (d.delta > 0)
     d["valid_cell"] = ok_cell
     g = d.groupby(["m49", "species"]).valid_cell.agg(["sum"])
@@ -80,7 +83,7 @@ def wide(d, boundary, year, drop=None, fpcm=False):
     x = d[(d.year == year) & d.complete].copy()
     if drop is not None:
         x = x[~drop(x)]
-    icol = {"milk": "I_milk", "milk_gle": "I_milk_gle", "whole": "I_whole"}[boundary]
+    icol = {"milk": "I_milk", "milk_gle": "I_milk_gle", "milk_cat": "I_milk_cat", "whole": "I_whole"}[boundary]
     x["I"] = x[icol] / (x.species.map(FPCM_F) if fpcm else 1.0)
     x["Mx"] = x.milk_t * (x.species.map(FPCM_F) if fpcm else 1.0)
     M = x.pivot_table(index="m49", columns="species", values="Mx", aggfunc="sum").reindex(columns=SP).fillna(0.0)
@@ -368,6 +371,8 @@ def main():
     cases_gle["boundary"] = "milk"
     cases.append(cases_gle)
     cases.append({**run_case("milk_gle", "milk-allocated, GLE stock as TS, Mongolia sheep excluded", drop=lambda x: (x.m49 == mon) & (x.species == "sheep"))[1], "boundary": "milk"})
+    cases.append({**run_case("milk_cat", "milk-allocated, cattle delta = min(1, PAS / GLE dairy stock)")[1], "boundary": "milk"})
+    cases.append({**run_case("milk_cat", "milk-allocated, cattle delta = min(1, PAS / GLE dairy stock), Mongolia sheep excluded", drop=lambda x: (x.m49 == mon) & (x.species == "sheep"))[1], "boundary": "milk"})
     # functional-unit sensitivity (FPCM) on the milk-allocated boundary
     cases.append(run_case("milk", "FPCM functional unit (milk-allocated)", fpcm=True)[1])
     cases.append(run_case("milk", "FPCM functional unit, Mongolia sheep excluded", fpcm=True,
@@ -471,6 +476,12 @@ def main():
     summary["accounting_checks_total"] = int(2 * chk.shape[0])
     summary["accounting_checks_max_share_err"] = float(chk.share_sum_err.max())
     summary["accounting_checks_max_mixture_err_g_per_kg"] = float(chk.mixture_err.max())
+    c23 = P[(P.species == "cattle") & (P.year == Y1) & P.complete]
+    ratio = c23.milk_animals / c23.stock_gle
+    w5 = ratio.between(0.95, 1.05)
+    summary["cattle_pas_vs_gle_dairy_stock_countries"] = int(ratio.notna().sum())
+    summary["cattle_pas_vs_gle_dairy_stock_within5pct_countries_pct"] = float(100 * w5.sum() / ratio.notna().sum())
+    summary["cattle_pas_vs_gle_dairy_stock_within5pct_milk_share_pct"] = float(100 * c23.milk_t[w5].sum() / c23.milk_t[ratio.notna()].sum())
     json.dump(summary, open(os.path.join(OUT, "results_summary.json"), "w"), indent=2, default=str)
     print(json.dumps(summary, indent=1, default=str)[:3000])
     pd.set_option("display.width", 250); pd.set_option("display.max_columns", 40)
