@@ -1,0 +1,49 @@
+{
+  "n_entities_raw": 187,
+  "n_countries_panel": 186,
+  "n_country_species": 405,
+  "n_cells": 1620,
+  "milk_share_retained_2023_pct": 99.907909944668,
+  "milk_total_reported_2023_Mt": 971.10582329,
+  "milk_total_panel_2023_Mt": 970.2115314,
+  "ch4_panel_2023_kt_whole": 44918.280699999996,
+  "ch4_panel_2023_kt_milk_allocated": 28853.319034832013,
+  "excluded_country_species_by_species": {
+    "buffalo": 7,
+    "cattle": 1,
+    "goats": 9,
+    "sheep": 8
+  },
+  "delta_capped_cells": 0,
+  "ef_within_series_cv_median_pct": 0.00013961949023140886,
+  "ef_within_series_cv_p90_pct": 0.009700608472675837,
+  "denominator_collapse_cells": [
+    {
+      "country": "Mongolia",
+      "species": "sheep"
+    }
+  ],
+  "closed_form_vs_lp_max_abs_diff_objective": 4.547473508864641e-13,
+  "n_multispecies_countries": 107,
+  "cattle_lowest_whole": 89,
+  "cattle_lowest_milk": 53,
+  "lowest_species_milk_counts": {
+    "cattle": 53,
+    "goats": 44,
+    "buffalo": 5,
+    "camel": 3,
+    "sheep": 2
+  },
+  "world_ratio_whole_2020": 47.37579072503501,
+  "world_ratio_whole_2021": 46.82434894673771,
+  "world_ratio_whole_2022": 46.71564833651241,
+  "world_ratio_whole_2023": 46.297409633117454,
+  "world_ratio_milk_2020": 30.380634833721775,
+  "world_ratio_milk_2021": 30.00594768695256,
+  "world_ratio_milk_2022": 29.887106310448125,
+  "world_ratio_milk_2023": 29.739204391022984,
+  "accounting_checks_country_years": 744,
+  "accounting_checks_total": 4464,
+  "accounting_checks_max_share_err": 3.3306690738754696e-16,
+  "accounting_checks_max_mixture_err_g_per_kg": 4.547473508864641e-13
+}

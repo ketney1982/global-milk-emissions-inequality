@@ -21,6 +21,12 @@
 **Affiliation:** „Lucian Blaga" University of Sibiu, Department of Agricultural Science and Food Engineering, Dr. I. Rațiu Street, no. 7-9, 550012 Sibiu, Romania
 **Contact:** ketney.otto@ulbsibiu.ro | [ORCID 0000-0003-1638-1154](https://orcid.org/0000-0003-1638-1154)
 
+## Revision R1 (v4.0.0-R1)
+
+The analysis of revision 1 (186 countries, FAOSTAT re-extraction, country-specific milk allocation, observed intensities) is in
+[`revision_R1/`](revision_R1/README.md), with the extraction and analysis scripts, the analytical panel and all result tables.
+The sections below describe the earlier pipeline (v3.x).
+
 ## Overview
 
 This repository implements a reproducible research pipeline to:

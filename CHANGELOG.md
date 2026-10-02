@@ -1,5 +1,23 @@
 # Changelog
 
+## v4.0.0-R1
+
+Revision 1 of the manuscript submitted to *Animals*. The R1 analysis is a new pipeline in `revision_R1/`; the
+earlier directories and tags are unchanged.
+
+### Added
+
+- `revision_R1/` with the FAOSTAT extraction script (`01_extract_faostat.py`), the analysis script (`02_analysis.py`),
+  the summary of the superseded hierarchical smoother, the export script, the analytical panel with FAOSTAT flags and
+  notes, a data dictionary, all result tables and a SHA-256 manifest. Figure and document-building scripts are not deposited.
+
+### Changed in the analysis (relative to v3.1.0-R4)
+
+- 186 countries from a re-extraction of the public FAOSTAT bulk files (five entities previously absent are recovered).
+- Country-specific allocation of non-bovine herd methane to milk with milk animals / total stock as primary comparison.
+- Observed intensities replace the posterior smoother; the mean–CVaR layer is replaced by a closed-form bounded counterfactual.
+- Influence analyses (leave-one-country-out, top-5/10, Mongolian sheep-milk series) and an exact three-factor decomposition of the world ratio.
+
 ## v3.1.0-R4
 
 Revision accompanying the submission to *Animals* (Section: Animal System and Management).

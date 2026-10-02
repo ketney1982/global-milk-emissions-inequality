@@ -1,0 +1,26 @@
+country,m49,species,years_with_milk,milk_2023_t,reason
+Belgium,56,goats,4,57000.0,no GLE methane for 3 year(s); no milk-animal count; no stock count
+Belgium,56,sheep,1,370.0,milk series incomplete in 2020-2023; no GLE methane for 1 year(s); no milk-animal count; no stock count
+Cyprus,196,goats,4,37280.0,no GLE methane for 1 year(s); no stock count
+Cyprus,196,sheep,4,49620.0,no GLE methane for 1 year(s); no stock count
+Czechia,203,goats,1,0.0,milk series incomplete in 2020-2023; no milk-animal count
+Czechia,203,sheep,1,0.0,milk series incomplete in 2020-2023; no milk-animal count
+Estonia,233,goats,4,500.0,no milk-animal count
+Germany,276,buffalo,1,0.0,milk series incomplete in 2020-2023; no milk-animal count
+Germany,276,goats,1,0.0,milk series incomplete in 2020-2023; no milk-animal count
+Germany,276,sheep,1,0.0,milk series incomplete in 2020-2023
+Greece,300,buffalo,1,0.0,milk series incomplete in 2020-2023; no milk-animal count
+Italy,380,buffalo,4,254280.0,no milk-animal count
+Luxembourg,442,goats,4,2200.0,no GLE methane for 3 year(s); no milk-animal count; no stock count
+Luxembourg,442,sheep,4,70.0,no GLE methane for 1 year(s); no milk-animal count; no stock count
+Mongolia,496,buffalo,4,14073.89,no GLE methane for 4 year(s); no stock count
+Netherlands (Kingdom of the),528,buffalo,4,4490.0,no GLE methane for 2 year(s); no milk-animal count; no stock count; zero methane against positive milk
+Palestine,275,cattle,3,0.0,milk series incomplete in 2020-2023
+Palestine,275,goats,3,0.0,milk series incomplete in 2020-2023
+Palestine,275,sheep,3,0.0,milk series incomplete in 2020-2023
+Poland,616,goats,4,9200.0,no milk-animal count
+Poland,616,sheep,4,440.0,no milk-animal count
+Romania,642,buffalo,4,19300.0,no milk-animal count
+Slovakia,703,goats,4,250.0,no GLE methane for 3 year(s); no milk-animal count; no stock count
+Slovakia,703,sheep,4,12210.0,no milk-animal count
+Venezuela (Bolivarian Republic of),862,buffalo,4,433008.0,no GLE methane for 4 year(s); no stock count
