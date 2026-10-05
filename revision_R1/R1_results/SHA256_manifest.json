@@ -14,6 +14,8 @@
  "R1_results/S_leave_one_country_out_whole.csv": "64ae2b0e7489ac892492c06c86d56f43a119192a81ee8fdd7b2345b2ec4e7c34",
  "R1_results/S_legacy_smoother_summary.csv": "69df36fba63e630216f2ad9aed56d0751005cbd2b6a094df81a13b396df2122b",
  "R1_results/S_legacy_smoother_top20.csv": "59cb46920b8d0cf15d0ffe309d9fb22d5178ee17bf80dffbe1aa423be90a2d2b",
+ "R1_results/S_longer_window_decomposition.csv": "7d4e04c2140739e76ac7556b9953c6631739faa47cdce3212d6274e4ea910302",
+ "R1_results/S_longer_window_world_ratio.csv": "bc162e8006794085134badb7ad0bca46bf67ce40961e4e61f2e421db1edc5062",
  "R1_results/S_low_end_countries_2023.csv": "38a59ad8b9d7f18452229448a0cb091ddddbdfbf4cfdb0050a4c5741f6f282d3",
  "R1_results/S_mongolia_audit.csv": "0c433244d19ea357cf3b60c9920b4c573b3968fd1bb223101de1070a2e2db369",
  "R1_results/S_shapley_country_milk.csv": "8e1daed2949a5f87cb65ee24d10d1a9a1718571dec50b07f56e92c83cb8d8602",
@@ -29,5 +31,6 @@
  "R1_code/01_extract_faostat.py": "dc7546867ddd3c1c37ead19f567225f33b3ce8b25af33b6a977ae26aba93b7df",
  "R1_code/02_analysis.py": "49ceed346911ef15be81653e5f7d65b460a5c046179b2073d1b82252698b3554",
  "R1_code/04_legacy_smoother_summary.py": "f20613de36d9fedae5c56818c90d7cf04e10798783059b1e7c64c206edd21a2b",
- "R1_code/06_export_deposit.py": "7856499c1c2dcbfc538d63e381647152b05610916c1d2d51d01db654e37591d9"
+ "R1_code/06_export_deposit.py": "6bffbb1df6dc4cf98f2f9ef1b2cc8c5926a9f067c2532a7ad6249be91c4a6c72",
+ "R1_code/12_longer_window.py": "b7bb82eb2b407a9267039d38d79faa3b67dcdc146115a414d79ca111931a57e9"
 }

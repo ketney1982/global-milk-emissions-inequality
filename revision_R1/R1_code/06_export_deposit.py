@@ -51,7 +51,7 @@ def sha(path):
     return hashlib.sha256(b).hexdigest()
 
 
-DEPOSITED_SCRIPTS = ("01_extract_faostat.py", "02_analysis.py", "04_legacy_smoother_summary.py", "06_export_deposit.py")   # data-generating scripts only
+DEPOSITED_SCRIPTS = ("01_extract_faostat.py", "02_analysis.py", "04_legacy_smoother_summary.py", "06_export_deposit.py", "12_longer_window.py")   # data-generating scripts only
 man = {}
 for folder in (D, R, os.path.join(HERE)):
     for fn in sorted(os.listdir(folder)):
